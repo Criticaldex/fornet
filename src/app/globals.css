@@ -3,25 +3,405 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+   --foreground: #ddd;
+   --background-start: #222;
+   --background-end: #222;
+   --background-color: #222;
+   --background-color-transparent: #222222bb;
+   --text-color: #ddd;
+   --text-color-2: #dddddd88;
+   --bg-nav: #161616;
+   --bg-light: #424242;
+   --bg-dark: #333;
+   --red-1: #f22613;
+   --red: #ff4f68;
+   --darkRed: #7f1d1d;
+   --green: #32c87d;
+   --orange-1: #f29513;
+   --orange: #f8b068;
+   --darkBlue: #0468BF;
+   --darkBlue2: #023A6B99;
+   --lightBlue: #0dcaf0;
+   --yellow: #eab107;
+   --white: #fff;
+   --black: #000;
+   --table-size-text: 14px;
+   --pestanaHover: #1f96ff1a;
+   --bg-nav-global: #161616;
+   --textNav: #ddd;
+   --spacerNav: #424242;
+   --hiper: #B1B163;
+   --hiper2: #B1B16350;
+   --seleccio: #9DA2EE;
+   --seleccio2: #9DA2EE50;
+   --universals: #B05AAA;
+   --universals2: #B05AAA50;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+   :root {
+      --foreground: #ddd;
+      --background-start: #222;
+      --background-end: #222;
+      --background-color: #222;
+      --bg-nav: #161616;
+      --text-color: #ddd;
+      --text-color-2: #bbb;
+      --bg-light: #424242;
+      --bg-dark: #333;
+      --contrario: #f2f2f2;
+      --pestanaDark: #838383;
+      --pestanaLight: #555555e6;
+   }
+}
+
+@media (prefers-color-scheme: light) {
+   :root {
+      --foreground: #222;
+      --background-start: #ddd;
+      --background-end: #ddd;
+      --background-color: #ddd;
+      --bg-nav: #eee;
+      --text-color: #222;
+      --text-color-2: #33333388;
+      --bg-light: #fff;
+      --bg-dark: #ccc;
+      --contrario: #262626;
+      --pestanaDark: #262626e6;
+      --pestanaLight: #838383;
+   }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+   color: var(--foreground);
+   background: linear-gradient(to bottom,
+         transparent,
+         var(--background-end)) var(--background-start);
+   padding-left: 4rem;
+}
+
+/* ---------------- HIGHCHARTS CONFIG ---------------- */
+.highcharts-background {
+   fill: var(--bg-light);
+}
+
+.highcharts-container text {
+   fill: var(--text-color) !important;
+}
+
+.highcharts-subtitle,
+.highcharts-credits,
+.highcharts-axis-title {
+   fill-opacity: 0.7;
+}
+
+.highcharts-title {
+   text-transform: capitalize;
+}
+
+.highcharts-axis-line,
+.highcharts-grid-line {
+   stroke: var(--text-color);
+   stroke-opacity: 0.2;
+}
+
+.highcharts-tooltip-box {
+   fill: var(--background-color);
+}
+
+.highcharts-column-series rect.highcharts-point {
+   stroke: var(--background-color);
+}
+
+/* ----------------------------------------------- */
+
+#scrollDiv::-webkit-scrollbar, .barraHori>div::-webkit-scrollbar {
+   width: 7px;
+}
+
+#scrollDiv::-webkit-scrollbar-track, .barraHori>div::-webkit-scrollbar-track {
+   border-radius: 10px;
+}
+
+#scrollDiv::-webkit-scrollbar-thumb, .barraHori>div::-webkit-scrollbar-thumb {
+   background: var(--foreground);
+   border-radius: 5px;
+}
+
+.rdt_TableCol_Sortable>div {
+   white-space: pre-wrap;
+}
+
+#tabla_contratos>div>div {
+   display: block !important;
+}
+
+/* LOADING */
+
+.pl {
+   display: block;
+   width: 6.25em;
+   height: 6.25em;
+}
+
+.pl__ring,
+.pl__ball {
+   animation: ring 2s ease-out infinite;
+}
+
+.pl__ball {
+   animation-name: ball;
+}
+
+
+/* Animation */
+@keyframes ring {
+   from {
+      stroke-dasharray: 0 257 0 0 1 0 0 258;
+   }
+
+   25% {
+      stroke-dasharray: 0 0 0 0 257 0 258 0;
+   }
+
+   50%,
+   to {
+      stroke-dasharray: 0 0 0 0 0 515 0 0;
+   }
+}
+
+@keyframes ball {
+
+   from,
+   50% {
+      animation-timing-function: ease-in;
+      stroke-dashoffset: 1;
+   }
+
+   64% {
+      animation-timing-function: ease-in;
+      stroke-dashoffset: -109;
+   }
+
+   78% {
+      animation-timing-function: ease-in;
+      stroke-dashoffset: -145;
+   }
+
+   92% {
+      animation-timing-function: ease-in;
+      stroke-dashoffset: -157;
+   }
+
+   57%,
+   71%,
+   85%,
+   99%,
+   to {
+      animation-timing-function: ease-out;
+      stroke-dashoffset: -163;
+   }
+}
+
+
+.tablaObjetivos>div>div {
+   display: block !important;
+}
+
+.tablaObjetivos>div {
+   overflow-y: inherit !important;
+   overflow-x: inherit !important;
+}
+
+.tablaObjetivos>div>div>div>div>div>div:first-child {
+   position: sticky;
+   left: 0;
+   z-index: 1;
+   background: var(--bg-light);
+   border-right: solid 1px var(--bg-dark);
+   margin-right: 10px;
+}
+
+.tags {
+   display: inline;
+   position: relative;
+}
+
+.tags:hover:after {
+   background: #333;
+   background: rgba(0, 0, 0, .8);
+   border-radius: 5px;
+   color: #fff;
+   content: attr(data-gloss);
+   top: -30px;
+   right: 0;
+   left: 50%;
+   transform: translateX(-50%);
+   margin: auto;
+   padding: 5px 3px;
+   position: absolute;
+   z-index: 99999999998;
+   width: fit-content;
+   white-space: nowrap;
+   text-align: center;
+}
+
+.tags:hover:before {
+   border: solid;
+   border-color: rgba(0, 0, 0, .8) transparent;
+   border-width: 6px 6px 0 6px;
+   content: "";
+   top: -5px;
+   left: 45%;
+   position: absolute;
+   z-index: 99;
+}
+
+/* FORM  */
+
+#validation-error::before {
+   display: inline;
+   content: "⚠ ";
+}
+
+/* REACT CONFIRM ALERT */
+
+body.react-confirm-alert-body-element {
+   overflow: hidden;
+}
+
+.react-confirm-alert-blur {
+   filter: url(#gaussian-blur);
+   filter: blur(2px);
+   -webkit-filter: blur(2px);
+}
+
+.react-confirm-alert-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   z-index: 99;
+   background: var(--background-color-transparent);
+   display: -webkit-flex;
+   display: -moz-flex;
+   display: -ms-flex;
+   display: -o-flex;
+   display: flex;
+   justify-content: center;
+   -ms-align-items: center;
+   align-items: center;
+   opacity: 0;
+   -webkit-animation: react-confirm-alert-fadeIn 0.5s 0.2s forwards;
+   -moz-animation: react-confirm-alert-fadeIn 0.5s 0.2s forwards;
+   -o-animation: react-confirm-alert-fadeIn 0.5s 0.2s forwards;
+   animation: react-confirm-alert-fadeIn 0.5s 0.2s forwards;
+}
+
+.react-confirm-alert-body {
+   font-family: Arial, Helvetica, sans-serif;
+   width: 400px;
+   padding: 30px;
+   text-align: left;
+   background: var(--bg-light);
+   opacity: 1;
+   border-radius: 10px;
+   box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
+   color: var(--text-color);
+}
+
+.react-confirm-alert-svg {
+   position: absolute;
+   top: 0;
+   left: 0;
+}
+
+.react-confirm-alert-body>h1 {
+   margin-top: 0;
+}
+
+.react-confirm-alert-body>h3 {
+   margin: 0;
+   font-size: 16px;
+}
+
+.react-confirm-alert-button-group {
+   display: -webkit-flex;
+   display: -moz-flex;
+   display: -ms-flex;
+   display: -o-flex;
+   display: flex;
+   justify-content: flex-start;
+   margin-top: 20px;
+}
+
+.react-confirm-alert-button-group>button {
+   outline: none;
+   background: var(--bg-dark);
+   border: 1px solid;
+   border-color: var(--darkBlue);
+   display: inline-block;
+   padding: 6px 18px;
+   color: --var(--bg-dark);
+   margin-right: 10px;
+   border-radius: 5px;
+   font-size: 12px;
+   cursor: pointer;
+}
+
+.react-confirm-alert-button-group>button:hover {
+   background: var(--bg-light);
+   /* Green */
+}
+
+.react-confirm-alert-button-group>button:nth-child(1) {
+   background: var(--bg-dark);
+   border-color: var(--red);
+}
+
+.react-confirm-alert-button-group>button:nth-child(1):hover {
+   background: var(--red);
+}
+
+
+
+@-webkit-keyframes react-confirm-alert-fadeIn {
+   from {
+      opacity: 0;
+   }
+
+   to {
+      opacity: 1;
+   }
+}
+
+@-moz-keyframes react-confirm-alert-fadeIn {
+   from {
+      opacity: 0;
+   }
+
+   to {
+      opacity: 1;
+   }
+}
+
+@-o-keyframes react-confirm-alert-fadeIn {
+   from {
+      opacity: 0;
+   }
+
+   to {
+      opacity: 1;
+   }
+}
+
+@keyframes react-confirm-alert-fadeIn {
+   from {
+      opacity: 0;
+   }
+
+   to {
+      opacity: 1;
+   }
 }
