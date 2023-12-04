@@ -4,7 +4,6 @@ import GetNav from './routing'
 import { NextAuthProvider } from "./providers";
 import { getSession } from "@/services/session"
 
-
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
