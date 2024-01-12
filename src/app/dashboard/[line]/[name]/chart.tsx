@@ -10,7 +10,7 @@ if (typeof Highcharts === "object") {
    HighchartsExportData(Highcharts)
 }
 
-export function Eqa({ name, data, objectius }: any) {
+export function Chart({ name, data, objectius }: any) {
    let max = 0;
    let min = 1000;
    let plotLines = [];

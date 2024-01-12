@@ -26,8 +26,10 @@ const getValues = async (filter: any, db?: string) => {
       }).then(res => res.json());
 }
 
-export const getChartValues = async (year: string, center: string) => {
-   const filter = { "any": year, "centre": center };
+export const getChartValues = async (line: string, name: string) => {
+   const filter = {
+      "line": line, "name": name
+   };
    const data = await getValues(filter);
 
    return data.map((i: any) => {
