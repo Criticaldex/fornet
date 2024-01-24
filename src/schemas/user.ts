@@ -6,7 +6,7 @@ export interface UserIface {
    email: string,
    password: string,
    hash: string,
-   license: {
+   license?: {
       start: string,
       end: string,
    },
