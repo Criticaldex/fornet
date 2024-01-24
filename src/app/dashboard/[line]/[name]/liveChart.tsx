@@ -18,7 +18,7 @@ export function LiveChart({ title, line, name }: any) {
          type: 'spline',
       },
       data: {
-         rowsURL: `http://localhost:3000/api/liveValues/${line}/${name}`,
+         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}`,
          enablePolling: true,
          dataRefreshRate: 1
       },
