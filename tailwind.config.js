@@ -41,6 +41,9 @@ module.exports = {
             seleccio2: 'var(--seleccio2)',
             universals: 'var(--universals)',
             universals2: 'var(--universals2)'
+         },
+         fontFamily: {
+            nunito: ['Nunito', 'sans-serif']
          }
       },
    },
