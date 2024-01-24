@@ -1,6 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import GetNav from './routing'
 import { NextAuthProvider } from "./providers";
 import { getSession } from "@/services/session"
@@ -24,6 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                {children}
             </NextAuthProvider>
             <Analytics />
+            <SpeedInsights />
          </body>
       </html>
    )
