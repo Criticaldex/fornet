@@ -18,13 +18,25 @@ export const chartOptions = {
    credits: {
       enabled: false
    },
+   data: {
+      rowsURL: 'https://demo-live-data.highcharts.com/time-rows.json',
+      enablePolling: true,
+      dataRefreshRate: 1
+   },
    title: {
       text: null
    },
    series: null,
    xAxis: {
-      zoomEnabled: false,
-      categories: ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'],
+      type: 'datetime',
+      dateTimeLabelFormats: {
+         // don't display the year
+         month: '%e. %b',
+         year: '%b'
+      },
+      title: {
+         text: 'Date'
+      }
    },
    yAxis: {
       title: {
@@ -73,6 +85,14 @@ export const chartOptions = {
       series: {
          borderWidth: 0,
          maxPointWidth: 100,
+         // marker: {
+         //    symbol: 'circle',
+         //    fillColor: '#FFFFFF',
+         //    enabled: true,
+         //    radius: 0.5,
+         //    lineWidth: 1,
+         //    lineColor: null
+         // }
       }
    }
 };

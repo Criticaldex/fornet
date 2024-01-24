@@ -1,14 +1,14 @@
-import { getChartValues } from "@/services/values";
-import { Chart } from "./chart";
+import { getChartValues, splitbyTimeInterval } from "@/services/values";
+import { LiveChart } from "./liveChart";
 
 export default async function Dashboard({ params }: any) {
    const { line, name } = params;
-   const values = await getChartValues(line, name);
 
    return (
-      <Chart
-         name={'TOTAL EQA'}
-         data={values}
+      <LiveChart
+         title={'productividad'}
+         line={line}
+         name={name}
       />
    )
 }
