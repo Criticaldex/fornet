@@ -1,7 +1,9 @@
 import { getLines, getNames } from "@/services/values";
+import { getSession } from "@/services/session";
 import { GetNames, GetLines } from "./routing";
 
 export default async function ContractsLayout({ children }: any) {
+   const session = await getSession();
    const lines = await getLines();
    const names = await getNames();
    return (
@@ -17,6 +19,8 @@ export default async function ContractsLayout({ children }: any) {
                />
             </div>
             <div className="bg-light text-right flex justify-end items-center">
+               <h1 className="right-0 mx-5 font-semibold text-lg">DB: {session?.user.db}</h1>
+               <h1 className="right-0 mx-5 font-semibold text-lg">Collection: values</h1>
                <h1 className="right-0 w-auto mx-10 font-semibold text-2xl italic">Quadre Comandament</h1>
             </div>
          </div>
