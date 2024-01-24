@@ -26,14 +26,41 @@ const getValues = async (filter: any, db?: string) => {
       }).then(res => res.json());
 }
 
-export const getChartValues = async (year: string, center: string) => {
-   const filter = { "any": year, "centre": center };
-   const data = await getValues(filter);
+export const getChartValues = async (line: string, name: string) => {
+   const filter = {
+      "line": line, "name": name
+   };
+   const data: [] = await getValues(filter);
+   const values = [{
+      name: 'Productividad',
+      data: [] as any
+   }];
 
-   return data.map((i: any) => {
-      return {
-         name: i.identificador,
-         data: i.resultat
-      }
+   data.forEach((i: any) => {
+      let val = [i.timestamp, i.value];
+      values[0].data.push(val);
    })
+   return values;
+}
+
+export const splitbyTimeInterval = async (data: any, interval: number) => {
+   let tornSegons = 8 * 60 * 60;
+   let xAxis = [];
+   let now = new Date();
+   let hoursNow = now.getHours();
+   let minutesNow = now.getMinutes();
+   for (let i = 0; i < (tornSegons / interval); i++) {
+      let timestamp = new Date();
+      const element = '';
+   }
+   const values = [{
+      name: 'Productividad',
+      data: [] as any
+   }];
+
+   data.forEach((i: any) => {
+      let val = [i.timestamp, i.value];
+      values[0].data.push(val);
+   })
+   return values;
 }

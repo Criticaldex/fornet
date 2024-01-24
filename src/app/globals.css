@@ -74,9 +74,7 @@
 
 body {
    color: var(--foreground);
-   background: linear-gradient(to bottom,
-         transparent,
-         var(--background-end)) var(--background-start);
+   background: var(--background-color);
    padding-left: 4rem;
 }
 
@@ -115,15 +113,18 @@ body {
 
 /* ----------------------------------------------- */
 
-#scrollDiv::-webkit-scrollbar, .barraHori>div::-webkit-scrollbar {
+#scrollDiv::-webkit-scrollbar,
+.barraHori>div::-webkit-scrollbar {
    width: 7px;
 }
 
-#scrollDiv::-webkit-scrollbar-track, .barraHori>div::-webkit-scrollbar-track {
+#scrollDiv::-webkit-scrollbar-track,
+.barraHori>div::-webkit-scrollbar-track {
    border-radius: 10px;
 }
 
-#scrollDiv::-webkit-scrollbar-thumb, .barraHori>div::-webkit-scrollbar-thumb {
+#scrollDiv::-webkit-scrollbar-thumb,
+.barraHori>div::-webkit-scrollbar-thumb {
    background: var(--foreground);
    border-radius: 5px;
 }
