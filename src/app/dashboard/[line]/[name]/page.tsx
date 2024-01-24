@@ -1,4 +1,3 @@
-import { getChartValues, splitbyTimeInterval } from "@/services/values";
 import { LiveChart } from "./liveChart";
 
 export default async function Dashboard({ params }: any) {
