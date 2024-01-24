@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
-
 :root {
    --blueDark: #2a356b;
    --blueLight: #475a9c;
@@ -24,11 +22,6 @@
       --background-secondary: hsla(0, 0%, 100%, 0.7);
       --input-bg: #dfdfdf;
    }
-}
-
-html {
-   font-family: 'Nunito', sans-serif;
-   font-size: 1rem;
 }
 
 body {
