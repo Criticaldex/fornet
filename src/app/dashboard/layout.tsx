@@ -1,6 +1,3 @@
-import { GetLinksYears, GetLinksCenters, GetSectionButtons } from "./routing";
-import { getValues } from "@/services/values";
-
 export default async function ContractsLayout({ children }: any) {
    return (
       <div>
