@@ -5,7 +5,6 @@ import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsData from 'highcharts/modules/data'
 import HighchartsReact from 'highcharts-react-official'
 import { chartOptions } from '@/components/chart.components'
-import { useState } from 'react'
 
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
@@ -33,7 +32,8 @@ export function LiveChart({ title, line, name }: any) {
          enabled: false
       },
       yAxis: {
-         title: null
+         title: null,
+         min: 0
       }
    }
 
