@@ -6,6 +6,7 @@ import HighchartsData from 'highcharts/modules/data'
 import HighchartsReact from 'highcharts-react-official'
 import { chartOptions } from '@/components/chart.components'
 
+
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
    HighchartsExportData(Highcharts)
@@ -14,6 +15,7 @@ if (typeof Highcharts === "object") {
 
 export function LiveChart({ title, line, name }: any) {
    const options = {
+      ...chartOptions,
       chart: {
          type: 'spline',
       },

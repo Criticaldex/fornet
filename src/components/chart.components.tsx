@@ -15,33 +15,20 @@ export const chartOptions = {
          color: '#666666'
       },
    },
-   credits: {
-      enabled: false
-   },
    data: {
       rowsURL: 'https://demo-live-data.highcharts.com/time-rows.json',
       enablePolling: true,
       dataRefreshRate: 1
    },
-   title: {
-      text: null
-   },
-   series: null,
    xAxis: {
       type: 'datetime',
       dateTimeLabelFormats: {
          // don't display the year
          month: '%e. %b',
          year: '%b'
-      },
-      title: {
-         text: 'Date'
       }
    },
    yAxis: {
-      title: {
-         enabled: false
-      },
       max: null,
       min: null,
       plotLines: [{
