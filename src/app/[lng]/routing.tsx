@@ -8,9 +8,9 @@ import { RiMedicineBottleLine } from "react-icons/ri"
 
 import { usePathname } from "next/navigation"
 import { LogoutButton, ProfileButton } from "@/components/loginbuttons.component";
-import { NextAuthProvider } from "@/app/providers";
+import { NextAuthProvider } from "@/app/[lng]/providers";
 
-export default function GetNav({ session }: any) {
+export default function GetNav({ params: { lng } }: any, { session }: any) {
 
    const pathname = usePathname();
 
@@ -20,7 +20,7 @@ export default function GetNav({ session }: any) {
       {
          label: 'Dashboard',
          icon: TbLayoutDashboard,
-         route: '/dashboard'
+         route: `/${lng}/dashboard`
       },
       {
          label: 'Professionals',

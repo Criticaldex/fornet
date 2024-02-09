@@ -38,10 +38,10 @@
       "**/*.ts",
       "**/*.tsx",
       ".next/types/**/*.ts",
-      "src/app/dashboard/[centro]/[year]/[center]/chart.ts",
+      "src/app/[lng]/dashboard/[centro]/[year]/[center]/chart.ts",
       "src/app/contracts/[year]/table.tsx",
       "src/lib/dbConnect.ts",
-      "src/app/api/contracts",
+      "src/app/[lng]/api/contracts",
       "build/types/**/*.ts"
    ],
    "exclude": [
