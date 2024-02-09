@@ -6,12 +6,20 @@ export interface UserIface {
    email: string,
    password: string,
    hash: string,
-   license: {
+   license?: {
       start: string,
       end: string,
    },
    db: string,
    role: string,
+   config: {
+      dashboard: {
+         general: [string]
+         cpr: [string]
+         nocpr: [string]
+      },
+      professionals: [string]
+   }
 }
 
 const UserSchema = new mongoose.Schema({

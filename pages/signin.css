@@ -1,0 +1,133 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+
+:root {
+   --blueDark: #2a356b;
+   --blueLight: #475a9c;
+   --border: #c7c7c7;
+   --error: #ff4f68;
+   --button: #0468BF;
+}
+
+@media (prefers-color-scheme: dark) {
+   :root {
+      --foreground: #ddd;
+      --background-primary: #222;
+      --background-secondary: #00000099;
+      --input-bg: #4a4a4a;
+   }
+}
+
+@media (prefers-color-scheme: light) {
+   :root {
+      --foreground: #222;
+      --background-primary: #ddd;
+      --background-secondary: hsla(0, 0%, 100%, 0.7);
+      --input-bg: #dfdfdf;
+   }
+}
+
+html {
+   font-family: 'Nunito', sans-serif;
+   font-size: 1rem;
+}
+
+body {
+   justify-content: center;
+   align-items: center;
+   margin: 0;
+   background-color: var(--background-primary);
+   color: var(--foreground);
+}
+
+.bg-image {
+   position: absolute;
+   width: 100%;
+   height: 300px;
+   background: linear-gradient(to top,
+         transparent,
+         var(--blueDark)) var(--blueLight);
+   top: 0;
+   left: 0;
+   z-index: -1;
+}
+
+main {
+   width: 23%;
+   margin: auto;
+}
+
+.title {
+   display: grid;
+   grid-template-columns: max-content max-content;
+   align-items: center;
+   column-gap: 1rem;
+   justify-content: center;
+}
+
+.title h1 {
+   text-align: center;
+   font-size: 60px;
+   font-weight: bold;
+   color: white;
+}
+
+.icono {
+   color: white;
+}
+
+section {
+   margin-top: 30px;
+   padding: 30px 50px 70px;
+   background: var(--background-secondary);
+   backdrop-filter: blur(40px);
+   vertical-align: middle;
+   text-align: center;
+   border: solid 1px var(--border);
+   border-radius: 5px;
+}
+
+section h1 {
+   margin-bottom: 50px;
+}
+
+input,
+button {
+   margin-bottom: 20px;
+   width: 80%;
+   border-radius: 7px;
+   border: none;
+}
+
+input {
+   background-color: var(--input-bg);
+   padding: 10px 8px;
+   color: var(--foreground);
+}
+
+input::placeholder {
+   color: gray;
+}
+
+button {
+   margin: auto;
+   padding: 10px;
+   background-color: var(--button);
+   color: white;
+   cursor: pointer;
+}
+
+#errorLogin {
+   position: relative;
+   margin-top: 30px;
+   padding: 15px;
+   background-color: var(--error);
+   vertical-align: middle;
+   border-radius: 5px;
+}
+
+
+@media screen and (max-width: 768px) {
+   main {
+      width: 80% !important;
+   }
+}
