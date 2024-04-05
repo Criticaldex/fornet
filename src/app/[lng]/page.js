@@ -13,7 +13,7 @@ export default async function Home({ params: { lng } }) {
                {t('to-second-page')}
             </Link>
          </main>
-         <Footer lng={lng} />
+         <Footer lng={lng} />0808
       </>
    )
 }
