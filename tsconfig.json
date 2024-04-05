@@ -34,7 +34,10 @@
     "src/lib/dbConnect.ts",
     "src/app/api/contracts",
     "build/types/**/*.ts",
-    "middleware.js"
+    "middleware.js",
+    "src/components/footer.components.js",
+    "src/app/[lng]/page.js",
+    "src/app/layout.js"
   ],
   "exclude": ["node_modules"]
 }
