@@ -1,25 +1,20 @@
 'use client'
 import Link from "next/link"
 import { usePathname, useRouter } from 'next/navigation';
+import { useState } from "react";
 
-export function GetLines({ lines }: any) {
-   const pathname = usePathname();
-   const router = useRouter();
-   const pathArray: string[] = (pathname) ? pathname.split('/') : [];
-   const line = (pathArray[2]) ? pathArray[2] : process.env.DASHBOARD_DEFAULT_LINE;
-   const name = (pathArray[3]) ? pathArray[3] : process.env.DASHBOARD_DEFAULT_NAME;
-
+export function GetLines({ lines, line, setter }: any) {
    return (
       <>
          <label className="flex">
-            <select value={`/dashboard/${line}/${name}`}
+            <select value={`${line}`}
                className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-darkBlue bg-bgDark hover:bg-bgLight'}
                onChange={e => {
-                  router.push(e.target.value)
+                  setter(e.target.value)
                }}>
 
                {lines.map((line: any) => {
-                  return <option key={line} value={`/dashboard/${line}/${name}`}>
+                  return <option key={line} value={`${line}`}>
                      {line}
                   </option>
                })}
@@ -29,24 +24,18 @@ export function GetLines({ lines }: any) {
    )
 }
 
-export function GetNames({ names }: any) {
-   const pathname = usePathname();
-   const router = useRouter();
-   const pathArray: string[] = (pathname) ? pathname.split('/') : [];
-   const line = (pathArray[2]) ? pathArray[2] : process.env.DASHBOARD_DEFAULT_LINE;
-   const name = (pathArray[3]) ? pathArray[3] : process.env.DASHBOARD_DEFAULT_NAME;
-
+export function GetNames({ names, name, setter }: any) {
    return (
       <>
          <label className="flex">
-            <select value={`/dashboard/${line}/${name}`}
+            <select value={`${name}`}
                className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-darkBlue bg-bgDark hover:bg-bgLight'}
                onChange={e => {
-                  router.push(e.target.value)
+                  setter(e.target.value)
                }}>
 
                {names.map((name: any) => {
-                  return <option key={name} value={`/dashboard/${line}/${name}`}>
+                  return <option key={name} value={`${name}`}>
                      {name}
                   </option>
                })}

@@ -5,6 +5,8 @@ import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsData from 'highcharts/modules/data'
 import HighchartsReact from 'highcharts-react-official'
 import { chartOptions } from '@/components/chart.components'
+import { GetLines, GetNames } from './routing'
+import { useState } from 'react'
 
 
 if (typeof Highcharts === "object") {
@@ -13,7 +15,9 @@ if (typeof Highcharts === "object") {
    HighchartsData(Highcharts)
 }
 
-export function LiveChart({ title, line, name }: any) {
+export function LiveChart({ session, lines, names }: any) {
+   const [line, setLine] = useState(lines[0]);
+   const [name, setName] = useState(names[0]);
    const options = {
       ...chartOptions,
       chart: {
@@ -25,7 +29,7 @@ export function LiveChart({ title, line, name }: any) {
          dataRefreshRate: 1
       },
       title: {
-         text: title
+         text: name
       },
       subtitle: {
          text: 'Dades en directe de Producció'
@@ -40,9 +44,23 @@ export function LiveChart({ title, line, name }: any) {
    }
 
    return (
-      <HighchartsReact
-         highcharts={Highcharts}
-         options={options}
-      />
+      <div className="m-2">
+         <div className="flex justify-start grow mb-2 mx-2">
+            <GetLines
+               lines={lines}
+               line={line}
+               setter={setLine}
+            />
+            <GetNames
+               names={names}
+               name={name}
+               setter={setName}
+            />
+         </div>
+         <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
+         />
+      </div>
    )
 }

@@ -10,14 +10,6 @@ export default async function ContractsLayout({ children }: any) {
       <div>
          <title>Quadre Comandament</title>
          <div className="mt-2 bg-light text-right flex justify-between items-center">
-            <div className="flex justify-start grow mb-2 mx-2">
-               <GetLines
-                  lines={lines}
-               />
-               <GetNames
-                  names={names}
-               />
-            </div>
             <div className="bg-light text-right flex justify-end items-center">
                <h1 className="right-0 mx-5 font-semibold text-lg">DB: {session?.user.db}</h1>
                <h1 className="right-0 mx-5 font-semibold text-lg">Collection: values</h1>
