@@ -11,14 +11,12 @@ const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
    const [names, setNames] = useState(null);
    const [isLoading, setLoading] = useState(true);
-   console.log('component: ', data);
 
 
    useEffect(() => {
       getNames(data, session?.user.db)
          .then((res: any) => {
             setNames(res);
-            console.log('res: ', res);
             setLoading(false)
          });
    }, [data])
@@ -64,7 +62,6 @@ const ExpandedComponent = ({ data }: any) => {
 }
 
 export function LinesTable({ lines }: any) {
-   console.log('lines: ', lines);
 
    let columns: any = [{
       name: 'Line',
@@ -74,11 +71,8 @@ export function LinesTable({ lines }: any) {
    }];
 
    const data = lines.map((line: String) => {
-      console.log('line: ', line);
       return ({ line: line })
    });
-
-   console.log('data: ', data);
 
    createThemes();
 
