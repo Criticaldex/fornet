@@ -1,6 +1,6 @@
 import { Loading } from "@/components/loading.component";
 
-export default async function ContractsLoading() {
+export default async function DashboardLoading() {
 
    return (
       <Loading />

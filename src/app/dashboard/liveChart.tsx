@@ -15,8 +15,7 @@ if (typeof Highcharts === "object") {
    HighchartsData(Highcharts)
 }
 
-export function LiveChart({ session, lines, names }: any) {
-   const [line, setLine] = useState(lines[0]);
+export function LiveChart({ line, names }: any) {
    const [name, setName] = useState(names[0]);
    const options = {
       ...chartOptions,
@@ -46,11 +45,6 @@ export function LiveChart({ session, lines, names }: any) {
    return (
       <div className="m-2">
          <div className="flex justify-start grow mb-2 mx-2">
-            <GetLines
-               lines={lines}
-               line={line}
-               setter={setLine}
-            />
             <GetNames
                names={names}
                name={name}

@@ -1,15 +1,11 @@
-import { getLines, getNames } from "@/services/values";
 import { getSession } from "@/services/session";
-import { GetNames, GetLines } from "./routing";
 
 export default async function ContractsLayout({ children }: any) {
    const session = await getSession();
-   const lines = await getLines();
-   const names = await getNames();
    return (
       <div>
          <title>Quadre Comandament</title>
-         <div className="mt-2 bg-light text-right flex justify-between items-center">
+         <div className="mt-2 bg-light text-right flex justify-end items-center">
             <div className="bg-light text-right flex justify-end items-center">
                <h1 className="right-0 mx-5 font-semibold text-lg">DB: {session?.user.db}</h1>
                <h1 className="right-0 mx-5 font-semibold text-lg">Collection: values</h1>
