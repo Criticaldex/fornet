@@ -1,23 +1,27 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { useSession } from 'next-auth/react';
 import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
 import { getNames } from '@/services/values';
 import { Loading } from "@/components/loading.component";
 
 const ExpandedComponent = ({ data }: any) => {
+   const { data: session, status } = useSession();
    const [names, setNames] = useState(null);
    const [isLoading, setLoading] = useState(true);
+   console.log('component: ', data);
+
 
    useEffect(() => {
-      getNames({ line: data.line })
+      getNames(data, session?.user.db)
          .then((res: any) => {
             setNames(res);
             console.log('res: ', res);
             setLoading(false)
          });
-   }, [data.line])
+   }, [data])
 
    if (isLoading) return <Loading />
 
@@ -75,7 +79,6 @@ export function LinesTable({ lines }: any) {
    });
 
    console.log('data: ', data);
-
 
    createThemes();
 

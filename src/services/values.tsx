@@ -56,15 +56,12 @@ export const getLines = async (filtros?: any) => {
    return lines;
 }
 
-export const getNames = async (filtros?: any, session?: any) => {
+export const getNames = async (filtros?: any, db?: any) => {
+   console.log('filtros: ', filtros, 'db: ', db);
+
    const fields = ['-_id', 'name']
-   console.log('filtros: ', filtros);
-
-   const data = await getValues(filtros, fields, session.db);
-   console.log('data: ', data);
-
+   const data = await getValues(filtros, fields, db);
    let groupBySec = _.groupBy(data, 'name');
-   console.log('groupBySec: ', groupBySec);
 
    let names: string[] = [];
    for (const [key, value] of (Object.entries(groupBySec) as [string, any][])) {
