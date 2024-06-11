@@ -54,7 +54,7 @@ export const getHoursChart = async (year: string, month: string, day: string, ce
    }, {
       type: 'spline',
       name: 'Operadors',
-      color: "var(--lightBlue)",
+      color: "var(--accentLight)",
       data: [],
       yAxis: 1
    }, {

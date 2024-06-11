@@ -8,7 +8,12 @@ const nextConfig = {
       return [
          {
             source: '/',
-            destination: `/dashboard`,
+            destination: `/live/${process.env.LIVE_DEFAULT_INTERVAL}`,
+            permanent: false,
+         },
+         {
+            source: '/live',
+            destination: `/live/${process.env.LIVE_DEFAULT_INTERVAL}`,
             permanent: false,
          }
       ];

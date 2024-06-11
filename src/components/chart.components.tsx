@@ -5,6 +5,7 @@ export const chartOptions = {
          mouseWheel: false
       }
    },
+   colors: ["#ff6600", "#2caffe", "#544fc5", "#00e272", "#fe6a35", "#6b8abc", "#d568fb", "#2ee0ca", "#fa4b42", "#feb56a", "#91e8e1"],
    lang: {
       noData: "No hi han dades disponibles"
    },
@@ -43,15 +44,15 @@ export const chartOptions = {
    navigation: {
       buttonOptions: {
          theme: {
-            stroke: 'var(--darkBlue)',
+            stroke: 'var(--accent)',
             fill: 'var(--bg-dark)',
             states: {
                hover: {
                   fill: 'var(--bg-light)',
                },
                select: {
-                  stroke: 'var(--darkBlue)',
-                  fill: 'var(--darkBlue)'
+                  stroke: 'var(--accent)',
+                  fill: 'var(--accent)'
                }
             }
          }
@@ -60,7 +61,7 @@ export const chartOptions = {
          background: 'var(--bg-dark)'
       },
       menuItemStyle: {
-         borderLeft: '2px solid var(--darkBlue)',
+         borderLeft: '2px solid var(--accent)',
          borderRadius: 0,
          color: 'var(--text-color)',
       },
