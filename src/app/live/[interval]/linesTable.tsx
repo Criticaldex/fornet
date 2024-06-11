@@ -14,7 +14,7 @@ const ExpandedComponent = ({ data }: any) => {
 
 
    useEffect(() => {
-      getNames(data, session?.user.db)
+      getNames({ line: data.line }, session?.user.db)
          .then((res: any) => {
             setNames(res);
             setLoading(false)
@@ -31,9 +31,10 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  interval={data.interval}
                />
             </div>
-            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
+            {/* <div className="m-2 basis-2/4 bg-bgLight rounded-md">
                <LiveChart
                   title={'productividad'}
                   line={data.line}
@@ -55,13 +56,13 @@ const ExpandedComponent = ({ data }: any) => {
                   line={data.line}
                   names={names}
                />
-            </div>
+            </div> */}
          </div>
       </>
    );
 }
 
-export function LinesTable({ lines }: any) {
+export function LinesTable({ lines, interval }: any) {
 
    let columns: any = [{
       name: 'Line',
@@ -71,7 +72,10 @@ export function LinesTable({ lines }: any) {
    }];
 
    const data = lines.map((line: String) => {
-      return ({ line: line })
+      return ({
+         line: line,
+         interval: interval
+      })
    });
 
    createThemes();

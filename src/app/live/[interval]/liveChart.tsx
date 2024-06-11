@@ -5,9 +5,8 @@ import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsData from 'highcharts/modules/data'
 import HighchartsReact from 'highcharts-react-official'
 import { chartOptions } from '@/components/chart.components'
-import { GetLines, GetNames } from './routing'
-import { useState } from 'react'
-
+import { GetLines, GetNames, GetTimeIntervals } from '../routing'
+import { useEffect, useState } from 'react'
 
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
@@ -15,15 +14,17 @@ if (typeof Highcharts === "object") {
    HighchartsData(Highcharts)
 }
 
-export function LiveChart({ line, names }: any) {
+export function LiveChart({ line, names, interval }: any) {
    const [name, setName] = useState(names[0]);
+   const timestamp = useState(Math.floor(Date.now() - (interval * 60 * 60 * 1000)).toString());
+
    const options = {
       ...chartOptions,
       chart: {
          type: 'spline',
       },
       data: {
-         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}`,
+         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/${timestamp}`,
          enablePolling: true,
          dataRefreshRate: 1
       },

@@ -18,9 +18,9 @@ export default function GetNav({ session }: any) {
 
    const navTitlesIcons = [
       {
-         label: 'Dashboard',
+         label: 'Live',
          icon: TbLayoutDashboard,
-         route: '/dashboard'
+         route: '/live'
       },
       {
          label: 'Professionals',
@@ -28,16 +28,6 @@ export default function GetNav({ session }: any) {
          route: '/professionals'
       }
    ]
-   {
-      callsCenters.includes(session?.user.db) &&
-         navTitlesIcons.push(
-            {
-               label: 'Trucades',
-               icon: FaPhoneAlt,
-               route: '/calls'
-            }
-         )
-   }
 
    const navTitlesIconsFarma = [
       {
