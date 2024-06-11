@@ -5,11 +5,12 @@ import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
 import { hash } from 'bcryptjs';
 
-export async function GET(request: Request, { params }: { params: { line: string, name: string } }) {
+export async function GET(request: Request, { params }: { params: { line: string, name: string, timestamp: string } }) {
    try {
       const dbName = 'empresa2';
+
       const filter = {
-         "line": params.line, "name": params.name
+         "line": params.line, "name": params.name, "timestamp": { $gte: parseInt(params.timestamp) }
       };
       const fields = [
          "-_id",

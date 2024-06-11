@@ -2,7 +2,8 @@ import { getLines } from "@/services/values";
 import { LinesTable } from "./linesTable";
 
 
-export default async function Dashboard() {
+export default async function Dashboard({ params }: any) {
+   const { interval } = params;
    const lines = await getLines();
 
    return (
@@ -11,6 +12,7 @@ export default async function Dashboard() {
             <div className="flex grow p-1 bg-bgLight rounded-md ">
                <LinesTable
                   lines={lines}
+                  interval={interval}
                />
             </div>
          </div>

@@ -38,7 +38,7 @@
       "**/*.ts",
       "**/*.tsx",
       ".next/types/**/*.ts",
-      "src/app/dashboard/[centro]/[year]/[center]/chart.ts",
+      "src/app/live/[centro]/[year]/[center]/chart.ts",
       "src/app/contracts/[year]/table.tsx",
       "src/lib/dbConnect.ts",
       "src/app/api/contracts",
