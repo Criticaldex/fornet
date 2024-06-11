@@ -19,10 +19,11 @@
    --green: #32c87d;
    --orange-1: #f29513;
    --orange: #ff6600;
-   --darkBlue: #ff6600;
+   --accent: #ff6600;
+   --accentLight: #f29513;
    --darkBlueOld: #0468BF;
    --darkBlue2: #023A6B99;
-   --lightBlue: #0dcaf0;
+   --lightBlueOld: #0dcaf0;
    --yellow: #eab107;
    --white: #fff;
    --black: #000;
@@ -342,7 +343,7 @@ body.react-confirm-alert-body-element {
    outline: none;
    background: var(--bg-dark);
    border: 1px solid;
-   border-color: var(--darkBlue);
+   border-color: var(--accent);
    display: inline-block;
    padding: 6px 18px;
    color: --var(--bg-dark);

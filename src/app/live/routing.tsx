@@ -8,7 +8,7 @@ export function GetLines({ lines, line, setter }: any) {
       <>
          <label className="flex">
             <select value={`${line}`}
-               className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-darkBlue bg-bgDark hover:bg-bgLight'}
+               className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark hover:bg-bgLight'}
                onChange={e => {
                   setter(e.target.value)
                }}>
@@ -29,7 +29,7 @@ export function GetNames({ names, name, setter }: any) {
       <>
          <label className="flex">
             <select value={`${name}`}
-               className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-darkBlue bg-bgDark hover:bg-bgLight'}
+               className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark hover:bg-bgLight'}
                onChange={e => {
                   setter(e.target.value)
                }}>
@@ -49,13 +49,13 @@ export function GetTimeIntervals() {
    const pathname = usePathname();
    const router = useRouter();
    const pathArray: string[] = (pathname) ? pathname.split('/') : [];
-   const interval = (pathArray[2]) ? pathArray[2] : process.env.DASHBOARD_DEFAULT_INTERVAL;
+   const interval = (pathArray[2]) ? pathArray[2] : process.env.LIVE_DEFAULT_INTERVAL;
    const ints = [1, 2, 4, 8, 12, 24]
    return (
       <>
          <label className="flex">
             <select value={`/live/${interval}`}
-               className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-darkBlue bg-bgDark hover:bg-bgLight'}
+               className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark hover:bg-bgLight'}
                onChange={e => {
                   router.push(e.target.value)
                }}>

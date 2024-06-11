@@ -106,7 +106,7 @@ export const UsersForm = ({ user, toast }: any) => {
          </div>
          {errors.license?.end && <p role="alert" className="text-red self-end">⚠ {errors.license?.end.message}</p>}
          <div className="inline-flex justify-around">
-            <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-darkBlue bg-darkBlue'} type="submit" value="Enviar" />
+            <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Enviar" />
          </div>
       </form >
    );

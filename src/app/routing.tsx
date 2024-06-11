@@ -47,8 +47,8 @@ export default function GetNav({ session }: any) {
                </Link>
                <div className="flex flex-col justify-between" id="lista">
                   {navTitlesIcons.map((navTI) => (
-                     <Link key={navTI.route} href={navTI.route} className={`hover:text-darkBlue pb-6 grid grid-cols-[max-content_max-content] place-items-center gap-x-4 pt-2 pr-0 pl-3 items-center ml-3
-                     ${pathname?.includes(navTI.route) ? 'text-darkBlue' : ''}`}>
+                     <Link key={navTI.route} href={navTI.route} className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-center gap-x-4 pt-2 pr-0 pl-3 items-center ml-3
+                     ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
                         <navTI.icon size={19} />
                         <span className="text-base">
                            {navTI.label}
@@ -63,8 +63,8 @@ export default function GetNav({ session }: any) {
                      </h3>
                   </div>
                   {navTitlesIconsFarma.map((navTI) => (
-                     <Link key={navTI.label} href={navTI.route} className={`hover:text-darkBlue pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
-                     ${pathname?.includes(navTI.route) ? 'text-darkBlue' : ''}`}>
+                     <Link key={navTI.label} href={navTI.route} className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
+                     ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
                         <navTI.icon size={19} />
                         <span className="text-base">
                            {navTI.label}
