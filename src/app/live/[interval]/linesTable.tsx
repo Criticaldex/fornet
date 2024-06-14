@@ -39,6 +39,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  interval={data.interval}
                />
             </div>
          </div>
@@ -48,6 +49,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  interval={data.interval}
                />
             </div>
             <div className="m-2 basis-2/4 bg-bgLight rounded-md">
@@ -55,6 +57,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  interval={data.interval}
                />
             </div>
          </div>
