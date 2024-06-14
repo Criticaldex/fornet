@@ -19,7 +19,7 @@ const ExpandedComponent = ({ data }: any) => {
             setNames(res);
             setLoading(false)
          });
-   }, [data])
+   }, [data, session?.user.db])
 
    if (isLoading) return <Loading />
 
@@ -63,7 +63,6 @@ const ExpandedComponent = ({ data }: any) => {
 }
 
 export function LinesTable({ lines, interval }: any) {
-
    let columns: any = [{
       name: 'Line',
       selector: (row: any) => row.line,
@@ -78,6 +77,8 @@ export function LinesTable({ lines, interval }: any) {
       })
    });
 
+   data[0].defaultExpanded = true;
+
    createThemes();
 
    return (
@@ -91,6 +92,7 @@ export function LinesTable({ lines, interval }: any) {
             expandableRows
             expandOnRowClicked
             expandableRowsComponent={ExpandedComponent}
+            expandableRowExpanded={(row: any) => row.defaultExpanded}
          />
       </div>
    )
