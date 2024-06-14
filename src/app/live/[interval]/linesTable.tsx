@@ -34,7 +34,7 @@ const ExpandedComponent = ({ data }: any) => {
                   interval={data.interval}
                />
             </div>
-            {/* <div className="m-2 basis-2/4 bg-bgLight rounded-md">
+            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
                <LiveChart
                   title={'productividad'}
                   line={data.line}
@@ -56,7 +56,7 @@ const ExpandedComponent = ({ data }: any) => {
                   line={data.line}
                   names={names}
                />
-            </div> */}
+            </div>
          </div>
       </>
    );
