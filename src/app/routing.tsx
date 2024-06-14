@@ -1,8 +1,9 @@
 'use client'
 import Link from "next/link"
 
-import { BiPlusMedical } from "react-icons/bi"
-import { FaCapsules, FaUserNurse, FaPhoneAlt } from "react-icons/fa"
+import { BiPlusMedical, BiRepeat } from "react-icons/bi"
+import { BsArrowRepeat, BsRepeat, BsRepeat1 } from "react-icons/bs"
+import { FaCapsules, FaUserNurse, FaBroadcastTower, FaHistory } from "react-icons/fa"
 import { TbLayoutDashboard } from "react-icons/tb"
 import { RiMedicineBottleLine } from "react-icons/ri"
 
@@ -19,13 +20,13 @@ export default function GetNav({ session }: any) {
    const navTitlesIcons = [
       {
          label: 'Live',
-         icon: TbLayoutDashboard,
+         icon: FaBroadcastTower,
          route: '/live'
       },
       {
-         label: 'Professionals',
-         icon: FaUserNurse,
-         route: '/professionals'
+         label: 'History',
+         icon: FaHistory,
+         route: '/history'
       }
    ]
 
@@ -42,8 +43,8 @@ export default function GetNav({ session }: any) {
          <nav className="text-TextNav flex flex-col justify-between h-full overflow-hidden">
             <div>
                <Link href="/" className="text-yellowCustom text-xl font-bold grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
-                  <BiPlusMedical size={20} />
-                  <span className="text-lg">CAPFA</span>
+                  <BsRepeat size={20} />
+                  <span className="text-lg">ForNet</span>
                </Link>
                <div className="flex flex-col justify-between" id="lista">
                   {navTitlesIcons.map((navTI) => (
@@ -55,7 +56,7 @@ export default function GetNav({ session }: any) {
                         </span>
                      </Link>
                   ))}
-                  <hr className="my-4 ml-2 border-spacerNav" />
+                  {/* <hr className="my-4 ml-2 border-spacerNav" />
                   <div className="text-yellowCustom text-lg font-bold grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
                      <RiMedicineBottleLine size={20} />
                      <h3>
@@ -70,7 +71,7 @@ export default function GetNav({ session }: any) {
                            {navTI.label}
                         </span>
                      </Link>
-                  ))}
+                  ))} */}
                </div>
             </div>
             <div>
