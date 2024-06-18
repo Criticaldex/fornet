@@ -18,6 +18,10 @@
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
-  "terminal.integrated.fontFamily": "DejaVuSansM Nerd Font"
+  "terminal.integrated.fontFamily": "DejaVuSansM Nerd Font",
+  "workbench.colorTheme": "Gruvbox Material Dark",
+  "git.confirmSync": false,
+  "terminal.external.linuxExec": "/usr/bin/zsh '-i'",
+  "terminal.integrated.defaultProfile.linux": "zsh",
   // set as "true" to run 'prettier' last not first
 }
