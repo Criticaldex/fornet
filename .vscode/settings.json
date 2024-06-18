@@ -23,5 +23,4 @@
   "git.confirmSync": false,
   "terminal.external.linuxExec": "/usr/bin/zsh '-i'",
   "terminal.integrated.defaultProfile.linux": "zsh",
-  // set as "true" to run 'prettier' last not first
 }
