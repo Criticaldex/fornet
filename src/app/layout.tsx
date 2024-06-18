@@ -6,7 +6,10 @@ import GetNav from './routing'
 import { NextAuthProvider } from "./providers";
 import { getSession } from "@/services/session"
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+   subsets: ['latin'],
+   variable: '--font-inter'
+});
 
 export const metadata = {
    title: 'Create Next App',
@@ -17,7 +20,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
    const session = await getSession();
    return (
       <html lang="en">
-         <body className={inter.className}>
+         <body className={`${inter.variable} font-sans`}>
             <GetNav
                session={session}
             />

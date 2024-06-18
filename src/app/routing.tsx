@@ -1,11 +1,8 @@
 'use client'
 import Link from "next/link"
 
-import { BiPlusMedical, BiRepeat } from "react-icons/bi"
-import { BsArrowRepeat, BsRepeat, BsRepeat1 } from "react-icons/bs"
-import { FaCapsules, FaUserNurse, FaBroadcastTower, FaHistory } from "react-icons/fa"
-import { TbLayoutDashboard } from "react-icons/tb"
-import { RiMedicineBottleLine } from "react-icons/ri"
+import { FaCapsules, FaBroadcastTower, FaHistory } from "react-icons/fa"
+import Image from 'next/image'
 
 import { usePathname } from "next/navigation"
 import { LogoutButton, ProfileButton } from "@/components/loginbuttons.component";
@@ -39,11 +36,18 @@ export default function GetNav({ session }: any) {
    ]
 
    return (
-      <div className="fixed top-0 left-0 z-50 w-16 h-screen bg-bgNavGlobal pt-4 pr-3 pb-0 pl-0 hover:w-52 transition-all duration-500">
+      <div className="fixed top-0 left-0 z-50 w-16 h-screen bg-bgNavGlobal pt-2 pr-3 pb-0 pl-0 hover:w-52 transition-all duration-500">
          <nav className="text-TextNav flex flex-col justify-between h-full overflow-hidden">
             <div>
-               <Link href="/" className="text-yellowCustom text-xl font-bold grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
-                  <BsRepeat size={20} />
+               <Link href="/" className="text-yellowCustom text-xl font-bold grid grid-cols-[max-content_max-content] gap-x-4 mt-1 mb-7 mr-1 ml-2">
+                  {/* <BsRepeat size={20} /> */}
+                  <Image
+                     className="text-accent"
+                     src="/fornet_color.svg"
+                     alt="ForNet Logo"
+                     width={40}
+                     height={40}
+                  />
                   <span className="text-lg">ForNet</span>
                </Link>
                <div className="flex flex-col justify-between" id="lista">

@@ -43,7 +43,7 @@ module.exports = {
             universals2: 'var(--universals2)'
          },
          fontFamily: {
-            nunito: ['Nunito', 'sans-serif']
+            sans: ['var(--font-inter)']
          }
       },
    },

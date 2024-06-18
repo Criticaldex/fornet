@@ -13,6 +13,8 @@
       "info": "next info"
    },
    "dependencies": {
+      "@next/font": "^14.2.4",
+      "@svgr/webpack": "^8.1.0",
       "@types/bcryptjs": "^2.4.2",
       "@types/jquery": "^3.5.16",
       "@types/lodash": "^4.14.195",
