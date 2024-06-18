@@ -1,8 +1,7 @@
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getCsrfToken } from "next-auth/react"
 import '../signin.css'
-import Image from 'next/image'
-import { BiPlusMedical } from "react-icons/bi"
+import { useRouter } from "next/router";
 import Fornet from "../../public/fornet_color.svg";
 import { Inter } from '@next/font/google'
 const inter = Inter({
@@ -10,7 +9,12 @@ const inter = Inter({
    variable: '--font-inter'
 });
 
-export default function SignIn({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
+
+export default function SignInError({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+   const router = useRouter();
+   const { error } = router.query;
+
    return (
       <main className={`${inter.variable} font-sans`}>
          <div className="bg-image"></div>
@@ -29,9 +33,16 @@ export default function SignIn({ csrfToken }: InferGetServerSidePropsType<typeof
                   <input name="password" type="password" placeholder="Contrasenya" required />
                </div>
                <div>
-                  <button type="submit">Entrar</button>
+                  <button type="submit">Sign in</button>
                </div>
             </form>
+            {error ?
+               <div id="errorLogin">
+                  {error}
+               </div>
+               :
+               ''
+            }
          </section>
       </main>
    )

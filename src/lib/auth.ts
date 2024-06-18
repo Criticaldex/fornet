@@ -37,13 +37,20 @@ export const authOptions: NextAuthOptions = {
                   ),
                }
             ).then(res => res.json());
-            if (!user || user?.ERROR) {
+            if (!user) {
                return null;
+            } else if (user?.ERROR) {
+               throw new Error(user.ERROR)
             }
             return user;
          }
       }),
    ],
+   pages: {
+      signIn: "/auth/signin",
+      signOut: '/auth/signout',
+      error: '/auth/error'
+   },
    callbacks: {
       session: ({ session, token }) => {
          // console.log("Session Callback", { session, token });
@@ -56,8 +63,15 @@ export const authOptions: NextAuthOptions = {
             },
          };
       },
-      jwt: ({ token, user }) => {
+      jwt: ({ token, user, trigger, session }) => {
          // console.log("JWT Callback", { token, user });
+         if (session && trigger === "update") {
+            const u = session as unknown as any;
+            return {
+               ...token,
+               user: u
+            };
+         }
          if (user) {
             const u = user as unknown as any;
             return {
