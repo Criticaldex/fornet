@@ -9,8 +9,6 @@ const inter = Inter({
    variable: '--font-inter'
 });
 
-
-
 export default function SignInError({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
    const router = useRouter();
    const { error } = router.query;

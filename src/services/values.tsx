@@ -57,14 +57,16 @@ export const getLines = async (filtros?: any) => {
 }
 
 export const getNames = async (filtros?: any, db?: any) => {
-   const fields = ['-_id', 'name']
+   const fields = ['-_id', 'name', 'unit']
    const data = await getValues(filtros, fields, db);
-   let groupBySec = _.groupBy(data, 'name');
+   let groupByName = _.groupBy(data, 'name');
 
    let names: string[] = [];
-   for (const [key, value] of (Object.entries(groupBySec) as [string, any][])) {
+   let units: string[] = [];
+   for (const [key, value] of (Object.entries(groupByName) as [string, any][])) {
       names.push(key);
+      units.push(value[0].unit);
    }
 
-   return names;
+   return { names, units };
 }
