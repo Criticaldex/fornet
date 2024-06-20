@@ -10,13 +10,15 @@ import { Loading } from "@/components/loading.component";
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
    const [names, setNames] = useState(null);
+   const [units, setUnits] = useState(null);
    const [isLoading, setLoading] = useState(true);
 
 
    useEffect(() => {
       getNames({ line: data.line }, session?.user.db)
          .then((res: any) => {
-            setNames(res);
+            setNames(res.names);
+            setUnits(res.units);
             setLoading(false)
          });
    }, [data, session?.user.db])
@@ -31,6 +33,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  units={units}
                   interval={data.interval}
                />
             </div>
@@ -39,6 +42,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  units={units}
                   interval={data.interval}
                />
             </div>
@@ -49,6 +53,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  units={units}
                   interval={data.interval}
                />
             </div>
@@ -57,6 +62,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  units={units}
                   interval={data.interval}
                />
             </div>

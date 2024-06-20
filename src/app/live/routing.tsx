@@ -24,7 +24,7 @@ export function GetLines({ lines, line, setter }: any) {
    )
 }
 
-export function GetNames({ names, name, setter }: any) {
+export function GetNames({ names, units, name, setter, setUnit }: any) {
    return (
       <>
          <label className="flex">
@@ -32,10 +32,11 @@ export function GetNames({ names, name, setter }: any) {
                className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark hover:bg-bgLight'}
                onChange={e => {
                   setter(e.target.value)
+                  setUnit(units[e.target.selectedIndex])
                }}>
 
-               {names.map((name: any) => {
-                  return <option key={name} value={`${name}`}>
+               {names.map((name: any, i: number) => {
+                  return <option key={i} value={`${name}`} tabIndex={i}>
                      {name}
                   </option>
                })}
