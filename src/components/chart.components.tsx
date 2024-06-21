@@ -1,3 +1,5 @@
+import { time } from "console";
+
 export const chartOptions = {
    chart: {
       type: null,
@@ -82,5 +84,8 @@ export const chartOptions = {
          //    lineColor: null
          // }
       }
+   },
+   time: {
+      timezone: 'Europe/Madrid'
    }
 };
