@@ -6,6 +6,7 @@ import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
 import { getNames } from '@/services/values';
 import { Loading } from "@/components/loading.component";
+import { GaugeChart } from './gaugeChart';
 
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
@@ -28,20 +29,42 @@ const ExpandedComponent = ({ data }: any) => {
    return (
       <>
          <div className="flex flex-nowrap mt-2">
-            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
-               <LiveChart
+            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
+               <GaugeChart
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  index='2'
                   units={units}
                   interval={data.interval}
                />
             </div>
-            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
-               <LiveChart
+            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
+               <GaugeChart
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  index='2'
+                  units={units}
+                  interval={data.interval}
+               />
+            </div>
+            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
+               <GaugeChart
+                  title={'productividad'}
+                  line={data.line}
+                  names={names}
+                  index='2'
+                  units={units}
+                  interval={data.interval}
+               />
+            </div>
+            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
+               <GaugeChart
+                  title={'productividad'}
+                  line={data.line}
+                  names={names}
+                  index='2'
                   units={units}
                   interval={data.interval}
                />
@@ -53,6 +76,7 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  index='0'
                   units={units}
                   interval={data.interval}
                />
@@ -62,6 +86,29 @@ const ExpandedComponent = ({ data }: any) => {
                   title={'productividad'}
                   line={data.line}
                   names={names}
+                  index='1'
+                  units={units}
+                  interval={data.interval}
+               />
+            </div>
+         </div >
+         <div className="flex flex-nowrap mt-2">
+            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
+               <LiveChart
+                  title={'productividad'}
+                  line={data.line}
+                  names={names}
+                  index='2'
+                  units={units}
+                  interval={data.interval}
+               />
+            </div>
+            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
+               <LiveChart
+                  title={'productividad'}
+                  line={data.line}
+                  names={names}
+                  index='3'
                   units={units}
                   interval={data.interval}
                />

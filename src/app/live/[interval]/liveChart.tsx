@@ -14,9 +14,9 @@ if (typeof Highcharts === "object") {
    HighchartsData(Highcharts)
 }
 
-export function LiveChart({ line, names, units, interval }: any) {
-   const [name, setName] = useState(names[0]);
-   const [unit, setUnit] = useState(units[0]);
+export function LiveChart({ line, names, index, units, interval }: any) {
+   const [name, setName] = useState(names[index]);
+   const [unit, setUnit] = useState(units[index]);
    const timestamp = useState(Math.floor(Date.now() - (interval * 60 * 60 * 1000)).toString());
 
    const options = {
