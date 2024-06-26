@@ -16,7 +16,7 @@ export function GetLinksAdmin({ session }: any) {
       },
       {
          label: 'Values',
-         route: `/admin/values`
+         route: `/admin/labels`
       }
    ];
 
