@@ -42,9 +42,9 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
       yAxis: {
          ...chartOptions.yAxis,
          stops: [
-            [0.1, '#55BF3B'], // green
-            [0.5, '#DDDF0D'], // yellow
-            [0.9, '#DF5353'] // red
+            [0.3, `var(--green)`],
+            [0.6, `var(--yellow)`],
+            [1, `var(--red)`]
          ],
          lineWidth: 0,
          tickWidth: 0,
