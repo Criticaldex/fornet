@@ -36,8 +36,8 @@ export function LiveChart({ line, names, units, interval }: any) {
          enabled: false
       },
       yAxis: {
-         title: null,
-         min: 0
+         ...chartOptions.yAxis,
+         title: null
       },
       tooltip: {
          formatter: function (this: any) {
