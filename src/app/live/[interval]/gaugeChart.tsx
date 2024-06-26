@@ -68,8 +68,8 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
                }
             },
             lineWidth: 1,
-            radius: "100%",
-            innerRadius: "80%"
+            radius: "99%",
+            innerRadius: "81%"
          }
       },
       pane: {
@@ -81,6 +81,7 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
          background: {
             outerRadius: '100%',
             innerRadius: '80%',
+            backgroundColor: `var(--bg-dark)`,
             borderWidth: 4,
             shape: 'arc'
          }
