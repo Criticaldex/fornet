@@ -1,49 +1,52 @@
 'use client';
 
 import { LabelIface } from "@/schemas/label";
-import { getLabels, getLabelsbyDB, upsertLabel } from "@/services/labels";
+import { getNames, getLines } from '@/services/values';
+import { getLabels, upsertLabel } from "@/services/labels";
+import { getSession } from "next-auth/react"
+import { useEffect, useState } from "react";
 
 export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, isDirty, dirtyFields, reset, session }: any) => {
-   const onSubmit = handleSubmit(async (data: LabelIface) => {
-      if (isDirty) {
-         let upsertData;
-         if (session.user.role == '1') {
-            upsertData = {
-               ...session.user,
-               email: data.email,
-               password: data.password,
-               name: data.name,
-               lastname: data.lastname,
-               role: "2"
-            }
-         } else if (session.user.role == '0') {
-            upsertData = {
-               ...session.user,
-               email: data.email,
-               password: data.password,
-               name: data.name,
-               lastname: data.lastname,
-               role: data.role,
-               db: data.db,
-               license: data.license
-            };
-         }
-         const upsert = await upsertLabel(upsertData);
-         if (upsert.lastErrorObject?.updatedExisting) {
-            toast.success('Usuari Modificat!', { theme: "colored" });
-         } else {
-            toast.success('Usuari Afegit!', { theme: "colored" });
-         }
-         reset(data);
+   const [lines, setLines] = useState(['-']);
+   const [linia, setLinia] = useState('');
+   const [names, setNames] = useState(['-']);
 
-         if (session?.user.role == '1') {
-            setRows(await getLabelsbyDB(session?.user.db));
-         } else if (session?.user.role == '0') {
-            setRows(await getLabels());
-         }
-      } else {
-         toast.warning('No s\'ha Modificat cap camp!', { theme: "colored" });
+
+   useEffect(() => {
+      getLines(session?.user.db)
+         .then((res: any) => {
+            setLines(res);
+            setLinia(res[0]);
+         });
+   }, [session?.user.db])
+
+   useEffect(() => {
+      getNames({ 'line': linia }, session?.user.db)
+         .then((res: any) => {
+            setNames(res.names);
+         });
+   }, [linia, session?.user.db])
+
+   const onSubmit = handleSubmit(async (data: LabelIface) => {
+      const session = await getSession();
+      const upsertData = {
+         _id: data._id,
+         line: data.line,
+         name: data.name,
+         unit: data.unit,
+         min: data.min,
+         max: data.max,
+         type: data.type
       }
+      const upsert = await upsertLabel(upsertData, session?.user.db);
+      if (upsert.lastErrorObject?.updatedExisting) {
+         toast.success('Object Modified!', { theme: "colored" });
+      } else {
+         toast.success('Object Added!', { theme: "colored" });
+      }
+      reset(data);
+
+      setRows(await getLabels(session?.user.db));
    });
 
    return (
@@ -53,84 +56,81 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          onSubmit={onSubmit}
       >
          <div className="inline-flex justify-end">
-            <label htmlFor="email" className="flex self-center">Email:</label>
-            <input id="email" type="email" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.email ? 'border-foreground' : 'border-red'}`} {...register("email", {
-               required: 'Camp obligatori',
-               minLength: {
-                  value: 5,
-                  message: 'Valor minim 5 caracters'
-               },
-               maxLength: {
-                  value: 50,
-                  message: 'Valor maxim 50 caracters'
-               },
-               pattern: {
-                  value: /([\w\.]+)@([\w\.]+)\.(\w+)/g,
-                  message: "Format incorrecte"
-               },
-            })} />
+            <label htmlFor="id" className="flex self-center">ID:</label>
+            <input id="id" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.id ? 'border-foreground' : 'border-red'}`}
+               disabled
+               {...register("_id")} />
          </div>
-         {errors.email && <p role="alert" className="text-red self-end">⚠ {errors.email?.message}</p>}
+
          <div className="inline-flex justify-end">
-            <label htmlFor="password" className="self-center">Contrasenya:</label>
-            <input id="password" type="password" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.password ? 'border-foreground' : 'border-red'}`} {...register("password")} />
+            <label htmlFor="line" className="flex self-center">Line:</label>
+            <select id="line"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.line ? 'border-foreground' : 'border-red'}`}
+               {...register("line", { required: 'Field Required' })}
+               onChange={e => {
+                  setLinia(e.target.value)
+               }}>
+               <option key='' value=''>Select...</option>
+               {lines.map((line: any) => {
+                  return <option key={line} value={`${line}`}>
+                     {line}
+                  </option>
+               })}
+            </select>
          </div>
-         {errors.password && <p role="alert" className="text-red self-end">⚠ {errors.password?.message}</p>}
+         {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
+
          <div className="inline-flex justify-end">
-            <label htmlFor="name" className="self-center">Nom:</label>
-            <input id="name" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.name ? 'border-foreground' : 'border-red'}`} {...register("name", {
-               maxLength: {
-                  value: 30,
-                  message: 'Valor maxim 30 caracters'
-               }
-            })} />
+            <label htmlFor="name" className="flex self-center">Name:</label>
+            <select id="name"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.name ? 'border-foreground' : 'border-red'}`}
+               {...register("name", { required: 'Field Required' })}>
+               <option key='' value=''>Select...</option>
+               {names.map((name: any) => {
+                  return <option key={name} value={`${name}`}>
+                     {name}
+                  </option>
+               })}
+            </select>
          </div>
          {errors.name && <p role="alert" className="text-red self-end">⚠ {errors.name?.message}</p>}
+
          <div className="inline-flex justify-end">
-            <label htmlFor="lastname" className="self-center">Cognom:</label>
-            <input id="lastname" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.lastname ? 'border-foreground' : 'border-red'}`} {...register("lastname", {
-               maxLength: {
-                  value: 30,
-                  message: 'Valor maxim 30 caracters'
-               }
-            })} />
+            <label htmlFor="unit" className="self-center">Unit:</label>
+            <input id="unit" type="unit" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.unit ? 'border-foreground' : 'border-red'}`}
+               {...register("unit", { required: 'Field Required' })} />
          </div>
-         {errors.lastname && <p role="alert" className="text-red self-end">⚠ {errors.lastname?.message}</p>}
-         {session.user.role == '0' &&
-            <>
-               <div className="inline-flex justify-end">
-                  <label htmlFor="db" className="self-center">DB:</label>
-                  <input id="db" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.db ? 'border-foreground' : 'border-red'}`} {...register("db", {
-                     required: 'Camp obligatori',
-                  })} />
-               </div>
-               {errors.db && <p role="alert" className="text-red self-end">⚠ {errors.db?.message}</p>}
-               <div className="inline-flex justify-end">
-                  <label htmlFor="role" className="self-center">Rol:</label>
-                  <input id="role" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.role ? 'border-foreground' : 'border-red'}`} {...register("role", {
-                     required: 'Camp obligatori',
-                  })} />
-               </div>
-               {errors.role && <p role="alert" className="text-red self-end">⚠ {errors.role?.message}</p>}
-               <div className="inline-flex justify-end">
-                  <label htmlFor="licenseStart" className="self-center">Inici Llicencia:</label>
-                  <input id="licenseStart" type="date" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.license?.start ? 'border-foreground' : 'border-red'}`} {...register("license.start", {
-                     required: 'Camp obligatori',
-                  })} />
-               </div>
-               {errors.license?.start && <p role="alert" className="text-red self-end">⚠ {errors.license?.start?.message}</p>}
-               <div className="inline-flex justify-end">
-                  <label htmlFor="licenseEnd" className="self-center">Fi Llicencia:</label>
-                  <input id="licenseEnd" type="date" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.license?.end ? 'border-foreground' : 'border-red'}`} {...register("license.end", {
-                     required: 'Camp obligatori',
-                  })} />
-               </div>
-               {errors.license?.end && <p role="alert" className="text-red self-end">⚠ {errors.license?.end.message}</p>}
-            </>
-         }
+         {errors.unit && <p role="alert" className="text-red self-end">⚠ {errors.unit?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="min" className="self-center">Min:</label>
+            <input id="min" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.min ? 'border-foreground' : 'border-red'}`}
+               {...register("min")} />
+         </div>
+         {errors.min && <p role="alert" className="text-red self-end">⚠ {errors.min?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="max" className="self-center">Max:</label>
+            <input id="max" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.max ? 'border-foreground' : 'border-red'}`}
+               {...register("max")} />
+         </div>
+         {errors.max && <p role="alert" className="text-red self-end">⚠ {errors.max?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="type" className="self-center">Type:</label>
+            <select id="type" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.type ? 'border-foreground' : 'border-red'}`}
+               {...register("type", { required: 'Field Required' })}>
+               <option key='' value=''>Select...</option>
+               <option key="line" value="line">Line</option>
+               <option key="gauge" value="gauge"> Gauge </option>
+               <option key="boolean" value="boolean"> Boolean </option>
+            </select>
+         </div>
+         {errors.type && <p role="alert" className="text-red self-end">⚠ {errors.type?.message}</p>}
+
          <div className="inline-flex justify-around">
-            <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Netejar" />
-            <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Enviar" />
+            <input type="reset" onClick={reset} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
+            <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
          </div>
       </form >
    );

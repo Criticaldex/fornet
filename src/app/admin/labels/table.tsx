@@ -5,7 +5,7 @@ import { createThemes } from "@/styles/themes"
 import { LabelsForm } from "./form";
 import { LabelIface } from "@/schemas/label";
 import { useForm, UseFormReset } from "react-hook-form";
-import { deleteLabel, getLabels, getLabelsbyDB } from '@/services/labels';
+import { deleteLabel, getLabels } from '@/services/labels';
 import { confirmAlert } from 'react-confirm-alert';
 import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
@@ -23,7 +23,7 @@ export function AdminTable({ labels, session }: any) {
    }, [])
 
    const filteredItems = rows.filter(
-      (item: any) => item.email && item.email.toLowerCase().includes(filterText.toLowerCase()),
+      (item: any) => item._id && item._id.toLowerCase().includes(filterText.toLowerCase()),
    );
 
    const subHeaderComponentMemo = useMemo(() => {
@@ -33,7 +33,7 @@ export function AdminTable({ labels, session }: any) {
                id="search"
                type="text"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4`}
-               placeholder="Filtrar per email"
+               placeholder="ID"
                aria-label="Search Input"
                value={filterText}
                onChange={(e: any) => setFilterText(e.target.value)}
@@ -56,24 +56,20 @@ export function AdminTable({ labels, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: 'Vols eliminar l\'usuari: \n' + row.email + ' ?',
+         message: 'Deleting the Object: \n' + row._id + ' \nare you sure?',
          buttons: [
             {
                label: 'Eliminar',
                onClick: async () => {
-                  const del = await deleteLabel(row.email);
+                  const del = await deleteLabel(row._id, session?.user.db);
                   if (del) {
-                     toast.error('Usuari Eliminat!!', { theme: "colored" });
-                     if (session?.user.role == '1') {
-                        setRows(await getLabelsbyDB(session?.user.db));
-                     } else if (session?.user.role == '0') {
-                        setRows(await getLabels());
-                     }
+                     toast.error('Object Deleted!!', { theme: "colored" });
+                     setRows(await getLabels(session?.user.db));
                   }
                }
             },
             {
-               label: 'Millor no toco res :S',
+               label: 'No',
             }
          ]
       });
@@ -81,41 +77,46 @@ export function AdminTable({ labels, session }: any) {
 
    let columns: any = [
       {
-         name: 'Email',
-         selector: (row: any) => row.email,
+         name: 'ID',
+         selector: (row: any) => row._id,
          sortable: true,
          grow: 2,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Nom',
+         name: 'Line',
+         selector: (row: any) => row.line,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Name',
          selector: (row: any) => row.name,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Cognom',
-         selector: (row: any) => row.lastname,
+         name: 'Unit',
+         selector: (row: any) => row.unit,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'database',
-         selector: (row: any) => row.db,
+         name: 'Min',
+         selector: (row: any) => row.min,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'role',
-         selector: (row: any) => row.role,
+         name: 'Max',
+         selector: (row: any) => row.max,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Licencia',
-         selector: (row: any) => Intl.DateTimeFormat("es-ES").format(new Date(row.license?.start)) + ' - ' + Intl.DateTimeFormat("es-ES").format(new Date(row.license?.end)),
+         name: 'Type',
+         selector: (row: any) => row.type,
          sortable: true,
-         grow: 2,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {

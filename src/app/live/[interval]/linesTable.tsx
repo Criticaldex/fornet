@@ -14,7 +14,6 @@ const ExpandedComponent = ({ data }: any) => {
    const [units, setUnits] = useState(null);
    const [isLoading, setLoading] = useState(true);
 
-
    useEffect(() => {
       getNames({ line: data.line }, session?.user.db)
          .then((res: any) => {

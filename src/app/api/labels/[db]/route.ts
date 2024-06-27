@@ -19,3 +19,55 @@ export async function GET(request: Request, { params }: { params: { db: string }
       return NextResponse.json({ ERROR: (err as Error).message });
    }
 }
+
+export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
+   try {
+      const body: LabelIface = await request.json();
+      if (!params.db) {
+         return NextResponse.json(`DB Missing!`);
+      }
+
+      if (!body._id) {
+         body._id = new mongoose.mongo.ObjectId();
+      }
+
+      const dbName = params.db;
+
+      await dbConnect();
+      const db = mongoose.connection.useDb(dbName, { useCache: true });
+      if (!db.models.label) {
+         db.model('label', LabelSchema);
+      }
+      const res = await db.models.label.findByIdAndUpdate(body._id, body, {
+         new: true,
+         upsert: true,
+         rawResult: true
+      }).lean();
+      return NextResponse.json(res);
+   } catch (err) {
+      return NextResponse.json({ ERROR: (err as Error).message });
+   }
+}
+
+export async function DELETE(request: Request, { params }: { params: { db: string | undefined } }) {
+   try {
+      const body: LabelIface = await request.json();
+      if (!params.db) {
+         return NextResponse.json(`DB Missing!`);
+      } else if (!body._id) {
+         return NextResponse.json(`ID Missing!`);
+      }
+
+      const dbName = params.db;
+
+      await dbConnect();
+      const db = mongoose.connection.useDb(dbName, { useCache: true });
+      if (!db.models.label) {
+         db.model('label', LabelSchema);
+      }
+      const res = await db.models.label.findByIdAndDelete(body._id);
+      return NextResponse.json(res);
+   } catch (err) {
+      return NextResponse.json({ ERROR: (err as Error).message });
+   }
+}
