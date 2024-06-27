@@ -1,7 +1,6 @@
 import { getLines } from "@/services/values";
 import { LinesTable } from "./linesTable";
 
-
 export default async function Dashboard({ params }: any) {
    const { interval } = params;
    const lines = await getLines();

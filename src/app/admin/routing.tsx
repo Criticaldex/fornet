@@ -7,12 +7,16 @@ export function GetLinksAdmin({ session }: any) {
 
    let links: object[] = [
       {
-         label: 'Perfil',
+         label: 'Profile',
          route: `/admin/profile`
       },
       {
-         label: 'Usuaris',
+         label: 'Users',
          route: `/admin/users`
+      },
+      {
+         label: 'Values',
+         route: `/admin/labels`
       }
    ];
 

@@ -45,9 +45,9 @@ export const getChartValues = async (line: string, name: string) => {
    return values;
 }
 
-export const getLines = async (filtros?: any) => {
+export const getLines = async (db?: any) => {
    const fields = ['-_id', 'line']
-   const data = await getValues(filtros, fields);
+   const data = await getValues({}, fields, db);
    let groupBySec = _.groupBy(data, 'line');
    let lines: string[] = [];
    for (const [key, value] of (Object.entries(groupBySec) as [string, any][])) {

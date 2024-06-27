@@ -3,7 +3,7 @@ import { getCsrfToken } from "next-auth/react"
 import '../signin.css'
 import { useRouter } from "next/router";
 import Fornet from "../../public/fornet_color.svg";
-import { Inter } from '@next/font/google'
+import { Inter } from 'next/font/google'
 const inter = Inter({
    subsets: ['latin'],
    variable: '--font-inter'

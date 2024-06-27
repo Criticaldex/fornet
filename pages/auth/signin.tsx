@@ -4,7 +4,7 @@ import '../signin.css'
 import Image from 'next/image'
 import { BiPlusMedical } from "react-icons/bi"
 import Fornet from "../../public/fornet_color.svg";
-import { Inter } from '@next/font/google'
+import { Inter } from 'next/font/google'
 const inter = Inter({
    subsets: ['latin'],
    variable: '--font-inter'
