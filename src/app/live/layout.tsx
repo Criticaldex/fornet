@@ -14,7 +14,7 @@ export default async function ContractsLayout({ children }: any) {
             <div className="bg-light text-right flex justify-end items-center">
                <h1 className="right-0 mx-5 font-semibold text-lg">DB: {session?.user.db}</h1>
                <h1 className="right-0 mx-5 font-semibold text-lg">Collection: values</h1>
-               <h1 className="right-0 w-auto mx-10 font-semibold text-2xl italic">Quadre Comandament</h1>
+               <h1 className="right-0 w-auto mx-10 font-semibold text-2xl italic">Live Values</h1>
             </div>
          </div>
          <hr className="w-11/12 m-auto border-b border-accent" />

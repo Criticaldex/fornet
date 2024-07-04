@@ -7,6 +7,9 @@ export const chartOptions = {
          mouseWheel: false
       }
    },
+   credits: {
+      enabled: false
+   },
    colors: ["#ff6600", "#2caffe", "#544fc5", "#00e272", "#fe6a35", "#6b8abc", "#d568fb", "#2ee0ca", "#fa4b42", "#feb56a", "#91e8e1"],
    lang: {
       noData: "No hi han dades disponibles"
