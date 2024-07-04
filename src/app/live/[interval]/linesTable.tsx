@@ -9,6 +9,13 @@ import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
 
+function Item({ name, isPacked }: any) {
+   if (isPacked) {
+      return <li className="item">{name} ✔</li>;
+   }
+   return <li className="item">{name}</li>;
+}
+
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
    const [names, setNames] = useState(null);
@@ -26,124 +33,57 @@ const ExpandedComponent = ({ data }: any) => {
 
    if (isLoading) return <Loading />
 
+   const layoutConf: any = [
+      [
+         {
+            type: 'line',
+            index: '5'
+         }
+      ],
+      [
+         {
+            type: 'gauge',
+            index: '9'
+         },
+         {
+            type: 'bool',
+            index: '1'
+         }
+      ],
+      [
+         {
+            type: 'bool',
+            index: '1'
+         },
+         {
+            type: 'gauge',
+            index: '7'
+         }
+      ]
+   ]
+
    return (
       <>
-         <div className="flex flex-nowrap mt-2">
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-         </div>
-         <div className="flex flex-nowrap mt-2">
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <GaugeChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <GaugeChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <GaugeChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="m-2 basis-1/4 bg-bgLight rounded-md">
-               <GaugeChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-         </div>
-         <div className="flex flex-nowrap mt-2">
-            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
+         <div className="flex flex-row flex-wrap mt-2">
+            {layoutConf.map((conf: any, index: number) => {
+               return < div key={index} className="flex flex-col basis-6/12" >
+                  {conf.map((ele: any, i: number) => (
+                     <LiveChart
+                        key={i}
+                        title={'productividad'}
+                        line={data.line}
+                        names={names}
+                        index={ele.index}
+                        units={units}
+                        interval={data.interval}
+                     />
+                  ))}
+               </div>
+            })}
+
+            {/* -------------------------------------------------- */}
+
+            {/* <div className="flex flex-col basis-6/12">
                <LiveChart
                   title={'productividad'}
                   line={data.line}
@@ -153,20 +93,16 @@ const ExpandedComponent = ({ data }: any) => {
                   interval={data.interval}
                />
             </div>
-            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
-               <LiveChart
+            <div className="flex flex-col basis-3/12">
+               <GaugeChart
                   title={'productividad'}
                   line={data.line}
                   names={names}
-                  index='1'
+                  index='2'
                   units={units}
                   interval={data.interval}
                />
-            </div>
-         </div >
-         <div className="flex flex-nowrap mt-2">
-            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
-               <LiveChart
+               <BoolChart
                   title={'productividad'}
                   line={data.line}
                   names={names}
@@ -175,17 +111,25 @@ const ExpandedComponent = ({ data }: any) => {
                   interval={data.interval}
                />
             </div>
-            <div className="m-2 basis-2/4 bg-bgLight rounded-md">
-               <LiveChart
+            <div className="flex flex-col basis-3/12 mt-2">
+               <BoolChart
                   title={'productividad'}
                   line={data.line}
                   names={names}
-                  index='3'
+                  index='2'
                   units={units}
                   interval={data.interval}
                />
-            </div>
-         </div>
+               <GaugeChart
+                  title={'productividad'}
+                  line={data.line}
+                  names={names}
+                  index='2'
+                  units={units}
+                  interval={data.interval}
+               />
+            </div> */}
+         </div >
       </>
    );
 }
