@@ -9,13 +9,6 @@ import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
 
-function Item({ name, isPacked }: any) {
-   if (isPacked) {
-      return <li className="item">{name} ✔</li>;
-   }
-   return <li className="item">{name}</li>;
-}
-
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
    const [names, setNames] = useState(null);
@@ -66,69 +59,42 @@ const ExpandedComponent = ({ data }: any) => {
       <>
          <div className="flex flex-row flex-wrap mt-2">
             {layoutConf.map((conf: any, index: number) => {
-               return < div key={index} className="flex flex-col basis-6/12" >
-                  {conf.map((ele: any, i: number) => (
-                     <LiveChart
-                        key={i}
-                        title={'productividad'}
-                        line={data.line}
-                        names={names}
-                        index={ele.index}
-                        units={units}
-                        interval={data.interval}
-                     />
-                  ))}
+               return < div key={index} className={`flex flex-col ${conf.length > 1 ? 'basis-3/12' : 'basis-6/12'}`}>
+                  {conf.map((ele: any, i: number) => {
+                     if (ele.type == 'line') {
+                        return <LiveChart
+                           key={i}
+                           title={'productividad'}
+                           line={data.line}
+                           names={names}
+                           index={ele.index}
+                           units={units}
+                           interval={data.interval}
+                        />
+                     } else if (ele.type == 'gauge') {
+                        return <GaugeChart
+                           key={i}
+                           title={'productividad'}
+                           line={data.line}
+                           names={names}
+                           index={ele.index}
+                           units={units}
+                           interval={data.interval}
+                        />
+                     } else if (ele.type == 'bool') {
+                        return <BoolChart
+                           key={i}
+                           title={'productividad'}
+                           line={data.line}
+                           names={names}
+                           index={ele.index}
+                           units={units}
+                           interval={data.interval}
+                        />
+                     }
+                  })}
                </div>
             })}
-
-            {/* -------------------------------------------------- */}
-
-            {/* <div className="flex flex-col basis-6/12">
-               <LiveChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='0'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="flex flex-col basis-3/12">
-               <GaugeChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div>
-            <div className="flex flex-col basis-3/12 mt-2">
-               <BoolChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-               <GaugeChart
-                  title={'productividad'}
-                  line={data.line}
-                  names={names}
-                  index='2'
-                  units={units}
-                  interval={data.interval}
-               />
-            </div> */}
          </div >
       </>
    );
