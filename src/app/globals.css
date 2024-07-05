@@ -8,9 +8,9 @@
    --background-end: #222;
    --background-color: #222;
    --background-color-transparent: #222222bb;
-   --text-color: #ddd;
-   --text-color-2: #dddddd88;
    --bg-nav: #161616;
+   --text-color: #ddd;
+   --text-color-2: #bbb;
    --bg-light: #424242;
    --bg-dark: #333;
    --red-1: #f22613;
@@ -38,40 +38,6 @@
    --seleccio2: #9DA2EE50;
    --universals: #B05AAA;
    --universals2: #B05AAA50;
-}
-
-@media (prefers-color-scheme: dark) {
-   :root {
-      --foreground: #ddd;
-      --background-start: #222;
-      --background-end: #222;
-      --background-color: #222;
-      --bg-nav: #161616;
-      --text-color: #ddd;
-      --text-color-2: #bbb;
-      --bg-light: #424242;
-      --bg-dark: #333;
-      --contrario: #f2f2f2;
-      --pestanaDark: #838383;
-      --pestanaLight: #555555e6;
-   }
-}
-
-@media (prefers-color-scheme: light) {
-   :root {
-      --foreground: #222;
-      --background-start: #ddd;
-      --background-end: #ddd;
-      --background-color: #ddd;
-      --bg-nav: #eee;
-      --text-color: #222;
-      --text-color-2: #33333388;
-      --bg-light: #fff;
-      --bg-dark: #ccc;
-      --contrario: #262626;
-      --pestanaDark: #262626e6;
-      --pestanaLight: #838383;
-   }
 }
 
 body {
