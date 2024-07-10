@@ -11,7 +11,7 @@ const getValues = async (filter: any, fields?: string[], db?: string) => {
       fields = ['-_id'];
    }
 
-   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values`,
+   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${db}`,
       {
          method: 'POST',
          headers: {
@@ -19,7 +19,6 @@ const getValues = async (filter: any, fields?: string[], db?: string) => {
          },
          body: JSON.stringify(
             {
-               db: db,
                fields: fields,
                filter: filter,
                sort: 'ordre'
@@ -69,4 +68,15 @@ export const getNames = async (filtros?: any, db?: any) => {
    }
 
    return { names, units };
+}
+
+export const deleteValues = async (line: string, name: string, db: string | undefined) => {
+   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${db}`,
+      {
+         method: 'DELETE',
+         headers: {
+            'Content-type': 'application/json',
+         },
+         body: JSON.stringify({ 'line': line, 'name': name })
+      }).then(res => res.json());
 }

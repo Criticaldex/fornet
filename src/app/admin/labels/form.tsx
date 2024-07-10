@@ -33,10 +33,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          _id: data._id,
          line: data.line,
          name: data.name,
-         unit: data.unit,
-         min: data.min,
-         max: data.max,
-         type: data.type
+         unit: data.unit
       }
       const upsert = await upsertLabel(upsertData, session?.user.db);
       if (upsert.lastErrorObject?.updatedExisting) {
@@ -101,33 +98,6 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
                {...register("unit", { required: 'Field Required' })} />
          </div>
          {errors.unit && <p role="alert" className="text-red self-end">⚠ {errors.unit?.message}</p>}
-
-         <div className="inline-flex justify-end">
-            <label htmlFor="min" className="self-center">Min:</label>
-            <input id="min" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.min ? 'border-foreground' : 'border-red'}`}
-               {...register("min")} />
-         </div>
-         {errors.min && <p role="alert" className="text-red self-end">⚠ {errors.min?.message}</p>}
-
-         <div className="inline-flex justify-end">
-            <label htmlFor="max" className="self-center">Max:</label>
-            <input id="max" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.max ? 'border-foreground' : 'border-red'}`}
-               {...register("max")} />
-         </div>
-         {errors.max && <p role="alert" className="text-red self-end">⚠ {errors.max?.message}</p>}
-
-         <div className="inline-flex justify-end">
-            <label htmlFor="type" className="self-center">Type:</label>
-            <select id="type" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.type ? 'border-foreground' : 'border-red'}`}
-               {...register("type", { required: 'Field Required' })}>
-               <option key='' value=''>Select...</option>
-               <option key="line" value="line">Line</option>
-               <option key="gauge" value="gauge"> Gauge </option>
-               <option key="boolean" value="boolean"> Boolean </option>
-            </select>
-         </div>
-         {errors.type && <p role="alert" className="text-red self-end">⚠ {errors.type?.message}</p>}
-
          <div className="inline-flex justify-around">
             <input type="reset" onClick={reset} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
             <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
