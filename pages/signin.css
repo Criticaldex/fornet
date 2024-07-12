@@ -1,11 +1,11 @@
 :root {
    --foreground: #ddd;
    --background-primary: #222;
-   --background-secondary: #00000099;
+   --background-secondary: #00000033;
    --input-bg: #4a4a4a;
    --accent: #6a040f;
    --accentLight: #e85d04;
-   --border: #c7c7c7;
+   --border: #888888;
    --error: #6a040f;
    --button: #ff6600dd;
 }
@@ -67,8 +67,8 @@ section {
    backdrop-filter: blur(40px);
    vertical-align: middle;
    text-align: center;
-   border: solid 1px var(--border);
    border-radius: 5px;
+   border: solid 1px var(--border);
 }
 
 section h1 {

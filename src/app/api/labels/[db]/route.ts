@@ -27,8 +27,17 @@ export async function PATCH(request: Request, { params }: { params: { db: string
          return NextResponse.json(`DB Missing!`);
       }
 
-      if (!body._id) {
-         body._id = new mongoose.mongo.ObjectId();
+      if (!body.line) {
+         return NextResponse.json(`Line Missing!`);
+      }
+
+      if (!body.name) {
+         return NextResponse.json(`Name Missing!`);
+      }
+
+      const filter = {
+         line: body.line,
+         name: body.name
       }
 
       const dbName = params.db;
@@ -38,11 +47,12 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       if (!db.models.label) {
          db.model('label', LabelSchema);
       }
-      const res = await db.models.label.findByIdAndUpdate(body._id, body, {
+      const res = await db.models.label.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
          rawResult: true
       }).lean();
+
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
