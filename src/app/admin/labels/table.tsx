@@ -82,13 +82,6 @@ export function AdminTable({ labels, session }: any) {
 
    let columns: any = [
       {
-         name: 'ID',
-         selector: (row: any) => row._id,
-         sortable: true,
-         grow: 2,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
          name: 'Line',
          selector: (row: any) => row.line,
          sortable: true,

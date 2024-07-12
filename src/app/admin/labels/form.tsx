@@ -53,13 +53,6 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          onSubmit={onSubmit}
       >
          <div className="inline-flex justify-end">
-            <label htmlFor="id" className="flex self-center">ID:</label>
-            <input id="id" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.id ? 'border-foreground' : 'border-red'}`}
-               disabled
-               {...register("_id")} />
-         </div>
-
-         <div className="inline-flex justify-end">
             <label htmlFor="line" className="flex self-center">Line:</label>
             <select id="line"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.line ? 'border-foreground' : 'border-red'}`}
