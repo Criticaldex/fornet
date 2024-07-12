@@ -11,6 +11,7 @@ import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
+import { deleteValues } from '@/services/values';
 
 export function AdminTable({ labels, session }: any) {
 
@@ -56,15 +57,19 @@ export function AdminTable({ labels, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: 'Deleting the Object: \n' + row._id + ' \nare you sure?',
+         message: 'Deleting ' + row.name + ' in ' + row.line + ' line\nAre you sure?',
          buttons: [
             {
                label: 'Eliminar',
                onClick: async () => {
-                  const del = await deleteLabel(row._id, session?.user.db);
-                  if (del) {
-                     toast.error('Object Deleted!!', { theme: "colored" });
+                  const dLabel = await deleteLabel(row._id, session?.user.db);
+                  const dValue = await deleteValues(row.line, row.name, session?.user.db);
+                  if (dLabel) {
+                     toast.error('Label Deleted!!', { theme: "colored" });
                      setRows(await getLabels(session?.user.db));
+                  }
+                  if (dValue.acknowledged) {
+                     toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
                   }
                }
             },
@@ -98,24 +103,6 @@ export function AdminTable({ labels, session }: any) {
       {
          name: 'Unit',
          selector: (row: any) => row.unit,
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Min',
-         selector: (row: any) => row.min,
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Max',
-         selector: (row: any) => row.max,
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Type',
-         selector: (row: any) => row.type,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
