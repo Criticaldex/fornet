@@ -59,7 +59,7 @@ const ExpandedComponent = ({ data }: any) => {
       <>
          <div className="flex flex-row flex-wrap mt-2">
             {layoutConf.map((conf: any, index: number) => {
-               return < div key={index} className={`flex flex-col ${conf.length > 1 ? 'basis-3/12' : 'basis-6/12'}`}>
+               return < div key={index} className={`flex flex-col ${conf[0].type == "line" ? 'basis-6/12' : 'basis-3/12'}`}>
                   {conf.map((ele: any, i: number) => {
                      if (ele.type == 'line') {
                         return <LiveChart
