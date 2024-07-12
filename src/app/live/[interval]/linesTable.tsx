@@ -8,6 +8,7 @@ import { getNames } from '@/services/values';
 import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
+import { AddChart } from './addChart';
 
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
@@ -95,6 +96,9 @@ const ExpandedComponent = ({ data }: any) => {
                   })}
                </div>
             })}
+            <div className={`flex flex-col basis-6/12`}>
+               <AddChart />
+            </div>
          </div >
       </>
    );
