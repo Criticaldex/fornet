@@ -70,13 +70,13 @@ export const getNames = async (filtros?: any, db?: any) => {
    return { names, units };
 }
 
-export const deleteValues = async (line: string, name: string, db: string | undefined) => {
+export const deleteValues = async (data: object, db: string | undefined) => {
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${db}`,
       {
          method: 'DELETE',
          headers: {
             'Content-type': 'application/json',
          },
-         body: JSON.stringify({ 'line': line, 'name': name })
+         body: JSON.stringify(data)
       }).then(res => res.json());
 }

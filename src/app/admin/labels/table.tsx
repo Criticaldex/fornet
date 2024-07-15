@@ -57,13 +57,13 @@ export function AdminTable({ labels, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: 'Deleting ' + row.name + ' in ' + row.line + ' line\nAre you sure?',
+         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL ITS VALUES ⚠️ Are you sure?',
          buttons: [
             {
-               label: 'Eliminar',
+               label: 'Yes',
                onClick: async () => {
-                  const dLabel = await deleteLabel(row._id, session?.user.db);
-                  const dValue = await deleteValues(row.line, row.name, session?.user.db);
+                  const dLabel = await deleteLabel(row, session?.user.db);
+                  const dValue = await deleteValues(row, session?.user.db);
                   if (dLabel) {
                      toast.error('Label Deleted!!', { theme: "colored" });
                      setRows(await getLabels(session?.user.db));
