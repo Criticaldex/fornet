@@ -30,7 +30,6 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
    const onSubmit = handleSubmit(async (data: LabelIface) => {
       const session = await getSession();
       const upsertData = {
-         _id: data._id,
          line: data.line,
          name: data.name,
          unit: data.unit

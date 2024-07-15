@@ -63,14 +63,14 @@ export function AdminTable({ labels, session }: any) {
                label: 'Eliminar',
                onClick: async () => {
                   const dLabel = await deleteLabel(row._id, session?.user.db);
-                  const dValue = await deleteValues(row.line, row.name, session?.user.db);
+                  // const dValue = await deleteValues(row.line, row.name, session?.user.db);
                   if (dLabel) {
                      toast.error('Label Deleted!!', { theme: "colored" });
                      setRows(await getLabels(session?.user.db));
                   }
-                  if (dValue.acknowledged) {
-                     toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
-                  }
+                  // if (dValue.acknowledged) {
+                  //    toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
+                  // }
                }
             },
             {

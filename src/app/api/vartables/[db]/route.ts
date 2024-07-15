@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
-import LabelSchema, { LabelIface } from '@/schemas/label'
+import VartableSchema, { VartableIface } from '@/schemas/vartable'
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request, { params }: { params: { db: string } }) {
@@ -8,13 +8,13 @@ export async function GET(request: Request, { params }: { params: { db: string }
       const dbName = params.db;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
-      if (!db.models.label) {
-         db.model('label', LabelSchema);
+      if (!db.models.vartable) {
+         db.model('vartable', VartableSchema);
       }
 
-      const labels = (await db.models.label.find().lean()) as LabelIface[];
+      const vartables = (await db.models.vartable.find().lean()) as VartableIface[];
 
-      return NextResponse.json(labels);
+      return NextResponse.json(vartables);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
    }
@@ -22,12 +22,16 @@ export async function GET(request: Request, { params }: { params: { db: string }
 
 export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
-      const body: LabelIface = await request.json();
+      const body: VartableIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
-      } else if (!body.line) {
+      }
+
+      if (!body.line) {
          return NextResponse.json(`Line Missing!`);
-      } else if (!body.name) {
+      }
+
+      if (!body.name) {
          return NextResponse.json(`Name Missing!`);
       }
 
@@ -40,10 +44,10 @@ export async function PATCH(request: Request, { params }: { params: { db: string
 
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
-      if (!db.models.label) {
-         db.model('label', LabelSchema);
+      if (!db.models.vartable) {
+         db.model('vartable', VartableSchema);
       }
-      const res = await db.models.label.findOneAndUpdate(filter, body, {
+      const res = await db.models.vartable.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
          rawResult: true
@@ -57,27 +61,21 @@ export async function PATCH(request: Request, { params }: { params: { db: string
 
 export async function DELETE(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
-      const body: LabelIface = await request.json();
+      const body: VartableIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
-      } else if (!body.line) {
-         return NextResponse.json(`Line Missing!`);
-      } else if (!body.name) {
-         return NextResponse.json(`Name Missing!`);
+      } else if (!body._id) {
+         return NextResponse.json(`ID Missing!`);
       }
 
       const dbName = params.db;
 
-      const filter = {
-         line: body.line,
-         name: body.name
-      }
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
-      if (!db.models.label) {
-         db.model('label', LabelSchema);
+      if (!db.models.vartable) {
+         db.model('vartable', VartableSchema);
       }
-      const res = await db.models.label.findOneAndDelete(filter);
+      const res = await db.models.vartable.findByIdAndDelete(body._id);
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
