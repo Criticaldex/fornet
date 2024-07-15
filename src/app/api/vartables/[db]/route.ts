@@ -25,19 +25,18 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       const body: VartableIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
-      }
-
-      if (!body.line) {
-         return NextResponse.json(`Line Missing!`);
-      }
-
-      if (!body.name) {
-         return NextResponse.json(`Name Missing!`);
+      } else if (!body.line) {
+         return NextResponse.json(`line Missing!`);
+      } else if (!body.plc_name) {
+         return NextResponse.json(`plc_name Missing!`);
+      } else if (!body.name) {
+         return NextResponse.json(`name Missing!`);
       }
 
       const filter = {
          line: body.line,
-         name: body.name
+         name: body.name,
+         plc_name: body.plc_name
       }
 
       const dbName = params.db;
@@ -64,8 +63,18 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       const body: VartableIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
-      } else if (!body._id) {
-         return NextResponse.json(`ID Missing!`);
+      } else if (!body.line) {
+         return NextResponse.json(`line Missing!`);
+      } else if (!body.plc_name) {
+         return NextResponse.json(`plc_name Missing!`);
+      } else if (!body.name) {
+         return NextResponse.json(`name Missing!`);
+      }
+
+      const filter = {
+         line: body.line,
+         name: body.name,
+         plc_name: body.plc_name
       }
 
       const dbName = params.db;
@@ -75,7 +84,7 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       if (!db.models.vartable) {
          db.model('vartable', VartableSchema);
       }
-      const res = await db.models.vartable.findByIdAndDelete(body._id);
+      const res = await db.models.vartable.findOneAndDelete(filter);
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
