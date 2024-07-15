@@ -19,13 +19,13 @@ export const upsertLabel = async (data: LabelIface, db: string | undefined) => {
       }).then(res => res.json());
 }
 
-export const deleteLabel = async (id: string | object, db: string | undefined) => {
+export const deleteLabel = async (data: object, db: string | undefined) => {
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labels/${db}`,
       {
          method: 'DELETE',
          headers: {
             'Content-type': 'application/json',
          },
-         body: JSON.stringify({ '_id': id })
+         body: JSON.stringify(data)
       }).then(res => res.json());
 }
