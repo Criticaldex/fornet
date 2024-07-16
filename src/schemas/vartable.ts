@@ -1,14 +1,19 @@
 import mongoose from 'mongoose'
 
 export interface VartableIface {
+   _id: any,
+   line: string,
    name: string,
    plc_name: string,
-   line: string,
-   unit: string
-   address: string
+   unit?: string
+   address?: string
 }
 
 const VartableSchema = new mongoose.Schema({
+   line: {
+      type: String,
+      required: [true, 'Line is mandatory!']
+   },
    name: {
       type: String,
       required: [true, 'Name is mandatory!']
@@ -16,10 +21,6 @@ const VartableSchema = new mongoose.Schema({
    plc_name: {
       type: String,
       required: [true, 'Name is mandatory!']
-   },
-   line: {
-      type: String,
-      required: [true, 'Line is mandatory!']
    },
    unit: {
       type: String,

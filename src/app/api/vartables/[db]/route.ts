@@ -22,7 +22,7 @@ export async function GET(request: Request, { params }: { params: { db: string }
 
 export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
-      const body: VartableIface = await request.json();
+      const { _id, ...body }: VartableIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
       } else if (!body.line) {
