@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
 
 export interface LabelIface {
-   name: string,
+   name?: string,
    line: string,
-   unit: string
+   unit?: string
 }
 
 const LabelSchema = new mongoose.Schema({
