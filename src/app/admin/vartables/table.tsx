@@ -2,10 +2,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { createThemes } from "@/styles/themes"
-import { LabelsForm } from "./form";
-import { LabelIface } from "@/schemas/label";
+import { VartablesForm } from "./form";
+import { VartableIface } from "@/schemas/vartable";
 import { useForm, UseFormReset } from "react-hook-form";
-import { deleteLabel, getLabels } from '@/services/labels';
+import { deleteVartable, getVartables } from '@/services/vartables';
 import { confirmAlert } from 'react-confirm-alert';
 import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
@@ -13,9 +13,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
 
-export function AdminTable({ labels, session }: any) {
+export function AdminTable({ vartables, session }: any) {
 
-   const [rows, setRows] = useState(labels);
+   const [rows, setRows] = useState(vartables);
    const [filterText, setFilterText] = useState('');
    const [isClient, setIsClient] = useState(false);
 
@@ -49,9 +49,9 @@ export function AdminTable({ labels, session }: any) {
       reset,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
-   } = useForm<LabelIface>();
+   } = useForm<VartableIface>();
 
-   const editHandler = (row: LabelIface, reset: UseFormReset<LabelIface>) => (event: any) => {
+   const editHandler = (row: VartableIface, reset: UseFormReset<VartableIface>) => (event: any) => {
       reset(row)
    }
 
@@ -62,11 +62,11 @@ export function AdminTable({ labels, session }: any) {
             {
                label: 'Yes',
                onClick: async () => {
-                  const dLabel = await deleteLabel(row, session?.user.db);
+                  const dVartable = await deleteVartable(row, session?.user.db);
                   const dValue = await deleteValues(row, session?.user.db);
-                  if (dLabel) {
-                     toast.error('Label Deleted!!', { theme: "colored" });
-                     setRows(await getLabels(session?.user.db));
+                  if (dVartable) {
+                     toast.error('Vartable Deleted!!', { theme: "colored" });
+                     setRows(await getVartables(session?.user.db));
                   }
                   if (dValue.acknowledged) {
                      toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
@@ -94,8 +94,20 @@ export function AdminTable({ labels, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
+         name: 'PLC Name',
+         selector: (row: any) => row.plc_name,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
          name: 'Unit',
          selector: (row: any) => row.unit,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Address',
+         selector: (row: any) => row.address,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
@@ -131,17 +143,13 @@ export function AdminTable({ labels, session }: any) {
                   />
                </div>
                <div className="flex basis-1/4 rounded-md bg-light">
-                  <LabelsForm
+                  <VartablesForm
                      register={register}
                      handleSubmit={handleSubmit}
                      errors={errors}
-                     clearErrors={clearErrors}
                      setRows={setRows}
                      toast={toast}
-                     isDirty={isDirty}
-                     dirtyFields={dirtyFields}
                      reset={reset}
-                     session={session}
                   />
                </div>
             </div>

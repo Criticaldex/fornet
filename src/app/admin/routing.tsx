@@ -17,6 +17,10 @@ export function GetLinksAdmin({ session }: any) {
       {
          label: 'Values',
          route: `/admin/labels`
+      },
+      {
+         label: 'PLCs',
+         route: `/admin/vartables`
       }
    ];
 

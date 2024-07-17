@@ -29,8 +29,10 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       const body: ValueIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
-      } else if (!body.line || !body.name) {
-         return NextResponse.json(`Line and name required!`);
+      } else if (!body.line) {
+         return NextResponse.json(`Line Missing!`);
+      } else if (!body.name) {
+         return NextResponse.json(`Name Missing!`);
       }
 
       const dbName = params.db;

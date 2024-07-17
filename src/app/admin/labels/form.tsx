@@ -30,7 +30,6 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
    const onSubmit = handleSubmit(async (data: LabelIface) => {
       const session = await getSession();
       const upsertData = {
-         _id: data._id,
          line: data.line,
          name: data.name,
          unit: data.unit
@@ -52,13 +51,6 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          className="flex flex-col gap-4 grow rounded-md p-4 bg-bgLight"
          onSubmit={onSubmit}
       >
-         <div className="inline-flex justify-end">
-            <label htmlFor="id" className="flex self-center">ID:</label>
-            <input id="id" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.id ? 'border-foreground' : 'border-red'}`}
-               disabled
-               {...register("_id")} />
-         </div>
-
          <div className="inline-flex justify-end">
             <label htmlFor="line" className="flex self-center">Line:</label>
             <select id="line"
