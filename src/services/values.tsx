@@ -64,7 +64,6 @@ export const getNames = async (filter?: ValueIface, db?: any) => {
       names.push(key);
       units.push(value[0].unit);
    }
-
    return { names, units };
 }
 

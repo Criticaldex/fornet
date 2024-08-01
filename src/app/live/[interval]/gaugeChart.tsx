@@ -18,7 +18,7 @@ if (typeof Highcharts === "object") {
    solidGauge(Highcharts);
 }
 
-export function GaugeChart({ line, names, index, units, interval }: any) {
+export function GaugeChart({ line, names, index, units, min, max }: any) {
    const [name, setName] = useState(names[index]);
    const [unit, setUnit] = useState(units[index]);
 
@@ -50,8 +50,8 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
          tickWidth: 0,
          minorTickInterval: null,
          tickAmount: 2,
-         max: 2000,
-         min: 0,
+         max: max,
+         min: min,
          labels: {
             y: 20
          }
@@ -96,7 +96,7 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
 
    return (
       <div className="m-2">
-         <div className="flex justify-start grow mb-2 mx-2">
+         <div className="flex justify-between grow mb-2 mx-2">
             <GetNames
                names={names}
                units={units}
@@ -104,6 +104,7 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
                setter={setName}
                setUnit={setUnit}
             />
+            <label htmlFor="x">X</label>
          </div>
          <HighchartsReact
             highcharts={Highcharts}

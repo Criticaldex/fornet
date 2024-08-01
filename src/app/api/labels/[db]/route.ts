@@ -20,6 +20,24 @@ export async function GET(request: Request, { params }: { params: { db: string }
    }
 }
 
+export async function POST(request: Request, { params }: { params: { db: string } }) {
+   try {
+      const body: LabelIface = await request.json();
+      const dbName = params.db;
+      await dbConnect();
+      const db = mongoose.connection.useDb(dbName, { useCache: true });
+      if (!db.models.label) {
+         db.model('label', LabelSchema);
+      }
+
+      const labels = (await db.models.label.find(body).lean()) as LabelIface[];
+
+      return NextResponse.json(labels);
+   } catch (err) {
+      return NextResponse.json({ ERROR: (err as Error).message });
+   }
+}
+
 export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
       const body: LabelIface = await request.json();
