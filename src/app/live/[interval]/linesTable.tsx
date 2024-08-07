@@ -27,6 +27,7 @@ const ExpandedComponent = ({ data }: any) => {
 
    if (isLoading) return <Loading />
 
+   // const layoutConf: any = session?.user.config.live;
    const layoutConf: any = [
       [
          {

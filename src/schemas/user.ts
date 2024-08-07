@@ -13,12 +13,16 @@ export interface UserIface {
    db: string,
    role: string,
    config: {
-      live: {
-         type: string,
-         index: string,
-         min: number,
-         max: number
-      }
+      live: [
+         [
+            {
+               type: string,
+               index: string,
+               min: number,
+               max: number
+            }
+         ]
+      ]
    }
 }
 
