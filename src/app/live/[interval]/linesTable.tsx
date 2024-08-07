@@ -8,6 +8,7 @@ import { getNames } from '@/services/values';
 import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
+import { FaPlus } from "react-icons/fa6";
 
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
@@ -26,6 +27,7 @@ const ExpandedComponent = ({ data }: any) => {
 
    if (isLoading) return <Loading />
 
+   // const layoutConf: any = session?.user.config.live;
    const layoutConf: any = [
       [
          {
@@ -36,7 +38,9 @@ const ExpandedComponent = ({ data }: any) => {
       [
          {
             type: 'gauge',
-            index: '9'
+            index: '9',
+            min: 0,
+            max: 2000
          },
          {
             type: 'bool',
@@ -50,7 +54,9 @@ const ExpandedComponent = ({ data }: any) => {
          },
          {
             type: 'gauge',
-            index: '7'
+            index: '7',
+            min: 0,
+            max: 2000
          }
       ]
    ]
@@ -79,7 +85,8 @@ const ExpandedComponent = ({ data }: any) => {
                            names={names}
                            index={ele.index}
                            units={units}
-                           interval={data.interval}
+                           min={ele.min}
+                           max={ele.max}
                         />
                      } else if (ele.type == 'bool') {
                         return <BoolChart
@@ -95,9 +102,17 @@ const ExpandedComponent = ({ data }: any) => {
                   })}
                </div>
             })}
+            {/* <div className={`flex flex-col basis-6/12`}>
+               <BasicModal />
+            </div> */}
          </div >
       </>
    );
+}
+
+const handleAdd = (row: any) => (event: any) => {
+   console.log('AAAAAAAAAAa');
+
 }
 
 export function LinesTable({ lines, interval }: any) {
@@ -106,6 +121,22 @@ export function LinesTable({ lines, interval }: any) {
       selector: (row: any) => row.line,
       sortable: true,
       style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+   },
+   {
+      name: 'Accions',
+      cell: (row: any) => (
+         <div className='flex flex-row mr-4'>
+            <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 border-foreground'}>
+               <option key='line' value='line'>Line</option>
+               <option key='gauge' value='gauge'>Gauge</option>
+               <option key='bool' value='bool'>Bool</option>
+            </select>
+            <FaPlus size={20} onClick={handleAdd(row)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
+            {/* <FaTrashCan onClick={deleteHandler(row)} className='cursor-pointer m-1'>Delete</FaTrashCan> */}
+         </div>
+      ),
+      ignoreRowClick: true,
+      button: true,
    }];
 
    const data = lines.map((line: String) => {

@@ -18,6 +18,18 @@ declare module "next-auth" {
          server: string,
          db: string,
          role: string,
+         config: {
+            live: [
+               [
+                  {
+                     type: string,
+                     index: string,
+                     min: number,
+                     max: number
+                  }
+               ]
+            ]
+         }
       } & DefaultSession["user"]
    }
 }
