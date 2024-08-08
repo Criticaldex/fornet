@@ -43,7 +43,7 @@
       "src/lib/dbConnect.ts",
       "src/app/api/contracts",
       "build/types/**/*.ts"
-   ],
+, "src/app/dnd/page.js"   ],
    "exclude": [
       "node_modules"
    ]

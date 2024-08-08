@@ -9,6 +9,7 @@ import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
 import { FaPlus } from "react-icons/fa6";
+import { DragDropContext } from 'react-beautiful-dnd';
 
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
