@@ -3,7 +3,8 @@ import mongoose from 'mongoose'
 export interface LabelIface {
    name?: string,
    line: string,
-   unit?: string
+   unit?: string,
+   created: bool
 }
 
 const LabelSchema = new mongoose.Schema({
@@ -17,6 +18,9 @@ const LabelSchema = new mongoose.Schema({
    },
    unit: {
       type: String,
+   },
+   created: {
+      type: Bool,
    }
 });
 
