@@ -4,7 +4,7 @@ export interface LabelIface {
    name?: string,
    line: string,
    unit?: string,
-   created: bool
+   created?: bool
 }
 
 const LabelSchema = new mongoose.Schema({
