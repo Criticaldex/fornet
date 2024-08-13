@@ -1,18 +1,18 @@
 import { getSession } from "@/services/session"
 import { AdminTable } from "./table"
-import { getLabels } from "@/services/labels"
+import { getSensors } from "@/services/sensors"
 
 export default async function ValuesPage() {
    const session = await getSession();
-   let labels = null;
+   let sensors = null;
    if (session) {
-      labels = await getLabels(session?.user.db);
+      sensors = await getSensors(session?.user.db);
    }
 
    return (
       <div className="flex flex-col">
          <AdminTable
-            labels={labels}
+            sensors={sensors}
             session={session}
          />
       </div >

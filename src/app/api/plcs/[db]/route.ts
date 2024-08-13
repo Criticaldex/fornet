@@ -20,6 +20,28 @@ export async function GET(request: Request, { params }: { params: { db: string }
    }
 }
 
+export async function POST(request: Request, { params }: { params: { db: string } }) {
+   try {
+      const body = await request.json();
+      if (!params.db) {
+         return NextResponse.json(`DB Missing!`);
+      }
+      const fields = (body.fields) ? body.fields.join(' ') : '';
+      const dbName = params.db;
+      await dbConnect();
+      const db = mongoose.connection.useDb(dbName, { useCache: true });
+      if (!db.models.plc) {
+         db.model('plc', PlcSchema);
+      }
+
+      const plcs = (await db.models.plc.find(body.filter).select(fields).sort(body.sort).lean()) as PlcIface[];
+
+      return NextResponse.json(plcs);
+   } catch (err) {
+      return NextResponse.json({ ERROR: (err as Error).message });
+   }
+}
+
 export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
       const { _id, ...body }: PlcIface = await request.json();

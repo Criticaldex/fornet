@@ -1,15 +1,15 @@
 'use client';
 
-import { LabelIface } from "@/schemas/label";
-import { getNames, getLines } from '@/services/values';
-import { getLabels, upsertLabel } from "@/services/labels";
+import { SensorIface } from "@/schemas/sensor";
+import { getNames, getLines } from '@/services/plcs';
+import { getSensors, upsertSensor } from "@/services/sensors";
 import { getSession } from "next-auth/react"
 import { useEffect, useState } from "react";
 
 export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, isDirty, dirtyFields, reset, session }: any) => {
    const [lines, setLines] = useState(['-']);
    const [linia, setLinia] = useState('');
-   const [names, setNames] = useState(['-']);
+   const [plcNames, setPlcNames] = useState(['-']);
 
 
    useEffect(() => {
@@ -21,20 +21,16 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
    }, [session?.user.db])
 
    useEffect(() => {
-      getNames({ 'line': linia }, session?.user.db)
+      getNames(session?.user.db, linia)
          .then((res: any) => {
-            setNames(res.names);
+            setPlcNames(res);
          });
    }, [linia, session?.user.db])
 
-   const onSubmit = handleSubmit(async (data: LabelIface) => {
+   const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
-      const upsertData = {
-         line: data.line,
-         name: data.name,
-         unit: data.unit
-      }
-      const upsert = await upsertLabel(upsertData, session?.user.db);
+      const upsert = await upsertSensor(data, session?.user.db);
+
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
       } else {
@@ -42,7 +38,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
       }
       reset(data);
 
-      setRows(await getLabels(session?.user.db));
+      setRows(await getSensors(session?.user.db));
    });
 
    return (
@@ -70,26 +66,49 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
 
          <div className="inline-flex justify-end">
-            <label htmlFor="name" className="flex self-center">Name:</label>
-            <select id="name"
-               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.name ? 'border-foreground' : 'border-red'}`}
-               {...register("name", { required: 'Field Required' })}>
+            <label htmlFor="plc_name" className="flex self-center">PLC Name:</label>
+            <select id="plc_name"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.plc_name ? 'border-foreground' : 'border-red'}`}
+               {...register("plc_name", { required: 'Field Required' })}>
                <option key='' value=''>Select...</option>
-               {names.map((name: any) => {
+               {plcNames.map((name: any) => {
                   return <option key={name} value={`${name}`}>
                      {name}
                   </option>
                })}
             </select>
          </div>
+         {errors.plc_name && <p role="alert" className="text-red self-end">⚠ {errors.plc_name?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="name" className="self-center">Name:</label>
+            <input id="name" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.name ? 'border-foreground' : 'border-red'}`}
+               {...register("name", { required: 'Field Required' })} />
+         </div>
          {errors.name && <p role="alert" className="text-red self-end">⚠ {errors.name?.message}</p>}
 
          <div className="inline-flex justify-end">
             <label htmlFor="unit" className="self-center">Unit:</label>
-            <input id="unit" type="unit" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.unit ? 'border-foreground' : 'border-red'}`}
+            <input id="unit" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.unit ? 'border-foreground' : 'border-red'}`}
                {...register("unit", { required: 'Field Required' })} />
          </div>
          {errors.unit && <p role="alert" className="text-red self-end">⚠ {errors.unit?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="address" className="self-center">Address:</label>
+            <input id="address" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.address ? 'border-foreground' : 'border-red'}`}
+               {...register("address", { required: 'Field Required' })} />
+         </div>
+         {errors.address && <p role="alert" className="text-red self-end">⚠ {errors.address?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="active" className="self-center">Active:</label>
+            <input id="active"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
+               {...register("active")} type="checkbox" value="true" />
+         </div>
+         {errors.active && <p role="alert" className="text-red self-end">⚠ {errors.active?.message}</p>}
+
          <div className="inline-flex justify-around">
             <input type="reset" onClick={reset} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
             <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
