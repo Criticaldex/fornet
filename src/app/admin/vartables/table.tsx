@@ -2,10 +2,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { createThemes } from "@/styles/themes"
-import { VartablesForm } from "./form";
-import { VartableIface } from "@/schemas/vartable";
+import { PlcForm } from "./form";
+import { PlcIface } from "@/schemas/plc";
 import { useForm, UseFormReset } from "react-hook-form";
-import { deleteVartable, getVartables } from '@/services/vartables';
+import { deletePlc, getPlcs } from '@/services/plcs';
 import { confirmAlert } from 'react-confirm-alert';
 import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
 
-export function AdminTable({ vartables, session }: any) {
+export function PlcTable({ vartables, session }: any) {
 
    const [rows, setRows] = useState(vartables);
    const [filterText, setFilterText] = useState('');
@@ -49,27 +49,23 @@ export function AdminTable({ vartables, session }: any) {
       reset,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
-   } = useForm<VartableIface>();
+   } = useForm<PlcIface>();
 
-   const editHandler = (row: VartableIface, reset: UseFormReset<VartableIface>) => (event: any) => {
+   const editHandler = (row: PlcIface, reset: UseFormReset<PlcIface>) => (event: any) => {
       reset(row)
    }
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL ITS VALUES ⚠️ Are you sure?',
+         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?',
          buttons: [
             {
                label: 'Yes',
                onClick: async () => {
-                  const dVartable = await deleteVartable(row, session?.user.db);
-                  const dValue = await deleteValues(row, session?.user.db);
-                  if (dVartable) {
+                  const plc = await deletePlc(row, session?.user.db);
+                  if (plc) {
                      toast.error('Vartable Deleted!!', { theme: "colored" });
-                     setRows(await getVartables(session?.user.db));
-                  }
-                  if (dValue.acknowledged) {
-                     toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
+                     setRows(await getPlcs(session?.user.db));
                   }
                }
             },
@@ -94,20 +90,14 @@ export function AdminTable({ vartables, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'PLC Name',
-         selector: (row: any) => row.plc_name,
+         name: 'IP',
+         selector: (row: any) => row.ip,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Unit',
-         selector: (row: any) => row.unit,
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Address',
-         selector: (row: any) => row.address,
+         name: 'Type',
+         selector: (row: any) => row.type,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
@@ -143,7 +133,7 @@ export function AdminTable({ vartables, session }: any) {
                   />
                </div>
                <div className="flex basis-1/4 rounded-md bg-light">
-                  <VartablesForm
+                  <PlcForm
                      register={register}
                      handleSubmit={handleSubmit}
                      errors={errors}
