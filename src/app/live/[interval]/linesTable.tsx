@@ -112,7 +112,6 @@ const ExpandedComponent = ({ data }: any) => {
 
 const handleAdd = (row: any) => (event: any) => {
    console.log('AAAAAAAAAAa');
-
 }
 
 export function LinesTable({ lines, interval }: any) {
