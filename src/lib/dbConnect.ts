@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 
 const MONGODB_URL = process.env.MONGO_HOST as string
 
-
 if (!MONGODB_URL) {
    throw new Error(
       'Please define the MONGO_HOST environment variable inside .env.local'

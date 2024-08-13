@@ -1,17 +1,17 @@
 import { getSession } from "@/services/session"
-import { AdminTable } from "./table"
-import { getVartables } from "@/services/vartables"
+import { PlcTable } from "./table"
+import { getPlcs } from "@/services/plcs"
 
 export default async function ValuesPage() {
    const session = await getSession();
    let vartables = null;
    if (session) {
-      vartables = await getVartables(session?.user.db);
+      vartables = await getPlcs(session?.user.db);
    }
 
    return (
       <div className="flex flex-col">
-         <AdminTable
+         <PlcTable
             vartables={vartables}
             session={session}
          />
