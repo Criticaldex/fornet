@@ -4,15 +4,15 @@ import { getPlcs } from "@/services/plcs"
 
 export default async function ValuesPage() {
    const session = await getSession();
-   let vartables = null;
+   let plcs = null;
    if (session) {
-      vartables = await getPlcs(session?.user.db);
+      plcs = await getPlcs(session?.user.db);
    }
 
    return (
       <div className="flex flex-col">
          <PlcTable
-            vartables={vartables}
+            plcs={plcs}
             session={session}
          />
       </div >

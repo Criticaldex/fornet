@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 
 export interface SensorIface {
+   _id: any,
    line: string,
    name: string,
    plc_name: string,

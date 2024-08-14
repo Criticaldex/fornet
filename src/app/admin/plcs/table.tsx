@@ -13,9 +13,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
 
-export function PlcTable({ vartables, session }: any) {
+export function PlcTable({ plcs, session }: any) {
 
-   const [rows, setRows] = useState(vartables);
+   const [rows, setRows] = useState(plcs);
    const [filterText, setFilterText] = useState('');
    const [isClient, setIsClient] = useState(false);
 
