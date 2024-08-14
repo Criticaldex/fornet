@@ -48,7 +48,11 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset 
 
          <div className="inline-flex justify-end">
             <label htmlFor="type" className="self-center">Type:</label>
-            <input id="type" type="text" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.type ? 'border-foreground' : 'border-red'}`}
+            <input id="type"
+               type="text"
+               disabled
+               value="s7 endpoint"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.type ? 'border-foreground' : 'border-red'}`}
                {...register("type", { required: 'Field Required' })} />
          </div>
          {errors.type && <p role="alert" className="text-red self-end">⚠ {errors.type?.message}</p>}
