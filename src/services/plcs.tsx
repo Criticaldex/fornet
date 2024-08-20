@@ -35,8 +35,8 @@ const getFilteredPlcs = async (db?: string, filter?: any, fields?: string[], sor
       }).then(res => res.json());
 }
 
-export const getLines = async (db: string) => {
-   const data = await getFilteredPlcs(db, {}, ['-_id', 'line']);
+export const getLines = async (db: string, filter: any) => {
+   const data = await getFilteredPlcs(db, filter, ['-_id', 'line']);
    let groupByLine = _.groupBy(data, 'line');
    let lines: string[] = [];
    for (const [key, value] of (Object.entries(groupByLine) as [string, any][])) {
@@ -45,8 +45,8 @@ export const getLines = async (db: string) => {
    return lines;
 }
 
-export const getNames = async (db: string, line: string) => {
-   const data = await getFilteredPlcs(db, { line: line }, ['-_id', 'name']);
+export const getNames = async (db: string) => {
+   const data = await getFilteredPlcs(db, {}, ['-_id', 'name']);
    let groupByName = _.groupBy(data, 'name');
 
    let names: string[] = [];
