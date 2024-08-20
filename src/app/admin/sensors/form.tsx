@@ -7,25 +7,24 @@ import { getSession } from "next-auth/react"
 import { useEffect, useState } from "react";
 
 export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, isDirty, dirtyFields, reset, session }: any) => {
-   const [lines, setLines] = useState(['-']);
-   const [linia, setLinia] = useState('');
+   const [line, setLine] = useState(['-']);
+   const [plcName, setPlcName] = useState('');
    const [plcNames, setPlcNames] = useState(['-']);
 
 
    useEffect(() => {
-      getLines(session?.user.db)
+      getLines(session?.user.db, { name: plcName })
          .then((res: any) => {
-            setLines(res);
-            setLinia(res[0]);
+            setLine(res);
          });
-   }, [session?.user.db])
+   }, [plcName, session?.user.db])
 
    useEffect(() => {
-      getNames(session?.user.db, linia)
+      getNames(session?.user.db)
          .then((res: any) => {
             setPlcNames(res);
          });
-   }, [linia, session?.user.db])
+   }, [session?.user.db])
 
    const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
@@ -49,19 +48,11 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
       >
          <div className="inline-flex justify-end">
             <label htmlFor="line" className="flex self-center">Line:</label>
-            <select id="line"
+            <input id="line"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.line ? 'border-foreground' : 'border-red'}`}
-               {...register("line", { required: 'Field Required' })}
-               onChange={e => {
-                  setLinia(e.target.value)
-               }}>
-               <option key='' value=''>Select...</option>
-               {lines.map((line: any) => {
-                  return <option key={line} value={`${line}`}>
-                     {line}
-                  </option>
-               })}
-            </select>
+               disabled
+               value={line}
+               {...register("line", { required: 'Field Required' })} />
          </div>
          {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
 
@@ -69,7 +60,10 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
             <label htmlFor="plc_name" className="flex self-center">PLC Name:</label>
             <select id="plc_name"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.plc_name ? 'border-foreground' : 'border-red'}`}
-               {...register("plc_name", { required: 'Field Required' })}>
+               {...register("plc_name", { required: 'Field Required' })}
+               onChange={e => {
+                  setPlcName(e.target.value)
+               }}>
                <option key='' value=''>Select...</option>
                {plcNames.map((name: any) => {
                   return <option key={name} value={`${name}`}>
@@ -104,8 +98,9 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          <div className="inline-flex justify-end">
             <label htmlFor="active" className="self-center">Active:</label>
             <input id="active"
+               checked={true}
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("active")} type="checkbox" value="true" />
+               {...register("active")} type="checkbox" value={true} />
          </div>
          {errors.active && <p role="alert" className="text-red self-end">⚠ {errors.active?.message}</p>}
 

@@ -15,7 +15,8 @@ const PlcSchema = new mongoose.Schema({
    },
    name: {
       type: String,
-      required: [true, 'Name is mandatory!']
+      required: [true, 'Name is mandatory!'],
+      unique: [true, 'Name must be unique!']
    },
    ip: {
       type: String,

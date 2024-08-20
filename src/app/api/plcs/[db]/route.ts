@@ -58,7 +58,6 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       }
 
       const filter = {
-         line: body.line,
          name: body.name,
       }
 
