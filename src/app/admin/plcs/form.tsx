@@ -2,6 +2,7 @@
 
 import { PlcIface } from "@/schemas/plc";
 import { getPlcs, upsertPlc } from "@/services/plcs";
+import { postSync } from "@/services/sync";
 import { getSession } from "next-auth/react"
 
 export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset }: any) => {
@@ -9,10 +10,16 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset 
    const onSubmit = handleSubmit(async (data: PlcIface) => {
       const session = await getSession();
       const upsert = await upsertPlc(data, session?.user.db);
+      const sync = await postSync({ synced: false }, session?.user.db);
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
       } else {
          toast.success('Object Added!', { theme: "colored" });
+      }
+      if (sync.lastErrorObject?.updatedExisting) {
+         toast.success('Syncing...', { theme: "colored" });
+      } else {
+         toast.error('Error Syncing!', { theme: "colored" });
       }
       reset(data);
 
