@@ -3,6 +3,7 @@
 import { SensorIface } from "@/schemas/sensor";
 import { getNames, getLines } from '@/services/plcs';
 import { getSensors, upsertSensor } from "@/services/sensors";
+import { postSync } from "@/services/sync";
 import { getSession } from "next-auth/react"
 import { useEffect, useState } from "react";
 
@@ -29,14 +30,20 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
    const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
       const upsert = await upsertSensor(data, session?.user.db);
+      const sync = await postSync({ synced: false }, session?.user.db);
 
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
       } else {
          toast.success('Object Added!', { theme: "colored" });
       }
+      if (sync.lastErrorObject?.updatedExisting) {
+         toast.success('Syncing...', { theme: "colored" });
+      } else {
+         toast.error('Error Syncing!', { theme: "colored" });
+      }
       reset(data);
-
+      setLine(data.line as any);
       setRows(await getSensors(session?.user.db));
    });
 
