@@ -145,7 +145,9 @@ export function LinesTable({ lines, interval }: any) {
       })
    });
 
-   data[0].defaultExpanded = true;
+   if (data[0]) {
+      data[0].defaultExpanded = true;
+   }
 
    createThemes();
 
