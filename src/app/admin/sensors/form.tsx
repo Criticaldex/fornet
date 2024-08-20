@@ -105,7 +105,6 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          <div className="inline-flex justify-end">
             <label htmlFor="active" className="self-center">Active:</label>
             <input id="active"
-               checked={true}
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
                {...register("active")} type="checkbox" value={true} />
          </div>
