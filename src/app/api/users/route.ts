@@ -3,9 +3,13 @@ import dbConnect from '@/lib/dbConnect'
 import userSchema, { UserIface } from '@/schemas/user'
 import { NextResponse } from "next/server";
 import { hash } from 'bcryptjs';
+import { headers } from 'next/headers';
 
 export async function POST(request: Request) {
    try {
+      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+         return NextResponse.json({ ERROR: 'Bad Auth' });
+      }
       const session = true;
 
       if (!session) {
@@ -47,6 +51,9 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
    try {
+      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+         return NextResponse.json({ ERROR: 'Bad Auth' });
+      }
       const { searchParams } = new URL(request.url)
       const database = searchParams.get('db');
       const filter = database ? { db: database } : {}
@@ -67,6 +74,9 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
    try {
+      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+         return NextResponse.json({ ERROR: 'Bad Auth' });
+      }
       const body: UserIface = await request.json();
       if (!body.email) {
          return NextResponse.json(`Email Obligatori!`);

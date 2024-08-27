@@ -3,9 +3,13 @@ import dbConnect from '@/lib/dbConnect'
 import { NextResponse } from 'next/server'
 import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import valueSchema, { ValueIface } from '@/schemas/value'
+import { headers } from 'next/headers'
 
 export async function POST(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
+      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+         return NextResponse.json({ ERROR: 'Bad Auth' });
+      }
       const body = await request.json()
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
@@ -26,6 +30,9 @@ export async function POST(request: Request, { params }: { params: { db: string 
 
 export async function DELETE(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
+      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+         return NextResponse.json({ ERROR: 'Bad Auth' });
+      }
       const body: ValueIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);

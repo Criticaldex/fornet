@@ -3,9 +3,13 @@ import dbConnect from '@/lib/dbConnect'
 import userSchema, { UserIface } from '@/schemas/user'
 import { NextResponse } from "next/server";
 import { hash } from 'bcryptjs';
+import { headers } from 'next/headers';
 
 export async function GET(request: Request, { params }: { params: { email: string } }) {
    try {
+      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+         return NextResponse.json({ ERROR: 'Bad Auth' });
+      }
       const dbName = 'Auth';
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
@@ -22,6 +26,9 @@ export async function GET(request: Request, { params }: { params: { email: strin
 
 export async function DELETE(request: Request, { params }: { params: { email: string } }) {
    try {
+      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+         return NextResponse.json({ ERROR: 'Bad Auth' });
+      }
       // const body: UserIface = await request.json();
       if (!params.email) {
          return NextResponse.json(`Email Obligatori!`);

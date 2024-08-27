@@ -3,9 +3,14 @@ import dbConnect from '@/lib/dbConnect'
 import SensorSchema, { SensorIface } from '@/schemas/sensor'
 import PlcSchema, { PlcIface } from '@/schemas/plc'
 import { NextResponse } from "next/server";
+import { headers } from 'next/headers'
 
 export async function GET(request: Request, { params }: { params: { db: string } }) {
     try {
+        if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+            return NextResponse.json({ ERROR: 'Bad Auth' });
+        }
+
         const dbName = params.db;
         await dbConnect();
         const db = mongoose.connection.useDb(dbName, { useCache: true });
