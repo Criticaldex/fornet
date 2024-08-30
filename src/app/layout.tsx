@@ -1,4 +1,6 @@
 import './globals.css'
+import '../../node_modules/react-grid-layout/css/styles.css'
+import '../../node_modules//react-resizable/css/styles.css'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/next"

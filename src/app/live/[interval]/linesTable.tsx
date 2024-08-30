@@ -9,6 +9,7 @@ import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
 import { FaPlus } from "react-icons/fa6";
+import GridLayout from "react-grid-layout";
 
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
@@ -29,84 +30,97 @@ const ExpandedComponent = ({ data }: any) => {
 
    // const layoutConf: any = session?.user.config.live;
    const layoutConf: any = [
-      [
-         {
-            type: 'line',
-            index: '5'
-         }
-      ],
-      [
-         {
-            type: 'gauge',
-            index: '9',
-            min: 0,
-            max: 2000
-         },
-         {
-            type: 'bool',
-            index: '1'
-         }
-      ],
-      [
-         {
-            type: 'bool',
-            index: '1'
-         },
-         {
-            type: 'gauge',
-            index: '7',
-            min: 0,
-            max: 2000
-         }
-      ]
+      { i: "line", x: 0, y: 0, w: 8, h: 9 },
+      { i: "gauge", x: 8, y: 0, w: 4, h: 6 },
+      { i: "bool", x: 12, y: 0, w: 2, h: 3, minW: 2, maxW: 4 },
+      { i: "bool2", x: 14, y: 0, w: 2, h: 3, minW: 2, maxW: 4 },
+      { i: "gauge2", x: 8, y: 3, w: 4, h: 6 },
+      { i: "gauge3", x: 12, y: 3, w: 4, h: 6 },
    ]
 
+   const width2 = window.screen.width - 105;
+   const width = window.innerWidth - 105;
+   console.log(width);
+
+
    return (
-      <>
-         <div className="flex flex-row flex-wrap mt-2">
-            {layoutConf.map((conf: any, index: number) => {
-               return < div key={index} className={`flex flex-col ${conf[0].type == "line" ? 'basis-6/12' : 'basis-3/12'}`}>
-                  {conf.map((ele: any, i: number) => {
-                     if (ele.type == 'line') {
-                        return <LiveChart
-                           key={i}
-                           title={'productividad'}
-                           line={data.line}
-                           names={names}
-                           index={ele.index}
-                           units={units}
-                           interval={data.interval}
-                        />
-                     } else if (ele.type == 'gauge') {
-                        return <GaugeChart
-                           key={i}
-                           title={'productividad'}
-                           line={data.line}
-                           names={names}
-                           index={ele.index}
-                           units={units}
-                           min={ele.min}
-                           max={ele.max}
-                        />
-                     } else if (ele.type == 'bool') {
-                        return <BoolChart
-                           key={i}
-                           title={'productividad'}
-                           line={data.line}
-                           names={names}
-                           index={ele.index}
-                           units={units}
-                           interval={data.interval}
-                        />
-                     }
-                  })}
-               </div>
-            })}
-            {/* <div className={`flex flex-col basis-6/12`}>
-               <BasicModal />
-            </div> */}
-         </div >
-      </>
+      <GridLayout
+         className="layout"
+         layout={layoutConf}
+         cols={16}
+         rowHeight={30}
+         width={width}
+      >
+         <div key="line">
+            <LiveChart
+               // key={i}
+               title={'productividad'}
+               line={data.line}
+               names={names}
+               index={'5'}
+               units={units}
+               interval={data.interval}
+            />
+         </div>
+         <div key="gauge">
+            <GaugeChart
+               // key={'1'}
+               title={'productividad'}
+               line={data.line}
+               names={names}
+               index={'9'}
+               units={units}
+               min={0}
+               max={2000}
+            />
+         </div>
+         <div key="bool">
+            <BoolChart
+               // key={i}
+               title={'productividad'}
+               line={data.line}
+               names={names}
+               index={'1'}
+               units={units}
+               interval={data.interval}
+            />
+         </div>
+         <div key="bool2">
+            <BoolChart
+               // key={i}
+               title={'productividad'}
+               line={data.line}
+               names={names}
+               index={'1'}
+               units={units}
+               interval={data.interval}
+            />
+         </div>
+         <div key="gauge2">
+            <GaugeChart
+               // key={'1'}
+               title={'productividad'}
+               line={data.line}
+               names={names}
+               index={'9'}
+               units={units}
+               min={0}
+               max={2000}
+            />
+         </div>
+         <div key="gauge3">
+            <GaugeChart
+               // key={'1'}
+               title={'productividad'}
+               line={data.line}
+               names={names}
+               index={'9'}
+               units={units}
+               min={0}
+               max={2000}
+            />
+         </div>
+      </GridLayout >
    );
 }
 
