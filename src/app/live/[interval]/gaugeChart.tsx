@@ -3,6 +3,7 @@ import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsReact from 'highcharts-react-official'
+import HighchartsData from 'highcharts/modules/data'
 import HighchartsNoData from 'highcharts/modules/no-data-to-display'
 import { chartOptions } from '@/components/chart.components'
 import highchartsMore from "highcharts/highcharts-more"
@@ -13,6 +14,7 @@ import { useState } from 'react'
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
    HighchartsExportData(Highcharts)
+   HighchartsData(Highcharts)
    HighchartsNoData(Highcharts)
    highchartsMore(Highcharts);
    solidGauge(Highcharts);
@@ -104,7 +106,6 @@ export function GaugeChart({ line, names, index, units, min, max }: any) {
                setter={setName}
                setUnit={setUnit}
             />
-            <label htmlFor="x">X</label>
          </div>
          <HighchartsReact
             highcharts={Highcharts}
