@@ -3,13 +3,15 @@ import dbConnect from '@/lib/dbConnect'
 import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { line: string, name: string, timestamp: string } }) {
+export async function GET(request: Request, { params }: { params: { line: string, name: string, interval: number } }) {
    try {
       const dbName = 'empresa2';
+      let timestamp = Math.floor(Date.now() - (params.interval * 60 * 60 * 1000)).toString();
 
       const filter = {
-         "line": params.line, "name": params.name, "timestamp": { $gte: parseInt(params.timestamp) }
+         "line": params.line, "name": params.name, "timestamp": { $gte: parseInt(timestamp) }
       };
+
       const fields = [
          "-_id",
          "value",
@@ -17,7 +19,7 @@ export async function GET(request: Request, { params }: { params: { line: string
       ];
 
       await dbConnect();
-      const db = mongoose.connection.useDb(dbName, { useCache: true });
+      const db = mongoose.connection.useDb(dbName, { useCache: false });
       if (!db.models.value) {
          db.model('value', indicatorSchema);
       }

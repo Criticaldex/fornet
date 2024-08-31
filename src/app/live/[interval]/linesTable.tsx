@@ -40,7 +40,6 @@ const ExpandedComponent = ({ data }: any) => {
 
    const width2 = window.screen.width - 105;
    const width = window.innerWidth - 105;
-   console.log(width);
 
 
    return (
