@@ -3,6 +3,7 @@
 import { PlcIface } from "@/schemas/plc";
 import { getPlcs, upsertPlc } from "@/services/plcs";
 import { postSync } from "@/services/sync";
+import { sendMqtt } from "@/services/mqtt";
 import { getSession } from "next-auth/react"
 
 export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset }: any) => {
@@ -11,6 +12,8 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset 
       const session = await getSession();
       const upsert = await upsertPlc(data, session?.user.db);
       const sync = await postSync({ synced: false }, session?.user.db);
+      sendMqtt('fornet987', 'false');
+
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
       } else {
@@ -21,6 +24,7 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset 
       } else {
          toast.error('Error Syncing!', { theme: "colored" });
       }
+
       reset(data);
 
       setRows(await getPlcs(session?.user.db));

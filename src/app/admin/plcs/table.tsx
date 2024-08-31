@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
+import { sendMqtt } from '@/services/mqtt';
 
 export function PlcTable({ plcs, session }: any) {
 
@@ -67,6 +68,8 @@ export function PlcTable({ plcs, session }: any) {
                      toast.error('Vartable Deleted!!', { theme: "colored" });
                      setRows(await getPlcs(session?.user.db));
                   }
+                  sendMqtt('fornet987', 'false');
+
                }
             },
             {

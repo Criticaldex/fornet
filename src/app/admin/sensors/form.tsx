@@ -1,6 +1,7 @@
 'use client';
 
 import { SensorIface } from "@/schemas/sensor";
+import { sendMqtt } from "@/services/mqtt";
 import { getNames, getLines } from '@/services/plcs';
 import { getSensors, upsertSensor } from "@/services/sensors";
 import { postSync } from "@/services/sync";
@@ -31,6 +32,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
       const session = await getSession();
       const upsert = await upsertSensor(data, session?.user.db);
       const sync = await postSync({ synced: false }, session?.user.db);
+      await sendMqtt('fornet987', 'false');
 
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });

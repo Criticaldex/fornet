@@ -30,7 +30,7 @@ const ExpandedComponent = ({ data }: any) => {
 
    // const layoutConf: any = session?.user.config.live;
    const layoutConf: any = [
-      { i: "line", x: 0, y: 0, w: 8, h: 9 },
+      { i: "line", x: 0, y: 0, w: 8, h: 12 },
       { i: "gauge", x: 8, y: 0, w: 4, h: 6 },
       { i: "bool", x: 12, y: 0, w: 2, h: 3, minW: 2, maxW: 4 },
       { i: "bool2", x: 14, y: 0, w: 2, h: 3, minW: 2, maxW: 4 },
@@ -41,7 +41,6 @@ const ExpandedComponent = ({ data }: any) => {
    const width2 = window.screen.width - 105;
    const width = window.innerWidth - 105;
    console.log(width);
-
 
    return (
       <GridLayout

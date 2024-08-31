@@ -12,6 +12,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
+import { postSync } from '@/services/sync';
+import { sendMqtt } from '@/services/mqtt';
 
 export function AdminTable({ sensors, session }: any) {
 
@@ -71,6 +73,13 @@ export function AdminTable({ sensors, session }: any) {
                   if (dValue.acknowledged) {
                      toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
                   }
+                  const sync = await postSync({ synced: false }, session?.user.db);
+                  if (sync.lastErrorObject?.updatedExisting) {
+                     toast.success('Syncing...', { theme: "colored" });
+                  } else {
+                     toast.error('Error Syncing!', { theme: "colored" });
+                  }
+                  sendMqtt('fornet987', 'false');
                }
             },
             {
