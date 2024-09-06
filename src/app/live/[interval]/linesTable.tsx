@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component';
 import { useSession } from 'next-auth/react';
 import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
-import { getNames } from '@/services/values';
+import { getNames } from '@/services/sensors';
 import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
@@ -18,7 +18,7 @@ const ExpandedComponent = ({ data }: any) => {
    const [isLoading, setLoading] = useState(true);
 
    useEffect(() => {
-      getNames({ line: data.line }, session?.user.db)
+      getNames(data.line, session?.user.db)
          .then((res: any) => {
             setNames(res.names);
             setUnits(res.units);
@@ -38,9 +38,7 @@ const ExpandedComponent = ({ data }: any) => {
       { i: "gauge3", x: 12, y: 3, w: 4, h: 6 },
    ]
 
-   const width2 = window.screen.width - 105;
    const width = window.innerWidth - 105;
-
 
    return (
       <GridLayout

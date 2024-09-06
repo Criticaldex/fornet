@@ -64,7 +64,7 @@ export function PlcTable({ plcs, session }: any) {
                onClick: async () => {
                   const plc = await deletePlc(row, session?.user.db);
                   if (plc) {
-                     toast.error('Vartable Deleted!!', { theme: "colored" });
+                     toast.error('PLC Deleted!!', { theme: "colored" });
                      setRows(await getPlcs(session?.user.db));
                   }
                }
