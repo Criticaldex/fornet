@@ -29,7 +29,11 @@ export async function POST(request: Request, { params }: { params: { db: string 
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
          return NextResponse.json({ ERROR: 'Bad Auth' });
       }
-      const body: SensorIface = await request.json();
+      const body = await request.json();
+      if (!params.db) {
+         return NextResponse.json(`DB Missing!`);
+      }
+      const fields = (body.fields) ? body.fields.join(' ') : '';
       const dbName = params.db;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
@@ -37,7 +41,7 @@ export async function POST(request: Request, { params }: { params: { db: string 
          db.model('sensor', SensorSchema);
       }
 
-      const sensors = (await db.models.sensor.find(body).lean()) as SensorIface[];
+      const sensors = (await db.models.sensor.find(body.filter).select(fields).sort(body.sort).lean()) as SensorIface[];
 
       return NextResponse.json(sensors);
    } catch (err) {
@@ -63,7 +67,6 @@ export async function PATCH(request: Request, { params }: { params: { db: string
 
       const filter = {
          line: body.line,
-         plc_name: body.plc_name,
          name: body.name
       }
 
