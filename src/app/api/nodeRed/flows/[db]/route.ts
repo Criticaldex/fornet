@@ -26,13 +26,6 @@ export async function GET(request: Request, { params }: { params: { db: string }
       const plcs = (await db.models.plc.find().lean()) as PlcIface[];
 
       let nodes = [{
-         "id": "bc9da5834aeee189",
-         "type": "mongodb3",
-         "uri": `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@fornetcluster.mcjjyoo.mongodb.net/${dbName}`,
-         "name": dbName,
-         "options": "",
-         "parallelism": "-1"
-      }, {
          "id": "7d940a1e580c0037",
          "type": "http request",
          "z": "e20161042794cb3d",
@@ -174,7 +167,7 @@ export async function GET(request: Request, { params }: { params: { db: string }
                "y": y,
                "wires": [
                   [
-                     "d1a8bab8d18fa9ad"
+                     'f' + sensor._id.toString()
                   ]
                ]
             }
@@ -184,14 +177,14 @@ export async function GET(request: Request, { params }: { params: { db: string }
                "type": "function",
                "z": "e20161042794cb3d",
                "name": "Process",
-               "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = ${sensor.name};\nmsg.payload = da;\nmsg.method = 'PATCH';\nreturn msg;`,
+               "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = da;\nmsg.method = 'PATCH';\nreturn msg;`,
                "outputs": 1,
                "timeout": 0,
                "noerr": 0,
                "initialize": "",
                "finalize": "",
                "libs": [],
-               "x": 240,
+               "x": 300,
                "y": y,
                "wires": [
                   [
