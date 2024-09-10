@@ -184,7 +184,7 @@ export async function GET(request: Request, { params }: { params: { db: string }
                "initialize": "",
                "finalize": "",
                "libs": [],
-               "x": 300,
+               "x": 320,
                "y": y,
                "wires": [
                   [
