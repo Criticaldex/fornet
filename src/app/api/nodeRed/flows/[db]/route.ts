@@ -33,39 +33,51 @@ export async function GET(request: Request, { params }: { params: { db: string }
          "options": "",
          "parallelism": "-1"
       }, {
-         "id": "e530bfef3dcdb002",
-         "type": "mongodb3 in",
-         "z": "0116f42dcdc8f6bb",
-         "service": "_ext_",
-         "configNode": "bc9da5834aeee189",
-         "name": "Fornet",
-         "collection": "values",
-         "operation": "insertOne",
-         "x": 610,
+         "id": "7d940a1e580c0037",
+         "type": "http request",
+         "z": "e20161042794cb3d",
+         "name": "",
+         "method": "use",
+         "ret": "txt",
+         "paytoqs": "ignore",
+         "url": `https://fornet.vercel.app/api/values/${dbName}`,
+         "tls": "",
+         "persist": false,
+         "proxy": "",
+         "insecureHTTPParser": false,
+         "authType": "",
+         "senderr": false,
+         "headers": [
+            {
+               "keyType": "other",
+               "keyValue": "token",
+               "valueType": "other",
+               "valueValue": process.env.NEXT_PUBLIC_API_KEY
+            }
+         ],
+         "x": 590,
          "y": 160,
          "wires": [
-            []
+            [
+               "01db69f3eb88c693"
+            ]
          ]
       },
       {
-         "id": "d1a8bab8d18fa9ad",
-         "type": "function",
-         "z": "0116f42dcdc8f6bb",
-         "name": "Process",
-         "func": "var nodes = msg.payload;  \nvar da = {\n    \"id\": \"c6c280ebbc516f5b\",\n    \"label\": \"Fornet\",\n    \"disabled\": false,\n    \"info\": \"\",\n    \"env\": [],\n    \"nodes\": nodes.nodes\n}\nmsg.payload = da;\n// msg.payload = nodes.nodes;\nreturn msg;",
-         "outputs": 2,
-         "timeout": 0,
-         "noerr": 0,
-         "initialize": "",
-         "finalize": "",
-         "libs": [],
-         "x": 400,
-         "y": 140,
-         "wires": [
-            [
-               "e530bfef3dcdb002"
-            ]
-         ]
+         "id": "01db69f3eb88c693",
+         "type": "debug",
+         "z": "e20161042794cb3d",
+         "name": "debug 42",
+         "active": true,
+         "tosidebar": true,
+         "console": false,
+         "tostatus": false,
+         "complete": "false",
+         "statusVal": "",
+         "statusType": "auto",
+         "x": 740,
+         "y": 160,
+         "wires": []
       },
       {
          "id": "fb64f4acee62767d",
@@ -166,7 +178,30 @@ export async function GET(request: Request, { params }: { params: { db: string }
                   ]
                ]
             }
+
+            const s7func: any = {
+               "id": 'f' + sensor._id.toString(),
+               "type": "function",
+               "z": "e20161042794cb3d",
+               "name": "Process",
+               "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = ${sensor.name};\nmsg.payload = da;\nmsg.method = 'PATCH';\nreturn msg;`,
+               "outputs": 1,
+               "timeout": 0,
+               "noerr": 0,
+               "initialize": "",
+               "finalize": "",
+               "libs": [],
+               "x": 240,
+               "y": y,
+               "wires": [
+                  [
+                     "7d940a1e580c0037"
+                  ]
+               ]
+            }
+
             nodes.push(s7in)
+            nodes.push(s7func);
 
             const s7out: any = {
                "id": 'o' + sensor._id.toString(),
@@ -175,7 +210,7 @@ export async function GET(request: Request, { params }: { params: { db: string }
                "endpoint": endpoint,
                "variable": sensor.name,
                "name": sensor.name,
-               "x": 1080,
+               "x": 1300,
                "y": y,
                "wires": []
             }
@@ -194,7 +229,7 @@ export async function GET(request: Request, { params }: { params: { db: string }
                "rap": true,
                "rh": 0,
                "inputs": 0,
-               "x": 800,
+               "x": 1000,
                "y": y,
                "wires": [
                   [
