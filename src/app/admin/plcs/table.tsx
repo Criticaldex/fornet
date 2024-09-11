@@ -12,8 +12,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
+import { mongo } from 'mongoose';
 
-export function PlcTable({ plcs, session }: any) {
+export function PlcTable({ plcs, nodes, session }: any) {
 
    const [rows, setRows] = useState(plcs);
    const [filterText, setFilterText] = useState('');
@@ -84,6 +85,12 @@ export function PlcTable({ plcs, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
+         name: 'node',
+         selector: (row: any) => row.node,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
          name: 'Name',
          selector: (row: any) => row.name,
          sortable: true,
@@ -140,6 +147,8 @@ export function PlcTable({ plcs, session }: any) {
                      setRows={setRows}
                      toast={toast}
                      reset={reset}
+                     session={session}
+                     nodes={nodes}
                   />
                </div>
             </div>

@@ -5,12 +5,12 @@ import { getPlcs, upsertPlc } from "@/services/plcs";
 import { postSync } from "@/services/sync";
 import { getSession } from "next-auth/react"
 
-export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset }: any) => {
+export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, session, nodes }: any) => {
 
    const onSubmit = handleSubmit(async (data: PlcIface) => {
       const session = await getSession();
       const upsert = await upsertPlc(data, session?.user.db);
-      const sync = await postSync({ synced: false }, session?.user.db);
+      const sync = await postSync({ synced: false }, session?.user.db, data.node);
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
       } else {
@@ -38,6 +38,21 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset 
                {...register("line", { required: 'Field Required' })} />
          </div>
          {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="node" className="flex self-center">Node:</label>
+            <select id="node"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.node ? 'border-foreground' : 'border-red'}`}
+               {...register("node", { required: 'Field Required' })}>
+               <option key='' value=''>Select...</option>
+               {nodes.map((name: any) => {
+                  return <option key={name} value={`${name}`}>
+                     {name}
+                  </option>
+               })}
+            </select>
+         </div>
+         {errors.node && <p role="alert" className="text-red self-end">⚠ {errors.node?.message}</p>}
 
          <div className="inline-flex justify-end">
             <label htmlFor="name" className="flex self-center">Name:</label>
