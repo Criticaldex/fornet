@@ -148,91 +148,94 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          if (sensor.active) {
             y = y + 50;
             let endpoint;
+            let insert;
             for (let i = 0; i < plcs.length; i++) {
-               if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name) {
+               if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
                   endpoint = plcs[i]._id.toString();
+                  insert = true;
                   break;
                }
             }
 
-            const s7in: any = {
-               "id": 'i' + sensor._id.toString(),
-               "type": "s7 in",
-               "z": "0116f42dcdc8f6bb",
-               "endpoint": endpoint,
-               "mode": "single",
-               "variable": sensor.name,
-               "diff": true,
-               "name": sensor.name,
-               "x": 180,
-               "y": y,
-               "wires": [
-                  [
-                     'f' + sensor._id.toString()
+            if (insert) {
+               const s7in: any = {
+                  "id": 'i' + sensor._id.toString(),
+                  "type": "s7 in",
+                  "z": "0116f42dcdc8f6bb",
+                  "endpoint": endpoint,
+                  "mode": "single",
+                  "variable": sensor.name,
+                  "diff": true,
+                  "name": sensor.name,
+                  "x": 180,
+                  "y": y,
+                  "wires": [
+                     [
+                        'f' + sensor._id.toString()
+                     ]
                   ]
-               ]
-            }
+               }
 
-            const s7func: any = {
-               "id": 'f' + sensor._id.toString(),
-               "type": "function",
-               "z": "e20161042794cb3d",
-               "name": "Process",
-               "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = da;\nmsg.method = 'PATCH';\nreturn msg;`,
-               "outputs": 1,
-               "timeout": 0,
-               "noerr": 0,
-               "initialize": "",
-               "finalize": "",
-               "libs": [],
-               "x": 320,
-               "y": y,
-               "wires": [
-                  [
-                     "7d940a1e580c0037"
+               const s7func: any = {
+                  "id": 'f' + sensor._id.toString(),
+                  "type": "function",
+                  "z": "e20161042794cb3d",
+                  "name": "Process",
+                  "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = da;\nmsg.method = 'PATCH';\nreturn msg;`,
+                  "outputs": 1,
+                  "timeout": 0,
+                  "noerr": 0,
+                  "initialize": "",
+                  "finalize": "",
+                  "libs": [],
+                  "x": 320,
+                  "y": y,
+                  "wires": [
+                     [
+                        "7d940a1e580c0037"
+                     ]
                   ]
-               ]
-            }
+               }
 
-            nodes.push(s7in)
-            nodes.push(s7func);
+               nodes.push(s7in)
+               nodes.push(s7func);
 
-            const s7out: any = {
-               "id": 'o' + sensor._id.toString(),
-               "type": "s7 out",
-               "z": "c6c280ebbc516f5b",
-               "endpoint": endpoint,
-               "variable": sensor.name,
-               "name": sensor.name,
-               "x": 1300,
-               "y": y,
-               "wires": []
-            }
-            nodes.push(s7out)
+               const s7out: any = {
+                  "id": 'o' + sensor._id.toString(),
+                  "type": "s7 out",
+                  "z": "c6c280ebbc516f5b",
+                  "endpoint": endpoint,
+                  "variable": sensor.name,
+                  "name": sensor.name,
+                  "x": 1300,
+                  "y": y,
+                  "wires": []
+               }
+               nodes.push(s7out)
 
-            const mqtt: any = {
-               "id": 'm' + sensor._id.toString(),
-               "type": "mqtt in",
-               "z": "c6c280ebbc516f5b",
-               "name": sensor.name,
-               "topic": "fornet" + sensor._id.toString(),
-               "qos": "2",
-               "datatype": "utf8",
-               "broker": "abf8899ee04d3094",
-               "nl": false,
-               "rap": true,
-               "rh": 0,
-               "inputs": 0,
-               "x": 1000,
-               "y": y,
-               "wires": [
-                  [
-                     'o' + sensor._id.toString(),
+               const mqtt: any = {
+                  "id": 'm' + sensor._id.toString(),
+                  "type": "mqtt in",
+                  "z": "c6c280ebbc516f5b",
+                  "name": sensor.name,
+                  "topic": "fornet" + sensor._id.toString(),
+                  "qos": "2",
+                  "datatype": "utf8",
+                  "broker": "abf8899ee04d3094",
+                  "nl": false,
+                  "rap": true,
+                  "rh": 0,
+                  "inputs": 0,
+                  "x": 1000,
+                  "y": y,
+                  "wires": [
+                     [
+                        'o' + sensor._id.toString(),
+                     ]
                   ]
-               ]
+               }
+               nodes.push(mqtt)
             }
-            nodes.push(mqtt)
-
          }
       });
 
