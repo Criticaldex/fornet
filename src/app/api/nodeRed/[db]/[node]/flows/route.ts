@@ -27,28 +27,22 @@ export async function GET(request: Request, { params }: { params: { db: string, 
       const plcs = (await db.models.plc.find({ node: node }).lean()) as PlcIface[];
 
       let nodes = [{
+         "id": "bc9da5834aeee189",
+         "type": "mongodb3",
+         "uri": `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@fornetcluster.mcjjyoo.mongodb.net/${dbName}`,
+         "name": dbName,
+         "options": "",
+         "parallelism": "-1"
+      },
+      {
          "id": "7d940a1e580c0037",
-         "type": "http request",
-         "z": "e20161042794cb3d",
-         "name": "",
-         "method": "use",
-         "ret": "txt",
-         "paytoqs": "ignore",
-         "url": `https://fornet.vercel.app/api/values/${dbName}`,
-         "tls": "",
-         "persist": false,
-         "proxy": "",
-         "insecureHTTPParser": false,
-         "authType": "",
-         "senderr": false,
-         "headers": [
-            {
-               "keyType": "other",
-               "keyValue": "token",
-               "valueType": "other",
-               "valueValue": process.env.NEXT_PUBLIC_API_KEY
-            }
-         ],
+         "type": "mongodb3 in",
+         "z": "0116f42dcdc8f6bb",
+         "service": "_ext_",
+         "configNode": "bc9da5834aeee189",
+         "name": "Fornet",
+         "collection": "values",
+         "operation": "insertOne",
          "x": 590,
          "y": 160,
          "wires": [
@@ -57,6 +51,37 @@ export async function GET(request: Request, { params }: { params: { db: string, 
             ]
          ]
       },
+      // {
+      //    "id": "7d940a1e580c0037",
+      //    "type": "http request",
+      //    "z": "e20161042794cb3d",
+      //    "name": "",
+      //    "method": "use",
+      //    "ret": "txt",
+      //    "paytoqs": "ignore",
+      //    "url": `https://fornet.vercel.app/api/values/${dbName}`,
+      //    "tls": "",
+      //    "persist": false,
+      //    "proxy": "",
+      //    "insecureHTTPParser": false,
+      //    "authType": "",
+      //    "senderr": false,
+      //    "headers": [
+      //       {
+      //          "keyType": "other",
+      //          "keyValue": "token",
+      //          "valueType": "other",
+      //          "valueValue": process.env.NEXT_PUBLIC_API_KEY
+      //       }
+      //    ],
+      //    "x": 590,
+      //    "y": 160,
+      //    "wires": [
+      //       [
+      //          "01db69f3eb88c693"
+      //       ]
+      //    ]
+      // },
       {
          "id": "01db69f3eb88c693",
          "type": "debug",
