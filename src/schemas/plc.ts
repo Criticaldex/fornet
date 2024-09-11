@@ -4,8 +4,9 @@ export interface PlcIface {
    _id: any,
    line: string,
    name: string,
-   ip: string
-   type: string
+   ip: string,
+   type: string,
+   node: string
 }
 
 const PlcSchema = new mongoose.Schema({
@@ -25,7 +26,11 @@ const PlcSchema = new mongoose.Schema({
    type: {
       type: String,
       required: [true, 'Type is mandatory!']
-   }
+   },
+   node: {
+      type: String,
+      required: [true, 'Node is mandatory!']
+   },
 });
 
 export default PlcSchema;
