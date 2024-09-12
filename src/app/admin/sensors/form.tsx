@@ -3,7 +3,7 @@
 import { SensorIface } from "@/schemas/sensor";
 import { getNames, getLines, getNodes } from '@/services/plcs';
 import { getSensors, upsertSensor } from "@/services/sensors";
-import { postSync } from "@/services/sync";
+import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 import { useEffect, useState } from "react";
 
@@ -33,7 +33,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
    const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
       const upsert = await upsertSensor(data, session?.user.db);
-      const sync = await postSync({ synced: false }, session?.user.db);
+      const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
 
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
@@ -41,7 +41,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          toast.success('Object Added!', { theme: "colored" });
       }
       if (sync.lastErrorObject?.updatedExisting) {
-         toast.success('Syncing...', { theme: "colored" });
+         toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
       } else {
          toast.error('Error Syncing!', { theme: "colored" });
       }

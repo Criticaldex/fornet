@@ -2,24 +2,22 @@
 
 import { PlcIface } from "@/schemas/plc";
 import { getPlcs, upsertPlc } from "@/services/plcs";
-import { postSync } from "@/services/sync";
+import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 
 export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, session, nodes }: any) => {
 
    const onSubmit = handleSubmit(async (data: PlcIface) => {
-      console.log("data: ", data);
-
       const session = await getSession();
       const upsert = await upsertPlc(data, session?.user.db);
-      const sync = await postSync({ synced: false }, session?.user.db, data.node);
+      const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
       } else {
          toast.success('Object Added!', { theme: "colored" });
       }
       if (sync.lastErrorObject?.updatedExisting) {
-         toast.success('Syncing...', { theme: "colored" });
+         toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
       } else {
          toast.error('Error Syncing!', { theme: "colored" });
       }
