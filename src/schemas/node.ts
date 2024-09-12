@@ -1,13 +1,18 @@
 import mongoose from 'mongoose'
 
 export interface NodeIface {
-   name: string
+   name: string,
+   synced: boolean
 }
 
 const NodeSchema = new mongoose.Schema({
    name: {
       type: String,
       required: [true, 'Name is mandatory!']
+   },
+   synced: {
+      type: Boolean,
+      required: [true, 'Sync is mandatory!']
    }
 });
 

@@ -1,14 +1,13 @@
 'use client';
 
 import { SensorIface } from "@/schemas/sensor";
-import { getNames, getLines } from '@/services/plcs';
+import { getNames, getLines, getNodes } from '@/services/plcs';
 import { getSensors, upsertSensor } from "@/services/sensors";
-import { postSync } from "@/services/sync";
+import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 import { useEffect, useState } from "react";
 
-export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, isDirty, dirtyFields, reset, session }: any) => {
-   const [line, setLine] = useState(['-']);
+export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, isDirty, dirtyFields, reset, resetField, session }: any) => {
    const [plcName, setPlcName] = useState('');
    const [plcNames, setPlcNames] = useState(['-']);
 
@@ -16,9 +15,13 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
    useEffect(() => {
       getLines(session?.user.db, { name: plcName })
          .then((res: any) => {
-            setLine(res);
+            resetField("line", { defaultValue: res[0] })
          });
-   }, [plcName, session?.user.db])
+      getNodes(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("node", { defaultValue: res[0] })
+         });
+   }, [plcName, resetField, session?.user.db])
 
    useEffect(() => {
       getNames(session?.user.db)
@@ -30,7 +33,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
    const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
       const upsert = await upsertSensor(data, session?.user.db);
-      const sync = await postSync({ synced: false }, session?.user.db);
+      const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
 
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
@@ -38,12 +41,11 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          toast.success('Object Added!', { theme: "colored" });
       }
       if (sync.lastErrorObject?.updatedExisting) {
-         toast.success('Syncing...', { theme: "colored" });
+         toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
       } else {
          toast.error('Error Syncing!', { theme: "colored" });
       }
       reset(data);
-      setLine(data.line as any);
       setRows(await getSensors(session?.user.db));
    });
 
@@ -58,10 +60,18 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
             <input id="line"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.line ? 'border-foreground' : 'border-red'}`}
                disabled
-               value={line}
-               {...register("line", { required: 'Field Required' })} />
+               {...register("line")} />
          </div>
          {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="node" className="flex self-center">Node:</label>
+            <input id="node"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.node ? 'border-foreground' : 'border-red'}`}
+               disabled
+               {...register("node")} />
+         </div>
+         {errors.node && <p role="alert" className="text-red self-end">⚠ {errors.node?.message}</p>}
 
          <div className="inline-flex justify-end">
             <label htmlFor="plc_name" className="flex self-center">PLC Name:</label>
@@ -91,7 +101,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          <div className="inline-flex justify-end">
             <label htmlFor="unit" className="self-center">Unit:</label>
             <input id="unit" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.unit ? 'border-foreground' : 'border-red'}`}
-               {...register("unit", { required: 'Field Required' })} />
+               {...register("unit")} />
          </div>
          {errors.unit && <p role="alert" className="text-red self-end">⚠ {errors.unit?.message}</p>}
 
@@ -111,7 +121,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          {errors.active && <p role="alert" className="text-red self-end">⚠ {errors.active?.message}</p>}
 
          <div className="inline-flex justify-around">
-            <input type="reset" onClick={reset} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
+            <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
             <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
          </div>
       </form >

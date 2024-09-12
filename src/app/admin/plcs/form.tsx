@@ -2,22 +2,22 @@
 
 import { PlcIface } from "@/schemas/plc";
 import { getPlcs, upsertPlc } from "@/services/plcs";
-import { postSync } from "@/services/sync";
+import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 
-export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, session, nodes }: any) => {
+export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, session, nodes }: any) => {
 
    const onSubmit = handleSubmit(async (data: PlcIface) => {
       const session = await getSession();
       const upsert = await upsertPlc(data, session?.user.db);
-      const sync = await postSync({ synced: false }, session?.user.db, data.node);
+      const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
       } else {
          toast.success('Object Added!', { theme: "colored" });
       }
       if (sync.lastErrorObject?.updatedExisting) {
-         toast.success('Syncing...', { theme: "colored" });
+         toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
       } else {
          toast.error('Error Syncing!', { theme: "colored" });
       }
@@ -70,17 +70,17 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset,
 
          <div className="inline-flex justify-end">
             <label htmlFor="type" className="self-center">Type:</label>
-            <input id="type"
-               type="text"
-               disabled
-               value="s7 endpoint"
+            <select id="type"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.type ? 'border-foreground' : 'border-red'}`}
-               {...register("type", { required: 'Field Required' })} />
+               {...register("type", { required: 'Field Required' })}>
+               <option key='' value=''>Select...</option>
+               <option key='s7_endpoint' value='s7 endpoint'>s7 endpoint</option>
+            </select>
          </div>
          {errors.type && <p role="alert" className="text-red self-end">⚠ {errors.type?.message}</p>}
 
          <div className="inline-flex justify-around">
-            <input type="reset" onClick={reset} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
+            <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
             <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
          </div>
       </form >

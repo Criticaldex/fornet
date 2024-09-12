@@ -147,6 +147,7 @@ export function PlcTable({ plcs, nodes, session }: any) {
                      setRows={setRows}
                      toast={toast}
                      reset={reset}
+                     clearErrors={clearErrors}
                      session={session}
                      nodes={nodes}
                   />

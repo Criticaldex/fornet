@@ -50,6 +50,16 @@ export const getLines = async (db?: string, filter?: any) => {
    return lines;
 }
 
+export const getNodes = async (db?: string, filter?: any) => {
+   const data = await getFilteredPlcs(db, filter, ['-_id', 'node']);
+   let groupByLine = _.groupBy(data, 'node');
+   let nodes: string[] = [];
+   for (const [key, value] of (Object.entries(groupByLine) as [string, any][])) {
+      nodes.push(key);
+   }
+   return nodes;
+}
+
 export const getNames = async (db: string) => {
    const data = await getFilteredPlcs(db, {}, ['-_id', 'name']);
    let groupByName = _.groupBy(data, 'name');
