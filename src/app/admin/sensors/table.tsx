@@ -47,6 +47,7 @@ export function AdminTable({ sensors, session }: any) {
       register,
       handleSubmit,
       reset,
+      resetField,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
    } = useForm<SensorIface>();
@@ -84,6 +85,12 @@ export function AdminTable({ sensors, session }: any) {
       {
          name: 'Line',
          selector: (row: any) => row.line,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Node',
+         selector: (row: any) => row.node,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
@@ -159,6 +166,7 @@ export function AdminTable({ sensors, session }: any) {
                      isDirty={isDirty}
                      dirtyFields={dirtyFields}
                      reset={reset}
+                     resetField={resetField}
                      session={session}
                   />
                </div>
