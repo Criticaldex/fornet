@@ -27,22 +27,41 @@ export async function GET(request: Request, { params }: { params: { db: string, 
       const plcs = (await db.models.plc.find({ node: node }).lean()) as PlcIface[];
 
       let nodes = [{
-         "id": "bc9da5834aeee189",
-         "type": "mongodb3",
-         "uri": `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@fornetcluster.mcjjyoo.mongodb.net/${dbName}`,
-         "name": dbName,
-         "options": "",
-         "parallelism": "-1"
+         "id": "e48de9f0bc1f4a1a",
+         "type": "mongodb4-client",
+         "name": "",
+         "protocol": "mongodb+srv",
+         "hostname": `${process.env.MONGO_USER}:${process.env.MONGO_PASS}@fornetcluster.mcjjyoo.mongodb.net/`,
+         "port": "",
+         "dbName": dbName,
+         "appName": "",
+         "authSource": "",
+         "authMechanism": "DEFAULT",
+         "tls": false,
+         "tlsCAFile": "",
+         "tlsCertificateKeyFile": "",
+         "tlsInsecure": false,
+         "connectTimeoutMS": "30000",
+         "socketTimeoutMS": "0",
+         "minPoolSize": "0",
+         "maxPoolSize": "100",
+         "maxIdleTimeMS": "0",
+         "uri": "",
+         "advanced": "{}",
+         "uriTabActive": "tab-uri-simple"
       },
       {
-         "id": "7d940a1e580c0037",
-         "type": "mongodb3 in",
-         "z": "0116f42dcdc8f6bb",
-         "service": "_ext_",
-         "configNode": "bc9da5834aeee189",
-         "name": "Fornet",
+         "id": "ee5456395837bb6f",
+         "type": "mongodb4",
+         "z": "c6c280ebbc516f5b",
+         "clientNode": "e48de9f0bc1f4a1a",
+         "mode": "collection",
          "collection": "values",
          "operation": "insertOne",
+         "output": "toArray",
+         "maxTimeMS": "0",
+         "handleDocId": false,
+         "name": "ForNet",
          "x": 590,
          "y": 160,
          "wires": [
@@ -206,7 +225,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                   "type": "function",
                   "z": "e20161042794cb3d",
                   "name": "Process",
-                  "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = da;\nmsg.method = 'PATCH';\nreturn msg;`,
+                  "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;`,
                   "outputs": 1,
                   "timeout": 0,
                   "noerr": 0,
@@ -217,7 +236,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                   "y": y,
                   "wires": [
                      [
-                        "7d940a1e580c0037"
+                        "ee5456395837bb6f"
                      ]
                   ]
                }
