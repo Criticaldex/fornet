@@ -23,7 +23,7 @@ export async function GET(request: Request, { params }: { params: { line: string
       }
       const values = await db.models.value.find(filter).select(fields).limit(1).sort([['timestamp', 'desc']]).lean();
       if (values[0].value === true) values[0].value = 1
-      else if (values[0].value === false) values[0].value = 1
+      else if (values[0].value === false) values[0].value = 0
 
       const liveValues = [[values[0].timestamp, values[0].value], [values[0].timestamp, values[0].value],];
       return NextResponse.json(liveValues);
