@@ -10,6 +10,7 @@ import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
 import { FaPlus } from "react-icons/fa6";
 import GridLayout from "react-grid-layout";
+import { GetLineSensors } from '../routing';
 
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status } = useSession();
@@ -125,26 +126,40 @@ const handleAdd = (row: any) => (event: any) => {
    console.log('AAAAAAAAAAa');
 }
 
-export function LinesTable({ lines, interval }: any) {
+export function LinesTable({ lines, interval, sensors }: any) {
    let columns: any = [{
       name: 'Line',
       selector: (row: any) => row.line,
       sortable: true,
+      grow: 6,
       style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
    },
    {
-      name: 'Accions',
+      // name: 'Selects',
       cell: (row: any) => (
-         <div className='flex flex-row mr-4'>
-            <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 border-foreground'}>
+         <div className='flex flex-row mr-2'>
+            <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}>
                <option key='line' value='line'>Line</option>
                <option key='gauge' value='gauge'>Gauge</option>
                <option key='bool' value='bool'>Bool</option>
             </select>
-            <FaPlus size={20} onClick={handleAdd(row)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
-            {/* <FaTrashCan onClick={deleteHandler(row)} className='cursor-pointer m-1'>Delete</FaTrashCan> */}
+
+            <GetLineSensors
+               sensors={sensors[row.line]}
+            />
+            {/* <FaPlus size={20} onClick={handleAdd(row)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus> */}
          </div>
       ),
+      grow: 1,
+      ignoreRowClick: true,
+      button: false,
+   },
+   {
+      // name: 'Accions',
+      cell: (row: any) => (
+         <FaPlus size={20} onClick={handleAdd(row)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
+      ),
+      grow: 1,
       ignoreRowClick: true,
       button: true,
    }];

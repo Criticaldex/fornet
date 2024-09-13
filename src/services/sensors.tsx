@@ -54,6 +54,11 @@ export const getNames = async (line: string, db?: string) => {
    return { names, units };
 }
 
+export const getSensorsbyLine = async (db?: string) => {
+   const data = await getSensors(db);
+   return _.groupBy(data, 'line');
+}
+
 export const upsertSensor = async (filter: SensorIface, db: string | undefined) => {
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${db}`,
       {
