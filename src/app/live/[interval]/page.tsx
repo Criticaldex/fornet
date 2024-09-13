@@ -1,4 +1,4 @@
-import { getLines } from "@/services/values";
+import { getLines } from "@/services/plcs";
 import { LinesTable } from "./linesTable";
 
 export default async function Dashboard({ params }: any) {

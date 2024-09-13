@@ -17,7 +17,6 @@ if (typeof Highcharts === "object") {
 export function LiveChart({ line, names, index, units, interval }: any) {
    const [name, setName] = useState(names[index]);
    const [unit, setUnit] = useState(units[index]);
-   const timestamp = useState(Math.floor(Date.now() - (interval * 60 * 60 * 1000)).toString());
 
    const options = {
       ...chartOptions,
@@ -25,7 +24,7 @@ export function LiveChart({ line, names, index, units, interval }: any) {
          type: 'spline',
       },
       data: {
-         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/${timestamp}`,
+         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/${interval}`,
          enablePolling: true,
          dataRefreshRate: 1
       },

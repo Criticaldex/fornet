@@ -1,9 +1,7 @@
 import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
-import userSchema, { UserIface } from '@/schemas/user'
 import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
-import { hash } from 'bcryptjs';
 
 export async function GET(request: Request, { params }: { params: { line: string, name: string } }) {
    try {

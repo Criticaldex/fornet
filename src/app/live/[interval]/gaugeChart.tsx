@@ -3,6 +3,7 @@ import Highcharts from 'highcharts'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsReact from 'highcharts-react-official'
+import HighchartsData from 'highcharts/modules/data'
 import HighchartsNoData from 'highcharts/modules/no-data-to-display'
 import { chartOptions } from '@/components/chart.components'
 import highchartsMore from "highcharts/highcharts-more"
@@ -13,12 +14,13 @@ import { useState } from 'react'
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
    HighchartsExportData(Highcharts)
+   HighchartsData(Highcharts)
    HighchartsNoData(Highcharts)
    highchartsMore(Highcharts);
    solidGauge(Highcharts);
 }
 
-export function GaugeChart({ line, names, index, units, interval }: any) {
+export function GaugeChart({ line, names, index, units, min, max }: any) {
    const [name, setName] = useState(names[index]);
    const [unit, setUnit] = useState(units[index]);
 
@@ -50,8 +52,8 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
          tickWidth: 0,
          minorTickInterval: null,
          tickAmount: 2,
-         max: 2000,
-         min: 0,
+         max: max,
+         min: min,
          labels: {
             y: 20
          }
@@ -96,7 +98,7 @@ export function GaugeChart({ line, names, index, units, interval }: any) {
 
    return (
       <div className="m-2">
-         <div className="flex justify-start grow mb-2 mx-2">
+         <div className="flex justify-between grow mb-2 mx-2">
             <GetNames
                names={names}
                units={units}

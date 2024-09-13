@@ -1,5 +1,6 @@
 import _ from "lodash"
 import { getSession } from "@/services/session"
+import { ValueIface } from "@/schemas/value";
 
 const getValues = async (filter: any, fields?: string[], db?: string) => {
    if (!db) {
@@ -16,6 +17,7 @@ const getValues = async (filter: any, fields?: string[], db?: string) => {
          method: 'POST',
          headers: {
             'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
          },
          body: JSON.stringify(
             {
@@ -27,10 +29,7 @@ const getValues = async (filter: any, fields?: string[], db?: string) => {
       }).then(res => res.json());
 }
 
-export const getChartValues = async (line: string, name: string) => {
-   const filter = {
-      "line": line, "name": name
-   };
+export const getChartValues = async (filter: ValueIface) => {
    const data: [] = await getValues(filter);
    const values = [{
       name: 'Productividad',
@@ -55,9 +54,9 @@ export const getLines = async (db?: any) => {
    return lines;
 }
 
-export const getNames = async (filtros?: any, db?: any) => {
+export const getNames = async (filter?: ValueIface, db?: any) => {
    const fields = ['-_id', 'name', 'unit']
-   const data = await getValues(filtros, fields, db);
+   const data = await getValues(filter, fields, db);
    let groupByName = _.groupBy(data, 'name');
 
    let names: string[] = [];
@@ -66,17 +65,17 @@ export const getNames = async (filtros?: any, db?: any) => {
       names.push(key);
       units.push(value[0].unit);
    }
-
    return { names, units };
 }
 
-export const deleteValues = async (line: string, name: string, db: string | undefined) => {
+export const deleteValues = async (filter: ValueIface, db: string | undefined) => {
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${db}`,
       {
          method: 'DELETE',
          headers: {
             'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
          },
-         body: JSON.stringify({ 'line': line, 'name': name })
+         body: JSON.stringify(filter)
       }).then(res => res.json());
 }

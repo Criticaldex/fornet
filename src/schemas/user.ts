@@ -13,12 +13,16 @@ export interface UserIface {
    db: string,
    role: string,
    config: {
-      dashboard: {
-         general: [string]
-         cpr: [string]
-         nocpr: [string]
-      },
-      professionals: [string]
+      live: [
+         [
+            {
+               type: string,
+               index: string,
+               min: number,
+               max: number
+            }
+         ]
+      ]
    }
 }
 

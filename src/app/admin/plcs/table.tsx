@@ -2,20 +2,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { createThemes } from "@/styles/themes"
-import { LabelsForm } from "./form";
-import { LabelIface } from "@/schemas/label";
+import { PlcForm } from "./form";
+import { PlcIface } from "@/schemas/plc";
 import { useForm, UseFormReset } from "react-hook-form";
-import { deleteLabel, getLabels } from '@/services/labels';
+import { deletePlc, getPlcs } from '@/services/plcs';
 import { confirmAlert } from 'react-confirm-alert';
 import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
+import { mongo } from 'mongoose';
 
-export function AdminTable({ labels, session }: any) {
+export function PlcTable({ plcs, nodes, session }: any) {
 
-   const [rows, setRows] = useState(labels);
+   const [rows, setRows] = useState(plcs);
    const [filterText, setFilterText] = useState('');
    const [isClient, setIsClient] = useState(false);
 
@@ -24,7 +25,7 @@ export function AdminTable({ labels, session }: any) {
    }, [])
 
    const filteredItems = rows.filter(
-      (item: any) => item._id && item._id.toLowerCase().includes(filterText.toLowerCase()),
+      (item: any) => item.name && item.name.toLowerCase().includes(filterText.toLowerCase()),
    );
 
    const subHeaderComponentMemo = useMemo(() => {
@@ -34,7 +35,7 @@ export function AdminTable({ labels, session }: any) {
                id="search"
                type="text"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4`}
-               placeholder="ID"
+               placeholder="Name"
                aria-label="Search Input"
                value={filterText}
                onChange={(e: any) => setFilterText(e.target.value)}
@@ -49,27 +50,23 @@ export function AdminTable({ labels, session }: any) {
       reset,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
-   } = useForm<LabelIface>();
+   } = useForm<PlcIface>();
 
-   const editHandler = (row: LabelIface, reset: UseFormReset<LabelIface>) => (event: any) => {
+   const editHandler = (row: PlcIface, reset: UseFormReset<PlcIface>) => (event: any) => {
       reset(row)
    }
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: 'Deleting ' + row.name + ' in ' + row.line + ' line\nAre you sure?',
+         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?',
          buttons: [
             {
-               label: 'Eliminar',
+               label: 'Yes',
                onClick: async () => {
-                  const dLabel = await deleteLabel(row._id, session?.user.db);
-                  const dValue = await deleteValues(row.line, row.name, session?.user.db);
-                  if (dLabel) {
-                     toast.error('Label Deleted!!', { theme: "colored" });
-                     setRows(await getLabels(session?.user.db));
-                  }
-                  if (dValue.acknowledged) {
-                     toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
+                  const plc = await deletePlc(row, session?.user.db);
+                  if (plc) {
+                     toast.error('PLC Deleted!!', { theme: "colored" });
+                     setRows(await getPlcs(session?.user.db));
                   }
                }
             },
@@ -82,15 +79,14 @@ export function AdminTable({ labels, session }: any) {
 
    let columns: any = [
       {
-         name: 'ID',
-         selector: (row: any) => row._id,
+         name: 'Line',
+         selector: (row: any) => row.line,
          sortable: true,
-         grow: 2,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Line',
-         selector: (row: any) => row.line,
+         name: 'node',
+         selector: (row: any) => row.node,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
@@ -101,8 +97,14 @@ export function AdminTable({ labels, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Unit',
-         selector: (row: any) => row.unit,
+         name: 'IP',
+         selector: (row: any) => row.ip,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Type',
+         selector: (row: any) => row.type,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
@@ -138,17 +140,16 @@ export function AdminTable({ labels, session }: any) {
                   />
                </div>
                <div className="flex basis-1/4 rounded-md bg-light">
-                  <LabelsForm
+                  <PlcForm
                      register={register}
                      handleSubmit={handleSubmit}
                      errors={errors}
-                     clearErrors={clearErrors}
                      setRows={setRows}
                      toast={toast}
-                     isDirty={isDirty}
-                     dirtyFields={dirtyFields}
                      reset={reset}
+                     clearErrors={clearErrors}
                      session={session}
+                     nodes={nodes}
                   />
                </div>
             </div>
