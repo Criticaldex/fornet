@@ -190,13 +190,13 @@ export async function GET(request: Request, { params }: { params: { db: string, 
       let y = 100;
       sensors.forEach(sensor => {
          if (sensor.active) {
-            y = y + 50;
             let endpoint;
             let insert;
             for (let i = 0; i < plcs.length; i++) {
                if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
                   endpoint = plcs[i]._id.toString();
                   insert = true;
+                  y = y + 50;
                   break;
                }
             }
