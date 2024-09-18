@@ -14,9 +14,7 @@ if (typeof Highcharts === "object") {
    HighchartsData(Highcharts)
 }
 
-export function LiveChart({ line, names, index, units, interval }: any) {
-   const [name, setName] = useState(names[index]);
-   const [unit, setUnit] = useState(units[index]);
+export function LiveChart({ line, name, unit, interval }: any) {
 
    const options = {
       ...chartOptions,
@@ -48,15 +46,6 @@ export function LiveChart({ line, names, index, units, interval }: any) {
 
    return (
       <div className="m-2">
-         <div className="flex justify-start grow mb-2 mx-2">
-            <GetNames
-               names={names}
-               units={units}
-               name={name}
-               setter={setName}
-               setUnit={setUnit}
-            />
-         </div>
          <HighchartsReact
             highcharts={Highcharts}
             options={options}

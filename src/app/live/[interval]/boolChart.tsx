@@ -20,9 +20,7 @@ if (typeof Highcharts === "object") {
    solidGauge(Highcharts);
 }
 
-export function BoolChart({ line, names, index, units, interval }: any) {
-   const [name, setName] = useState(names[index]);
-   const [unit, setUnit] = useState(units[index]);
+export function BoolChart({ line, name }: any) {
 
    const options = {
       ...chartOptions,
@@ -31,7 +29,7 @@ export function BoolChart({ line, names, index, units, interval }: any) {
          type: 'solidgauge',
          spacingTop: 0,
          height: '30%',
-         margin: [0, 0, 0, 0],
+         margin: [20, 0, 0, 0],
          spacing: [0, 0, 0, 0],
       },
       data: {
@@ -40,7 +38,7 @@ export function BoolChart({ line, names, index, units, interval }: any) {
          dataRefreshRate: 1
       },
       title: {
-         text: ""
+         text: name
       },
       yAxis: {
          ...chartOptions.yAxis,
@@ -90,15 +88,6 @@ export function BoolChart({ line, names, index, units, interval }: any) {
 
    return (
       <div className="m-2">
-         <div className="flex justify-start grow mb-2 mx-2">
-            <GetNames
-               names={names}
-               units={units}
-               name={name}
-               setter={setName}
-               setUnit={setUnit}
-            />
-         </div>
          <HighchartsReact
             highcharts={Highcharts}
             options={options}

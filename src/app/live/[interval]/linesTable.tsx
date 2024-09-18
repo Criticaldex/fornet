@@ -31,12 +31,9 @@ const ExpandedComponent = ({ data }: any) => {
 
    // const layoutConf: any = session?.user.config.live;
    const layoutConf: any = [
-      { i: "line", x: 0, y: 0, w: 8, h: 12 },
-      { i: "gauge", x: 8, y: 0, w: 4, h: 7 },
-      { i: "bool", x: 12, y: 0, w: 2, h: 4, minW: 2, maxW: 4 },
-      { i: "bool2", x: 14, y: 0, w: 2, h: 4, minW: 2, maxW: 4 },
-      { i: "gauge2", x: 8, y: 3, w: 4, h: 7 },
-      { i: "gauge3", x: 12, y: 3, w: 4, h: 7 },
+      { i: "1", x: 0, y: 0, w: 8, h: 12, type: 'line', name: 'PiezasOK', unit: 'UDs' },
+      { i: "2", x: 8, y: 0, w: 4, h: 7, type: 'gauge', name: 'Velocidad', unit: 'RPM' },
+      { i: "3", x: 12, y: 0, w: 2, h: 4, minW: 2, maxW: 4, type: 'bool', name: 'Inductivo' }
    ]
 
    const width = window.innerWidth - 105;
@@ -49,75 +46,33 @@ const ExpandedComponent = ({ data }: any) => {
          rowHeight={30}
          width={width}
       >
-         <div key="line">
-            <LiveChart
-               // key={i}
-               title={'productividad'}
-               line={data.line}
-               names={names}
-               index={'5'}
-               units={units}
-               interval={data.interval}
-            />
-         </div>
-         <div key="gauge">
-            <GaugeChart
-               // key={'1'}
-               title={'productividad'}
-               line={data.line}
-               names={names}
-               index={'9'}
-               units={units}
-               min={0}
-               max={2000}
-            />
-         </div>
-         <div key="bool">
-            <BoolChart
-               // key={i}
-               title={'productividad'}
-               line={data.line}
-               names={names}
-               index={'1'}
-               units={units}
-               interval={data.interval}
-            />
-         </div>
-         <div key="bool2">
-            <BoolChart
-               // key={i}
-               title={'productividad'}
-               line={data.line}
-               names={names}
-               index={'1'}
-               units={units}
-               interval={data.interval}
-            />
-         </div>
-         <div key="gauge2">
-            <GaugeChart
-               // key={'1'}
-               title={'productividad'}
-               line={data.line}
-               names={names}
-               index={'9'}
-               units={units}
-               min={0}
-               max={2000}
-            />
-         </div>
-         <div key="gauge3">
-            <GaugeChart
-               // key={'1'}
-               title={'productividad'}
-               line={data.line}
-               names={names}
-               index={'9'}
-               units={units}
-               min={0}
-               max={2000}
-            />
-         </div>
+         {layoutConf.map((chart: any, index: number) => {
+            if (chart.type == 'line') {
+               return < div key={chart.i}>
+                  <LiveChart
+                     line={data.line}
+                     name={chart.name}
+                     unit={chart.unit}
+                     interval={data.interval}
+                  />
+               </div>
+            } else if (chart.type == 'gauge') {
+               return < div key={chart.i}>
+                  <GaugeChart
+                     line={data.line}
+                     name={chart.name}
+                     unit={chart.unit}
+                  />
+               </div>
+            } else if (chart.type == 'bool') {
+               return < div key={chart.i}>
+                  <BoolChart
+                     line={data.line}
+                     name={chart.name}
+                  />
+               </div>
+            }
+         })}
       </GridLayout >
    );
 }

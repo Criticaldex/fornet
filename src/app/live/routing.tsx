@@ -47,8 +47,6 @@ export function GetNames({ names, units, name, setter, setUnit }: any) {
 }
 
 export function GetLineSensors({ sensors }: any) {
-   console.log('sensors: ', sensors);
-
    return (
       <>
          <label className="flex">
