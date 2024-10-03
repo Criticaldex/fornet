@@ -1,40 +1,38 @@
 'use client'
-import React, { Component, useEffect, useState } from 'react';
+import React, { MouseEventHandler, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { useSession } from 'next-auth/react';
 import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
-import { getNames } from '@/services/sensors';
 import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
 import { FaPlus } from "react-icons/fa6";
-import GridLayout from "react-grid-layout";
-import { GetLineSensors } from '../routing';
+import RGL, { WidthProvider } from "react-grid-layout";
+
+const GridLayout = WidthProvider(RGL);
+
 
 const ExpandedComponent = ({ data }: any) => {
-   const { data: session, status } = useSession();
-   const [names, setNames] = useState(null);
-   const [units, setUnits] = useState(null);
-   const [isLoading, setLoading] = useState(true);
+   const { data: session, status, update } = useSession();
+   const [layoutConf, setLayoutConf] = useState([]);
 
    useEffect(() => {
-      getNames(data.line, session?.user.db)
-         .then((res: any) => {
-            setNames(res.names);
-            setUnits(res.units);
-            setLoading(false)
-         });
-   }, [data, session?.user.db])
+      setLayoutConf(session?.user.config.live[data.line] as any)
+   }, [data, session])
 
-   if (isLoading) return <Loading />
+   function handleDel(i: any): void {
+      if (session) {
+         let user = session.user;
+         console.log('user: ', user);
+         user.config.live[data.line].splice(i, 1);
+         console.log('user: ', user);
+         update(user);
+      }
 
-   // const layoutConf: any = session?.user.config.live;
-   const layoutConf: any = [
-      { i: "1", x: 0, y: 0, w: 8, h: 12, type: 'line', name: 'PiezasOK', unit: 'UDs' },
-      { i: "2", x: 8, y: 0, w: 4, h: 7, type: 'gauge', name: 'Velocidad', unit: 'RPM' },
-      { i: "3", x: 12, y: 0, w: 2, h: 4, minW: 2, maxW: 4, type: 'bool', name: 'Inductivo' }
-   ]
+   }
+
+   if (layoutConf == undefined) return <Loading />
 
    const width = window.innerWidth - 105;
 
@@ -45,11 +43,18 @@ const ExpandedComponent = ({ data }: any) => {
          cols={16}
          rowHeight={30}
          width={width}
+         draggableHandle=".dragHandle"
       >
          {layoutConf.map((chart: any, index: number) => {
+            chart.i = index.toString();
             if (chart.type == 'line') {
                return < div key={chart.i}>
+                  <div className="flex flex-row justify-between">
+                     <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">[DRAG HERE]</span>
+                     <FaPlus size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaPlus>
+                  </div>
                   <LiveChart
+                     i={chart.i}
                      line={data.line}
                      name={chart.name}
                      unit={chart.unit}
@@ -58,7 +63,12 @@ const ExpandedComponent = ({ data }: any) => {
                </div>
             } else if (chart.type == 'gauge') {
                return < div key={chart.i}>
+                  <div className="flex flex-row justify-between">
+                     <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">[DRAG HERE]</span>
+                     <FaPlus size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaPlus>
+                  </div>
                   <GaugeChart
+                     i={chart.i}
                      line={data.line}
                      name={chart.name}
                      unit={chart.unit}
@@ -66,7 +76,12 @@ const ExpandedComponent = ({ data }: any) => {
                </div>
             } else if (chart.type == 'bool') {
                return < div key={chart.i}>
+                  <div className="flex flex-row justify-between">
+                     <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">[DRAG HERE]</span>
+                     <FaPlus size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaPlus>
+                  </div>
                   <BoolChart
+                     i={chart.i}
                      line={data.line}
                      name={chart.name}
                   />
@@ -77,11 +92,24 @@ const ExpandedComponent = ({ data }: any) => {
    );
 }
 
-const handleAdd = (row: any) => (event: any) => {
-   console.log('AAAAAAAAAAa');
+const handleAdd = (row: any, session: any, update: any) => async (event: any) => {
+   let user = session.user;
+
+   const newData = {
+      i: (user.config.live[row.line].length).toString(),
+      x: 8,
+      y: 0,
+      w: 4,
+      h: 7,
+      type: row.type,
+      name: row.sensor
+   };
+   user.config.live[row.line].push(newData);
+   update(user);
 }
 
 export function LinesTable({ lines, interval, sensors }: any) {
+   const { data: session, status, update } = useSession();
    let columns: any = [{
       name: 'Line',
       selector: (row: any) => row.line,
@@ -90,19 +118,28 @@ export function LinesTable({ lines, interval, sensors }: any) {
       style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
    },
    {
-      // name: 'Selects',
+      name: 'Selects',
       cell: (row: any) => (
          <div className='flex flex-row mr-2'>
-            <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}>
+            <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
+               onChange={e => {
+                  row.type = e.target.value;
+               }}>
                <option key='line' value='line'>Line</option>
                <option key='gauge' value='gauge'>Gauge</option>
                <option key='bool' value='bool'>Bool</option>
             </select>
 
-            <GetLineSensors
-               sensors={sensors[row.line]}
-            />
-            {/* <FaPlus size={20} onClick={handleAdd(row)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus> */}
+            <select className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
+               onChange={e => {
+                  row.sensor = e.target.value;
+               }}>
+               {sensors[row.line].map((sensor: any, i: number) => {
+                  return <option key={i} value={`${sensor.name}`} tabIndex={i}>
+                     {sensor.name}
+                  </option>
+               })}
+            </select>
          </div>
       ),
       grow: 1,
@@ -110,19 +147,21 @@ export function LinesTable({ lines, interval, sensors }: any) {
       button: false,
    },
    {
-      // name: 'Accions',
+      name: 'Accions',
       cell: (row: any) => (
-         <FaPlus size={20} onClick={handleAdd(row)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
+         <FaPlus size={20} onClick={handleAdd(row, session, update)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
       ),
       grow: 1,
       ignoreRowClick: true,
       button: true,
    }];
 
-   const data = lines.map((line: String) => {
+   const data = lines.map((line: string) => {
       return ({
          line: line,
-         interval: interval
+         interval: interval,
+         type: 'line',
+         sensor: sensors[line][0].name
       })
    });
 

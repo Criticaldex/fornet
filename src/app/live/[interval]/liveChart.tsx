@@ -6,7 +6,8 @@ import HighchartsData from 'highcharts/modules/data'
 import HighchartsReact from 'highcharts-react-official'
 import { chartOptions } from '@/components/chart.components'
 import { GetNames } from '../routing'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
@@ -14,8 +15,14 @@ if (typeof Highcharts === "object") {
    HighchartsData(Highcharts)
 }
 
-export function LiveChart({ line, name, unit, interval }: any) {
-
+export function LiveChart({ i, line, name, unit, interval }: any) {
+   const { data: session, status, update } = useSession();
+   const [user, setUser] = useState({});
+   useEffect(() => {
+      if (session) {
+         setUser(session.user)
+      }
+   }, [session])
    const options = {
       ...chartOptions,
       chart: {

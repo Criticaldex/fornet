@@ -46,22 +46,6 @@ export function GetNames({ names, units, name, setter, setUnit }: any) {
    )
 }
 
-export function GetLineSensors({ sensors }: any) {
-   return (
-      <>
-         <label className="flex">
-            <select className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}>
-               {sensors.map((sensor: any, i: number) => {
-                  return <option key={i} value={`${sensor.name}`} tabIndex={i}>
-                     {sensor.name}
-                  </option>
-               })}
-            </select>
-         </label>
-      </>
-   )
-}
-
 export function GetTimeIntervals() {
    const pathname = usePathname();
    const router = useRouter();
