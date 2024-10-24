@@ -39,7 +39,7 @@ export function GaugeChart({ line, name, unit }: any) {
          dataRefreshRate: 1
       },
       title: {
-         text: name
+         text: undefined
       },
       yAxis: {
          ...chartOptions.yAxis,

@@ -38,7 +38,7 @@ export function BoolChart({ line, name }: any) {
          dataRefreshRate: 1
       },
       title: {
-         text: name
+         text: undefined
       },
       yAxis: {
          ...chartOptions.yAxis,

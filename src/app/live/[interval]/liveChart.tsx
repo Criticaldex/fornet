@@ -34,7 +34,7 @@ export function LiveChart({ i, line, name, unit, interval }: any) {
          dataRefreshRate: 1
       },
       title: {
-         text: name + ` (${unit})`
+         text: undefined
       },
       legend: {
          enabled: false
