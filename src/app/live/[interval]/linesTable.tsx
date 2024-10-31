@@ -24,9 +24,7 @@ const ExpandedComponent = ({ data }: any) => {
    function handleDel(i: any): void {
       if (session) {
          let user = session.user;
-         console.log('user: ', user);
          user.config.live[data.line].splice(i, 1);
-         console.log('user: ', user);
          update(user);
       }
 
@@ -40,8 +38,8 @@ const ExpandedComponent = ({ data }: any) => {
       <GridLayout
          className="layout bg-bgDark rounded-md mt-2"
          layout={layoutConf}
-         cols={16}
-         rowHeight={30}
+         cols={8}
+         rowHeight={width / 20}
          width={width}
          draggableHandle=".dragHandle"
       >
@@ -92,23 +90,35 @@ const ExpandedComponent = ({ data }: any) => {
    );
 }
 
-const handleAdd = (row: any, session: any, update: any) => async (event: any) => {
+const handleAdd = (row: any, session: any, update: any, selected: any) => async (event: any) => {
    let user = session.user;
-
-   const newData = {
+   let newData = {
       i: (user.config.live[row.line].length).toString(),
       x: 8,
       y: 0,
       w: 4,
-      h: 7,
-      type: row.type,
-      name: row.sensor
+      h: 4,
+      type: selected[row.line].type,
+      name: selected[row.line].sensor
    };
+   switch (selected[row.line].type) {
+      case 'gauge':
+         newData.w = 2;
+         newData.h = 3
+         break;
+      case 'bool':
+         newData.w = 1;
+         newData.h = 1
+         break;
+      default:
+         break;
+   }
+
    user.config.live[row.line].push(newData);
    update(user);
 }
 
-export function LinesTable({ lines, interval, sensors }: any) {
+export function LinesTable({ lines, interval, sensors, types, selected }: any) {
    const { data: session, status, update } = useSession();
    let columns: any = [{
       name: 'Line',
@@ -124,15 +134,19 @@ export function LinesTable({ lines, interval, sensors }: any) {
             <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
                onChange={e => {
                   row.type = e.target.value;
+                  selected[row.line].type = e.target.value;
                }}>
-               <option key='line' value='line'>Line</option>
-               <option key='gauge' value='gauge'>Gauge</option>
-               <option key='bool' value='bool'>Bool</option>
+               {types.map((type: any, i: number) => {
+                  return <option key={i} value={`${type}`} tabIndex={i}>
+                     {type}
+                  </option>
+               })}
             </select>
 
-            <select className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
+            <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
                onChange={e => {
                   row.sensor = e.target.value;
+                  selected[row.line].sensor = e.target.value;
                }}>
                {sensors[row.line].map((sensor: any, i: number) => {
                   return <option key={i} value={`${sensor.name}`} tabIndex={i}>
@@ -149,7 +163,7 @@ export function LinesTable({ lines, interval, sensors }: any) {
    {
       name: 'Accions',
       cell: (row: any) => (
-         <FaPlus size={20} onClick={handleAdd(row, session, update)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
+         <FaPlus size={20} onClick={handleAdd(row, session, update, selected)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
       ),
       grow: 1,
       ignoreRowClick: true,
