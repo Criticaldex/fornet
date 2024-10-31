@@ -8,6 +8,9 @@ export default async function Dashboard({ params }: any) {
    const session = await getSession();
    const lines = await getLines();
    const sensors = await getSensorsbyLine(session?.user.db);
+   const types = ['line', 'gauge', 'bool']
+   let selected = {} as any;
+   lines.map((line) => { selected[line] = { type: 'line', sensor: sensors[line][0].name } });
 
    return (
       <>
@@ -17,6 +20,8 @@ export default async function Dashboard({ params }: any) {
                   lines={lines}
                   interval={interval}
                   sensors={sensors}
+                  types={types}
+                  selected={selected}
                />
             </div>
          </div>
