@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link"
 
-import { FaCapsules, FaBroadcastTower, FaHistory } from "react-icons/fa"
+import { FaCapsules, FaBroadcastTower, FaHistory, FaChartBar } from "react-icons/fa"
 import Image from 'next/image'
 
 import { usePathname } from "next/navigation"
@@ -24,6 +24,11 @@ export default function GetNav({ session }: any) {
          label: 'History',
          icon: FaHistory,
          route: '/history'
+      },
+      {
+         label: 'PowerBi',
+         icon: FaChartBar,
+         route: 'https://www.microsoft.com/en-us/power-platform/products/power-bi/'
       }
    ]
 
