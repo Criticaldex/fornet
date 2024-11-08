@@ -28,7 +28,7 @@ export default function GetNav({ session }: any) {
       {
          label: 'PowerBi',
          icon: FaChartBar,
-         route: 'https://www.microsoft.com/en-us/power-platform/products/power-bi/'
+         route: 'https://app.powerbi.com/groups/d8792594-3b20-4154-9892-77fe3e41f43e/reports/209d6e8f-97c1-4550-9518-8ab93ecf0c37/ea75936307d815500425?experience=power-bi'
       }
    ]
 
