@@ -130,7 +130,7 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
    {
       name: 'Selects',
       cell: (row: any) => (
-         <div className='flex flex-row mr-2'>
+         <div className='flex flex-row mr-2 justify-end items-center '>
             <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
                onChange={e => {
                   row.type = e.target.value;
@@ -156,9 +156,10 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
             </select>
          </div>
       ),
-      grow: 1,
+      grow: 2,
       ignoreRowClick: true,
       button: false,
+      center: true
    },
    {
       name: 'Accions',
@@ -168,6 +169,7 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
       grow: 1,
       ignoreRowClick: true,
       button: true,
+      center: true
    }];
 
    const data = lines.map((line: string) => {
