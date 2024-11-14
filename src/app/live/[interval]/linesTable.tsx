@@ -110,7 +110,8 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
       w: 4,
       h: 4,
       type: selected[row.line].type,
-      name: selected[row.line].sensor
+      name: selected[row.line].sensor,
+      unit: selected[row.line].unit
    };
    switch (selected[row.line].type) {
       case 'gauge':
@@ -157,10 +158,12 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
             <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
                onChange={e => {
                   row.sensor = e.target.value;
-                  selected[row.line].sensor = e.target.value;
+                  let fields = e.target.value.split('/');
+                  selected[row.line].sensor = fields[0];
+                  selected[row.line].unit = fields[1];
                }}>
                {sensors[row.line].map((sensor: any, i: number) => {
-                  return <option key={i} value={`${sensor.name}`} tabIndex={i}>
+                  return <option key={i} value={`${sensor.name}/${sensor.unit}`} tabIndex={i}>
                      {sensor.name}
                   </option>
                })}
