@@ -31,7 +31,7 @@ export function LiveChart({ i, line, name, unit, interval }: any) {
       data: {
          rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/${interval}`,
          enablePolling: true,
-         dataRefreshRate: 1
+         dataRefreshRate: 60
       },
       title: {
          text: undefined
