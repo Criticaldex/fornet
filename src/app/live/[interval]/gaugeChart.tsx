@@ -51,7 +51,7 @@ export function GaugeChart({ line, name, unit }: any) {
          lineWidth: 0,
          tickWidth: 0,
          minorTickInterval: null,
-         tickAmount: 2,
+         tickAmount: 5,
          max: max,
          min: min,
          labels: {
@@ -69,9 +69,9 @@ export function GaugeChart({ line, name, unit }: any) {
                   textOutline: 'none'
                }
             },
-            lineWidth: 1,
-            radius: "99%",
-            innerRadius: "81%"
+            lineWidth: 0.5,
+            radius: "95%",
+            innerRadius: "90%"
          }
       },
       pane: {
@@ -81,10 +81,10 @@ export function GaugeChart({ line, name, unit }: any) {
          endAngle: 90,
          center: ["50%", "80%"],
          background: {
-            outerRadius: '100%',
-            innerRadius: '80%',
+            outerRadius: '95%',
+            innerRadius: '90%',
             backgroundColor: `var(--bg-dark)`,
-            borderWidth: 4,
+            borderWidth: 1,
             shape: 'arc'
          }
       },

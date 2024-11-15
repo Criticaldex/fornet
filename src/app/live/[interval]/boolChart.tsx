@@ -62,7 +62,7 @@ export function BoolChart({ line, name }: any) {
                enabled: false
             },
             lineWidth: 1,
-            radius: "19%",
+            radius: "20%",
             innerRadius: "0%"
          }
       },
@@ -74,7 +74,7 @@ export function BoolChart({ line, name }: any) {
             outerRadius: '20%',
             innerRadius: '0%',
             backgroundColor: `var(--bg-dark)`,
-            borderWidth: 4,
+            borderWidth: 1,
             shape: 'circle'
          }
       },
