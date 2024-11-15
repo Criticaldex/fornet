@@ -32,8 +32,6 @@ const ExpandedComponent = ({ data }: any) => {
    function handleDel(i: any): void {
       if (session) {
          let user = session.user;
-         console.log('user: ', user);
-
          user.config.live[data.line].splice(i, 1);
          update(user);
       }
@@ -102,7 +100,6 @@ const ExpandedComponent = ({ data }: any) => {
 
 const handleAdd = (row: any, session: any, update: any, selected: any) => async (event: any) => {
    let user = session.user;
-   console.log('user: ', user);
    let newData = {
       i: (user.config.live[row.line].length).toString(),
       x: 8,
