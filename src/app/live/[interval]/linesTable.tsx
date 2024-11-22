@@ -49,6 +49,9 @@ const ExpandedComponent = ({ data }: any) => {
          cols={8}
          rowHeight={width / 50}
          width={width}
+         onLayoutChange={(layout) => {
+            console.log(layout[2]);
+         }}
          draggableHandle=".dragHandle"
       >
          {layoutConf.map((chart: any, index: number) => {
