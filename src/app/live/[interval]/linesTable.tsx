@@ -49,9 +49,7 @@ const ExpandedComponent = ({ data }: any) => {
          rowHeight={width / 50}
          width={width}
          onLayoutChange={(layout) => {
-            console.log(layout);
             if (session && layout[0]) {
-               console.log('user: ', session.user);
                let user = session.user;
                user.config.live[data.line].forEach((ele: any, i: number) => {
                   ele.w = layout[i].w;
@@ -115,13 +113,9 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
    let user = session.user;
    let maxY = 0;
    session.user.config.live[row.line].forEach((element: { h: number; y: number; }) => {
-      console.log('element: ', element);
       const suma = element.y + element.h
-      console.log('suma: ', suma);
       maxY = (maxY < suma) ? suma : maxY;
    });
-   console.log('maxY: ', maxY);
-
    let newData = {
       i: (user.config.live[row.line].length).toString(),
       x: 0,
