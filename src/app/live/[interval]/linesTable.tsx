@@ -113,10 +113,19 @@ const ExpandedComponent = ({ data }: any) => {
 
 const handleAdd = (row: any, session: any, update: any, selected: any) => async (event: any) => {
    let user = session.user;
+   let maxY = 0;
+   session.user.config.live[row.line].forEach((element: { h: number; y: number; }) => {
+      console.log('element: ', element);
+      const suma = element.y + element.h
+      console.log('suma: ', suma);
+      maxY = (maxY < suma) ? suma : maxY;
+   });
+   console.log('maxY: ', maxY);
+
    let newData = {
       i: (user.config.live[row.line].length).toString(),
-      x: 8,
-      y: 0,
+      x: 0,
+      y: maxY,
       w: 4,
       h: 11,
       type: selected[row.line].type,
