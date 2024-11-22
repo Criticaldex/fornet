@@ -35,7 +35,6 @@ const ExpandedComponent = ({ data }: any) => {
          user.config.live[data.line].splice(i, 1);
          update(user);
       }
-
    }
 
    if (layoutConf == undefined) return <Loading />
@@ -50,7 +49,18 @@ const ExpandedComponent = ({ data }: any) => {
          rowHeight={width / 50}
          width={width}
          onLayoutChange={(layout) => {
-            console.log(layout[2]);
+            console.log(layout);
+            if (session && layout[0]) {
+               console.log('user: ', session.user);
+               let user = session.user;
+               user.config.live[data.line].forEach((ele: any, i: number) => {
+                  ele.w = layout[i].w;
+                  ele.h = layout[i].h;
+                  ele.x = layout[i].x;
+                  ele.y = layout[i].y;
+               });
+               update(user);
+            }
          }}
          draggableHandle=".dragHandle"
       >
