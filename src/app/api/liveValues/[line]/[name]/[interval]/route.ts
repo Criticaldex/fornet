@@ -24,8 +24,14 @@ export async function GET(request: Request, { params }: { params: { line: string
          db.model('value', indicatorSchema);
       }
       const values = await db.models.value.find(filter).select(fields).sort('timestamp').lean();
-      const liveValues = values.map((val) => ([val.timestamp, val.value]));
-      return NextResponse.json(liveValues);
+      const filteredValues: any[] = [];
+      values.forEach((val, i) => {
+         if (i % 60 == 0) {
+            filteredValues.push([val.timestamp, val.value]);
+         }
+      });
+      // const liveValues = filteredValues.map((val) => ([val.timestamp, val.value]));
+      return NextResponse.json(filteredValues);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
    }
