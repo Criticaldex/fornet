@@ -47,7 +47,7 @@ const ExpandedComponent = ({ data }: any) => {
          className="layout bg-bgDark rounded-md mt-2"
          layout={layoutConf}
          cols={8}
-         rowHeight={width / 20}
+         rowHeight={width / 50}
          width={width}
          draggableHandle=".dragHandle"
       >
@@ -105,7 +105,7 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
       x: 8,
       y: 0,
       w: 4,
-      h: 4,
+      h: 11,
       type: selected[row.line].type,
       name: selected[row.line].sensor,
       unit: selected[row.line].unit
@@ -113,11 +113,11 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
    switch (selected[row.line].type) {
       case 'gauge':
          newData.w = 2;
-         newData.h = 3
+         newData.h = 7
          break;
       case 'bool':
          newData.w = 1;
-         newData.h = 1
+         newData.h = 3
          break;
       default:
          break;
