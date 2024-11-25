@@ -53,9 +53,6 @@ export const upsertUser = async (data: UserIface) => {
 }
 
 export const updateConfig = async (data: UserIface) => {
-   if (!data.config) {
-      return Response.json(`Config Mandatory!`);
-   }
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`,
       {
          method: 'PATCH',
