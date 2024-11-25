@@ -1,6 +1,7 @@
 'use client'
 import React, { MouseEventHandler, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { upsertUser } from "@/services/users";
 import { useSession } from 'next-auth/react';
 import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
@@ -41,6 +42,10 @@ const ExpandedComponent = ({ data }: any) => {
 
    const width = window.innerWidth - 105;
 
+   function saveUser(user: any) {
+      throw new Error('Function not implemented.');
+   }
+
    return (
       <GridLayout
          className="layout bg-bgDark rounded-md mt-2"
@@ -58,6 +63,11 @@ const ExpandedComponent = ({ data }: any) => {
                   ele.y = layout[i].y;
                });
                update(user);
+               upsertUser(
+                  {
+                     email: user.email,
+                     config: user.config
+                  });
             }
          }}
          draggableHandle=".dragHandle"
