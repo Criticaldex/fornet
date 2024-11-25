@@ -1,6 +1,7 @@
 'use client'
 import React, { MouseEventHandler, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { updateConfig } from "@/services/users";
 import { useSession } from 'next-auth/react';
 import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
@@ -35,12 +36,16 @@ const ExpandedComponent = ({ data }: any) => {
          user.config.live[data.line].splice(i, 1);
          update(user);
       }
-
    }
 
    if (layoutConf == undefined) return <Loading />
 
    const width = window.innerWidth - 105;
+
+   async function saveUser(user: any) {
+      const upsert = await updateConfig(user);
+      console.log('upsert OK: ', upsert.ok);
+   }
 
    return (
       <GridLayout
@@ -49,6 +54,19 @@ const ExpandedComponent = ({ data }: any) => {
          cols={8}
          rowHeight={width / 50}
          width={width}
+         onLayoutChange={(layout) => {
+            if (session && layout[0]) {
+               let user = session.user;
+               user.config.live[data.line].forEach((ele: any, i: number) => {
+                  ele.w = layout[i].w;
+                  ele.h = layout[i].h;
+                  ele.x = layout[i].x;
+                  ele.y = layout[i].y;
+               });
+               update(user);
+               saveUser(user);
+            }
+         }}
          draggableHandle=".dragHandle"
       >
          {layoutConf.map((chart: any, index: number) => {
@@ -100,10 +118,15 @@ const ExpandedComponent = ({ data }: any) => {
 
 const handleAdd = (row: any, session: any, update: any, selected: any) => async (event: any) => {
    let user = session.user;
+   let maxY = 0;
+   session.user.config.live[row.line].forEach((element: { h: number; y: number; }) => {
+      const suma = element.y + element.h
+      maxY = (maxY < suma) ? suma : maxY;
+   });
    let newData = {
       i: (user.config.live[row.line].length).toString(),
-      x: 8,
-      y: 0,
+      x: 0,
+      y: maxY,
       w: 4,
       h: 11,
       type: selected[row.line].type,

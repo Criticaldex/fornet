@@ -31,7 +31,7 @@ export async function DELETE(request: Request, { params }: { params: { email: st
       }
       // const body: UserIface = await request.json();
       if (!params.email) {
-         return NextResponse.json(`Email Obligatori!`);
+         return NextResponse.json(`Email Mandatory!`);
       }
       const dbName = 'Auth';
       await dbConnect();
