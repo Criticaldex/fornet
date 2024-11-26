@@ -24,7 +24,10 @@ export default function GetNav({ session }: any) {
          label: 'History',
          icon: FaHistory,
          route: '/history'
-      },
+      }
+   ]
+
+   const externalLinks = [
       {
          label: 'PowerBi',
          icon: FaChartBar,
@@ -32,19 +35,11 @@ export default function GetNav({ session }: any) {
       }
    ]
 
-   const navTitlesIconsFarma = [
-      {
-         label: 'IQF',
-         icon: FaCapsules,
-         route: '/iqf'
-      }
-   ]
-
    return (
       <div className="fixed top-0 left-0 z-50 w-16 h-screen bg-bgNavGlobal pt-2 pr-3 pb-0 pl-0 hover:w-52 transition-all duration-500">
          <nav className="text-TextNav flex flex-col justify-between h-full overflow-hidden">
             <div>
-               <Link href="/" className="text-yellowCustom text-xl font-bold grid grid-cols-[max-content_max-content] gap-x-4 mt-1 mb-7 mr-1 ml-2">
+               <Link href="/" className="text-accent text-xl font-bold grid grid-cols-[max-content_max-content] gap-x-4 mt-1 mb-7 mr-1 ml-2">
                   {/* <BsRepeat size={20} /> */}
                   <Image
                      className="text-accent"
@@ -65,22 +60,16 @@ export default function GetNav({ session }: any) {
                         </span>
                      </Link>
                   ))}
-                  {/* <hr className="my-4 ml-2 border-spacerNav" />
-                  <div className="text-yellowCustom text-lg font-bold grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
-                     <RiMedicineBottleLine size={20} />
-                     <h3>
-                        Farmàcia
-                     </h3>
-                  </div>
-                  {navTitlesIconsFarma.map((navTI) => (
-                     <Link key={navTI.label} href={navTI.route} className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
+                  <hr className="my-4 ml-2 border-spacerNav" />
+                  {externalLinks.map((navTI) => (
+                     <Link key={navTI.label} href={navTI.route} rel="noopener noreferrer" target="_blank" className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
                      ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
                         <navTI.icon size={19} />
                         <span className="text-base">
                            {navTI.label}
                         </span>
                      </Link>
-                  ))} */}
+                  ))}
                </div>
             </div>
             <div>
