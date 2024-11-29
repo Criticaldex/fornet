@@ -16,13 +16,6 @@ if (typeof Highcharts === "object") {
 }
 
 export function LiveChart({ i, line, name, unit, interval }: any) {
-   const { data: session, status, update } = useSession();
-   const [user, setUser] = useState({});
-   useEffect(() => {
-      if (session) {
-         setUser(session.user)
-      }
-   }, [session])
    const options = {
       ...chartOptions,
       chart: {

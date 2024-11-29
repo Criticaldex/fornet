@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component';
 import { updateConfig } from "@/services/users";
 import { useSession } from 'next-auth/react';
 import { LiveChart } from "./liveChart";
+import { CandleChart } from "./candleChart";
 import { createThemes } from "@/styles/themes";
 import { Loading } from "@/components/loading.component";
 import { GaugeChart } from './gaugeChart';
@@ -77,7 +78,7 @@ const ExpandedComponent = ({ data }: any) => {
                      <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
                      <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
                   </div>
-                  <LiveChart
+                  <CandleChart
                      i={chart.i}
                      line={data.line}
                      name={chart.name}

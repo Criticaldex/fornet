@@ -4,7 +4,7 @@ export const chartOptions = {
    chart: {
       type: null,
       zooming: {
-         mouseWheel: false
+         mouseWheel: true
       }
    },
    credits: {
@@ -12,7 +12,7 @@ export const chartOptions = {
    },
    colors: ["#ff6600", "#2caffe", "#544fc5", "#00e272", "#fe6a35", "#6b8abc", "#d568fb", "#2ee0ca", "#fa4b42", "#feb56a", "#91e8e1"],
    lang: {
-      noData: "No hi han dades disponibles"
+      noData: "No Data"
    },
    noData: {
       style: {
@@ -20,11 +20,6 @@ export const chartOptions = {
          fontWeight: 'bold',
          color: '#666666'
       },
-   },
-   data: {
-      rowsURL: 'https://demo-live-data.highcharts.com/time-rows.json',
-      enablePolling: true,
-      dataRefreshRate: 1
    },
    xAxis: {
       type: 'datetime',
