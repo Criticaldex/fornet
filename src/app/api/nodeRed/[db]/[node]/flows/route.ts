@@ -122,7 +122,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          "id": "fb64f4acee62767d",
          "type": "mqtt-broker",
          "name": "broker",
-         "broker": "broker.hivemq.com",
+         "broker": process.env.MQTT_BROKER,
          "port": "1883",
          "clientid": "",
          "autoConnect": true,
@@ -149,8 +149,8 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          "userProps": "",
          "sessionExpiry": "",
          "credentials": {
-            "user": "test",
-            "password": "test"
+            "user": process.env.MQTT_USER,
+            "password": process.env.MQTT_PASS
          }
       }
       ]
