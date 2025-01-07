@@ -50,7 +50,7 @@ export async function PATCH(request: Request, { params }: { params: { db: string
          new: true,
          upsert: false,
          includeResultMetadata: true
-      }).lean();
+      });
 
       return NextResponse.json(res);
    } catch (err) {

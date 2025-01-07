@@ -92,7 +92,7 @@ export async function PATCH(request: Request) {
          new: true,
          upsert: true,
          includeResultMetadata: true
-      }).lean();
+      });
       const { hash, ...userWithoutHash } = res.value;
       res.value = userWithoutHash;
       return NextResponse.json(res);
