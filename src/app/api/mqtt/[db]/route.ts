@@ -59,16 +59,8 @@ export async function PATCH(request: Request, { params }: { params: { db: string
          return NextResponse.json(`DB Missing!`);
       } else if (!body.line) {
          return NextResponse.json(`line Missing!`);
-      } else if (!body.ip) {
-         return NextResponse.json(`ip Missing!`);
       } else if (!body.name) {
          return NextResponse.json(`name Missing!`);
-      } else if (!body.plc) {
-         return NextResponse.json(`plc Missing!`);
-      } else if (!body.sensor) {
-         return NextResponse.json(`sensor Missing!`);
-      } else if (!body.value) {
-         return NextResponse.json(`value Missing!`);
       }
 
       const filter = {
@@ -88,7 +80,7 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       const res = await db.models.mqtt.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
-         rawResult: true
+         includeResultMetadata: true
       }).lean();
 
       return NextResponse.json(res);

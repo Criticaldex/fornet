@@ -81,7 +81,7 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       const res = await db.models.plc.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
-         rawResult: true
+         includeResultMetadata: true
       }).lean();
 
       return NextResponse.json(res);

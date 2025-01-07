@@ -49,7 +49,7 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       const res = await db.models.node.findOneAndUpdate({ name: body.name }, body, {
          new: true,
          upsert: false,
-         rawResult: true
+         includeResultMetadata: true
       }).lean();
 
       return NextResponse.json(res);
