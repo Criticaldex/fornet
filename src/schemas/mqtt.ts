@@ -13,8 +13,7 @@ export interface MqttIface {
 const MqttSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Name is mandatory!'],
-        unique: [true, 'Name must be unique!']
+        required: [true, 'Name is mandatory!']
     },
     line: {
         type: String,
