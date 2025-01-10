@@ -13,7 +13,6 @@ import RGL, { WidthProvider } from "react-grid-layout";
 
 const GridLayout = WidthProvider(RGL);
 
-
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status, update } = useSession();
    const [layoutConf, setLayoutConf] = useState([]);

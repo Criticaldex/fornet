@@ -41,6 +41,27 @@ const getFilteredMqtts = async (db?: string, filter?: any, fields?: string[], so
 }
 
 export const getMqttConfigs = async (db?: string, filter?: any) => {
+   const data = await getMqtts(db);
+   let groupByLine = _.groupBy(data, 'line');
+   let groupByName = _.groupBy(data, 'name');
+   let tableData: object[] = [];
+
+
+   for (const [name, nameGrouped] of (Object.entries(groupByName) as [string, any][])) {
+      let groupByLine = _.groupBy(nameGrouped, 'line');
+      for (const [line, lineGrouped] of (Object.entries(groupByLine) as [string, any][])) {
+         let subtableData: object[] = [];
+         lineGrouped.map((config: any) => {
+            subtableData.push(config);
+         });
+         tableData.push({ name: name, line: line, subtable: subtableData });
+      }
+   }
+
+   return tableData;
+}
+
+export const getFilteredMqttConfigs = async (db?: string, filter?: any) => {
    const data = await getFilteredMqtts(db, filter, ['-_id', '-__v']);
    let groupByLine = _.groupBy(data, ['line', 'name']);
    let lines: string[] = [];
