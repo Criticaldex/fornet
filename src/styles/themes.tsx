@@ -10,7 +10,7 @@ export function createThemes() {
          default: 'var(--bg-light)',
       },
       context: {
-         background: 'var(--bg-light)',
+         background: 'var(--bg-dark)',
          text: 'var(--text-color)',
       },
       divider: {

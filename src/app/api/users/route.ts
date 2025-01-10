@@ -91,8 +91,8 @@ export async function PATCH(request: Request) {
       const res = await db.models.user.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
-         rawResult: true
-      }).lean();
+         includeResultMetadata: true
+      });
       const { hash, ...userWithoutHash } = res.value;
       res.value = userWithoutHash;
       return NextResponse.json(res);

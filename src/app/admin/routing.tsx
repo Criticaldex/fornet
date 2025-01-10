@@ -21,6 +21,10 @@ export function GetLinksAdmin({ session }: any) {
       {
          label: 'PLCs',
          route: `/admin/plcs`
+      },
+      {
+         label: 'MQTT',
+         route: `/admin/mqtt`
       }
    ];
 

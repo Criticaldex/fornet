@@ -80,8 +80,8 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       const res = await db.models.sensor.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
-         rawResult: true
-      }).lean();
+         includeResultMetadata: true
+      });
 
       return NextResponse.json(res);
    } catch (err) {

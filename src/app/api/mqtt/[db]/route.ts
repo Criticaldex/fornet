@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
-import PlcSchema, { PlcIface } from '@/schemas/plc'
+import MqttSchema, { MqttIface } from '@/schemas/mqtt'
 import { NextResponse } from "next/server";
 import { headers } from 'next/headers';
 
@@ -12,13 +12,13 @@ export async function GET(request: Request, { params }: { params: { db: string }
       const dbName = params.db;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
-      if (!db.models.plc) {
-         db.model('plc', PlcSchema);
+      if (!db.models.mqtt) {
+         db.model('mqtt', MqttSchema);
       }
 
-      const plcs = (await db.models.plc.find().lean()) as PlcIface[];
+      const mqtts = (await db.models.mqtt.find().lean()) as MqttIface[];
 
-      return NextResponse.json(plcs);
+      return NextResponse.json(mqtts);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
    }
@@ -37,13 +37,13 @@ export async function POST(request: Request, { params }: { params: { db: string 
       const dbName = params.db;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
-      if (!db.models.plc) {
-         db.model('plc', PlcSchema);
+      if (!db.models.mqtt) {
+         db.model('mqtt', MqttSchema);
       }
 
-      const plcs = (await db.models.plc.find(body.filter).select(fields).sort(body.sort).lean()) as PlcIface[];
+      const mqtts = (await db.models.mqtt.find(body.filter).select(fields).sort(body.sort).lean()) as MqttIface[];
 
-      return NextResponse.json(plcs);
+      return NextResponse.json(mqtts);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
    }
@@ -54,31 +54,30 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
          return NextResponse.json({ ERROR: 'Bad Auth' });
       }
-      const { _id, ...body }: PlcIface = await request.json();
+      const { _id, ...body }: MqttIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
       } else if (!body.line) {
          return NextResponse.json(`line Missing!`);
-      } else if (!body.ip) {
-         return NextResponse.json(`ip Missing!`);
       } else if (!body.name) {
          return NextResponse.json(`name Missing!`);
-      } else if (!body.type) {
-         return NextResponse.json(`type Missing!`);
       }
 
       const filter = {
          name: body.name,
+         line: body.line,
+         plc: body.plc,
+         sensor: body.sensor
       }
 
       const dbName = params.db;
 
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
-      if (!db.models.plc) {
-         db.model('plc', PlcSchema);
+      if (!db.models.mqtt) {
+         db.model('mqtt', MqttSchema);
       }
-      const res = await db.models.plc.findOneAndUpdate(filter, body, {
+      const res = await db.models.mqtt.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
          includeResultMetadata: true
@@ -95,28 +94,34 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
          return NextResponse.json({ ERROR: 'Bad Auth' });
       }
-      const body: PlcIface = await request.json();
+      const body: MqttIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
       } else if (!body.line) {
          return NextResponse.json(`line Missing!`);
       } else if (!body.name) {
          return NextResponse.json(`name Missing!`);
+      } else if (!body.plc) {
+         return NextResponse.json(`plc Missing!`);
+      } else if (!body.sensor) {
+         return NextResponse.json(`sensor Missing!`);
       }
 
       const filter = {
          line: body.line,
-         name: body.name
+         name: body.name,
+         plc: body.plc,
+         sensor: body.sensor
       }
 
       const dbName = params.db;
 
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
-      if (!db.models.plc) {
-         db.model('plc', PlcSchema);
+      if (!db.models.mqtt) {
+         db.model('mqtt', MqttSchema);
       }
-      const res = await db.models.plc.findOneAndDelete(filter);
+      const res = await db.models.mqtt.findOneAndDelete(filter);
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
