@@ -43,7 +43,6 @@ const ExpandedComponent = ({ data }: any) => {
 
    async function saveUser(user: any) {
       const upsert = await updateConfig(user);
-      console.log('upsert OK: ', upsert.ok);
    }
 
    return (
