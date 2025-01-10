@@ -5,7 +5,7 @@ import { createThemes } from "@/styles/themes"
 import { MqttForm } from "./form";
 import { MqttIface } from "@/schemas/mqtt";
 import { useForm, UseFormReset } from "react-hook-form";
-import { deleteMqtt, getMqtts } from '@/services/mqtts';
+import { deleteMqtt, getMqttConfigs } from '@/services/mqtts';
 import { confirmAlert } from 'react-confirm-alert';
 import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
@@ -125,7 +125,7 @@ export function MqttTable({ mqtts, nodes, session }: any) {
                   const mqtt = await deleteMqtt(row, session?.user.db);
                   if (mqtt) {
                      toast.error('Value Deleted!!', { theme: "colored" });
-                     setRows(await getMqtts(session?.user.db));
+                     setRows(await getMqttConfigs(session?.user.db));
                   }
                }
             },
