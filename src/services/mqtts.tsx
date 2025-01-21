@@ -13,7 +13,7 @@ export const getMqtts = async (db: string | undefined) => {
       }).then(res => res.json());
 }
 
-const getFilteredMqtts = async (db?: string, filter?: any, fields?: string[], sort?: string) => {
+export const getFilteredMqtts = async (db?: string, filter?: any, fields?: string[], sort?: string) => {
    if (!db) {
       const session = await getSession();
       db = session?.user.db;
@@ -42,7 +42,6 @@ const getFilteredMqtts = async (db?: string, filter?: any, fields?: string[], so
 
 export const getMqttConfigs = async (db?: string, filter?: any) => {
    const data = await getMqtts(db);
-   let groupByLine = _.groupBy(data, 'line');
    let groupByName = _.groupBy(data, 'name');
    let tableData: object[] = [];
 
@@ -59,16 +58,6 @@ export const getMqttConfigs = async (db?: string, filter?: any) => {
    }
 
    return tableData;
-}
-
-export const getFilteredMqttConfigs = async (db?: string, filter?: any) => {
-   const data = await getFilteredMqtts(db, filter, ['-_id', '-__v']);
-   let groupByLine = _.groupBy(data, ['line', 'name']);
-   let lines: string[] = [];
-   for (const [key, value] of (Object.entries(groupByLine) as [string, any][])) {
-      lines.push(key);
-   }
-   return lines;
 }
 
 export const getNodes = async (db?: string, filter?: any) => {

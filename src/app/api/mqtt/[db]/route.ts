@@ -60,7 +60,7 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       } else if (!body.line) {
          return NextResponse.json(`line Missing!`);
       } else if (!body.name) {
-         return NextResponse.json(`name Missing!`);
+         body.name = 'null';
       }
 
       const filter = {

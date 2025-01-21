@@ -47,16 +47,6 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
             </div>
             {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
 
-            <div className="inline-flex justify-around">
-               <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
-               <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
-            </div>
-         </form >
-         <form
-            id="subtableForm"
-            className="flex flex-col gap-4 grow rounded-md p-4 bg-bgLight"
-            onSubmit={onSubmit}
-         >
             <div className="inline-flex justify-end">
                <label htmlFor="plc" className="flex self-center">Plc:</label>
                <input id="plc" type="text" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}
