@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link"
 
-import { FaCapsules, FaBroadcastTower, FaHistory, FaChartBar } from "react-icons/fa"
+import { FaCapsules, FaBroadcastTower, FaHistory, FaChartBar, FaPodcast, FaReceipt } from "react-icons/fa"
 import Image from 'next/image'
 
 import { usePathname } from "next/navigation"
@@ -24,6 +24,16 @@ export default function GetNav({ session }: any) {
          label: 'History',
          icon: FaHistory,
          route: '/history'
+      },
+      {
+         label: 'MQTT',
+         icon: FaPodcast,
+         route: '/mqtt'
+      },
+      {
+         label: 'Logs',
+         icon: FaReceipt,
+         route: '/logs'
       }
    ]
 
@@ -61,6 +71,11 @@ export default function GetNav({ session }: any) {
                      </Link>
                   ))}
                   <hr className="my-4 ml-2 border-spacerNav" />
+                  <div className="text-lg grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
+                     <h1 className="text-accent">
+                        External
+                     </h1>
+                  </div>
                   {externalLinks.map((navTI) => (
                      <Link key={navTI.label} href={navTI.route} rel="noopener noreferrer" target="_blank" className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
                      ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
