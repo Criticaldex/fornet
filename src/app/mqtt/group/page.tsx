@@ -9,7 +9,7 @@ export default async function ValuesPage() {
    let nodes = null;
    if (session) {
       // mqtts = await getMqtts(session?.user.db);
-      mqtts = await getMqttConfigs(session?.user.db);
+      mqtts = await getMqttConfigs(session?.user.db, { name: { '$not': { $eq: 'null' } } });
       nodes = await getNodeNames(session?.user.db)
    }
 

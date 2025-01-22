@@ -16,14 +16,9 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
       } else {
          toast.success('Object Added!', { theme: "colored" });
       }
-      // if (sync.lastErrorObject?.updatedExisting) {
-      //    toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
-      // } else {
-      //    toast.error('Error Syncing!', { theme: "colored" });
-      // }
       reset(data);
 
-      setRows(await getMqttConfigs(session?.user.db));
+      setRows(await getMqttConfigs(session?.user.db, { name: { '$not': { $eq: 'null' } } }));
    });
 
    return (

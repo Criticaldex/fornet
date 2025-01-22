@@ -41,7 +41,7 @@ export const getFilteredMqtts = async (db?: string, filter?: any, fields?: strin
 }
 
 export const getMqttConfigs = async (db?: string, filter?: any) => {
-   const data = await getMqtts(db);
+   const data = await getFilteredMqtts(db, filter);
    let groupByName = _.groupBy(data, 'name');
    let tableData: object[] = [];
 
