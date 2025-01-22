@@ -10,9 +10,6 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
    const onSubmit = handleSubmit(async (data: MqttIface) => {
       const session = await getSession();
       const upsert = await upsertMqtt(data, session?.user.db);
-      console.log('data: ', data);
-      console.log('upsert: ', upsert);
-
 
       //const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
       if (upsert.lastErrorObject?.updatedExisting) {
