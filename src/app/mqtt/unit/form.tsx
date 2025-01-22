@@ -1,7 +1,7 @@
 'use client';
 
 import { MqttIface } from "@/schemas/mqtt";
-import { getMqttConfigs, upsertMqtt } from "@/services/mqtts";
+import { getFilteredMqtts, upsertMqtt } from "@/services/mqtts";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 
@@ -10,20 +10,16 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
    const onSubmit = handleSubmit(async (data: MqttIface) => {
       const session = await getSession();
       const upsert = await upsertMqtt(data, session?.user.db);
+
       //const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
-      } else {
+      } else if (!upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Added!', { theme: "colored" });
-      }
-      // if (sync.lastErrorObject?.updatedExisting) {
-      //    toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
-      // } else {
-      //    toast.error('Error Syncing!', { theme: "colored" });
-      // }
+      } else toast.error(upsert, { theme: "colored" });
       reset(data);
 
-      setRows(await getMqttConfigs(session?.user.db));
+      setRows(await getFilteredMqtts(session?.user.db, { name: 'null' }));
    });
 
    return (
@@ -33,12 +29,6 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
             className="flex flex-col gap-4 grow rounded-md p-4 mb-2 bg-bgLight"
             onSubmit={onSubmit}
          >
-            <div className="inline-flex justify-end">
-               <label htmlFor="name" className="flex self-center">Name:</label>
-               <input id="name" type="text" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.name ? 'border-foreground' : 'border-red'}`}
-                  {...register("name", { required: 'Field Required' })} />
-            </div>
-            {errors.name && <p role="alert" className="text-red self-end">⚠ {errors.name?.message}</p>}
 
             <div className="inline-flex justify-end">
                <label htmlFor="line" className="flex self-center">Line:</label>
@@ -47,16 +37,6 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
             </div>
             {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
 
-            <div className="inline-flex justify-around">
-               <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
-               <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
-            </div>
-         </form >
-         <form
-            id="subtableForm"
-            className="flex flex-col gap-4 grow rounded-md p-4 bg-bgLight"
-            onSubmit={onSubmit}
-         >
             <div className="inline-flex justify-end">
                <label htmlFor="plc" className="flex self-center">Plc:</label>
                <input id="plc" type="text" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}

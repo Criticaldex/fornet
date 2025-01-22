@@ -22,6 +22,11 @@ const nextConfig = {
             source: '/live',
             destination: `/live/${process.env.LIVE_DEFAULT_INTERVAL}`,
             permanent: false,
+         },
+         {
+            source: '/mqtt',
+            destination: `/mqtt/${process.env.MQTT_DEFAULT}`,
+            permanent: false,
          }
       ];
    }

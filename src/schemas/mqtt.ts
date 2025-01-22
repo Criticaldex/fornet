@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
 export interface MqttIface {
     _id: any,
@@ -12,8 +12,7 @@ export interface MqttIface {
 
 const MqttSchema = new mongoose.Schema({
     name: {
-        type: String,
-        required: [true, 'Name is mandatory!']
+        type: String
     },
     line: {
         type: String,

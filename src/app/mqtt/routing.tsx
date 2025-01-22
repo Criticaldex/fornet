@@ -7,20 +7,12 @@ export function GetLinksAdmin({ session }: any) {
 
    let links: object[] = [
       {
-         label: 'Profile',
-         route: `/admin/profile`
+         label: 'Group',
+         route: `/mqtt/group`
       },
       {
-         label: 'Users',
-         route: `/admin/users`
-      },
-      {
-         label: 'Sensors',
-         route: `/admin/sensors`
-      },
-      {
-         label: 'PLCs',
-         route: `/admin/plcs`
+         label: 'Unit',
+         route: `/mqtt/unit`
       }
    ];
 
