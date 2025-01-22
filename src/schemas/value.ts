@@ -3,10 +3,10 @@ import mongoose from 'mongoose'
 export interface ValueIface {
    line: string,
    plc_name: string,
-   name: string,
+   name?: string,
    unit?: string,
-   value: number | string,
-   timestamp: number
+   value?: number | string,
+   timestamp?: number
 }
 
 const ValueSchema = new mongoose.Schema({

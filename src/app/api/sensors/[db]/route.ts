@@ -99,26 +99,18 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
          return NextResponse.json(`DB Missing!`);
       } else if (!body.line) {
          return NextResponse.json(`Line Missing!`);
-      } else if (!body.name) {
-         return NextResponse.json(`Name Missing!`);
       } else if (!body.plc_name) {
          return NextResponse.json(`PLC_Name Missing!`);
       }
 
       const dbName = params.db;
 
-      const filter = {
-         line: body.line,
-         plc_name: body.plc_name,
-         name: body.name
-      }
-
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
       if (!db.models.sensor) {
          db.model('sensor', SensorSchema);
       }
-      const res = await db.models.sensor.findOneAndDelete(filter);
+      const res = await db.models.sensor.deleteMany(body);
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });

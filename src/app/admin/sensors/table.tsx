@@ -58,19 +58,19 @@ export function AdminTable({ sensors, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL ITS VALUES ⚠️ Are you sure?',
+         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL It\'s Values ⚠️ Are you sure?',
          buttons: [
             {
                label: 'Yes',
                onClick: async () => {
-                  const dSensor = await deleteSensor(row, session?.user.db);
-                  const dValue = await deleteValues(row, session?.user.db);
+                  const dSensor = await deleteSensor({ line: row.line, name: row.name, plc_name: row.plc_name }, session?.user.db);
+                  const dValue = await deleteValues({ line: row.line, name: row.name, plc_name: row.plc_name }, session?.user.db);
                   if (dSensor) {
-                     toast.error('Label Deleted!!', { theme: "colored" });
+                     toast.error('Sensor Deleted!!', { theme: "colored" });
                      setRows(await getSensors(session?.user.db));
                   }
                   if (dValue.acknowledged) {
-                     toast.error(dValue.deletedCount + ' values Deleted!!', { theme: "colored" });
+                     toast.error(dValue.deletedCount + ' Values Deleted!!', { theme: "colored" });
                   }
                }
             },

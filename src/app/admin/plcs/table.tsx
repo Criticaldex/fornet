@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
 import { mongo } from 'mongoose';
+import { deleteSensor } from '@/services/sensors';
 
 export function PlcTable({ plcs, nodes, session }: any) {
 
@@ -58,15 +59,24 @@ export function PlcTable({ plcs, nodes, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?',
+         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL sensors and values attached to this plc ⚠️ Are you sure?',
          buttons: [
             {
                label: 'Yes',
                onClick: async () => {
-                  const plc = await deletePlc(row, session?.user.db);
-                  if (plc) {
+                  const dPlc = await deletePlc(row, session?.user.db);
+                  const dSensor = await deleteSensor({ line: row.line, plc_name: row.name }, session?.user.db);
+                  const dValue = await deleteValues({ line: row.line, plc_name: row.name }, session?.user.db);
+
+                  if (dPlc) {
                      toast.error('PLC Deleted!!', { theme: "colored" });
                      setRows(await getPlcs(session?.user.db));
+                  }
+                  if (dSensor.acknowledged) {
+                     toast.error(dSensor.deletedCount + 'Sensors Deleted!!', { theme: "colored" });
+                  }
+                  if (dValue.acknowledged) {
+                     toast.error(dValue.deletedCount + ' Values Deleted!!', { theme: "colored" });
                   }
                }
             },

@@ -59,8 +59,8 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
          return NextResponse.json(`DB Missing!`);
       } else if (!body.line) {
          return NextResponse.json(`Line Missing!`);
-      } else if (!body.name) {
-         return NextResponse.json(`Name Missing!`);
+      } else if (!body.plc_name) {
+         return NextResponse.json(`PLC Name Missing!`);
       }
 
       const dbName = params.db;
@@ -70,7 +70,7 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       if (!db.models.value) {
          db.model('value', valueSchema);
       }
-      const res = await db.models.value.deleteMany({ line: body.line, name: body.name });
+      const res = await db.models.value.deleteMany(body);
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });
