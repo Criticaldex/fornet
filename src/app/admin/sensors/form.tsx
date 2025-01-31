@@ -124,7 +124,7 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
             <label htmlFor="write" className="self-center">Write:</label>
             <input id="write"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("write")} type="checkbox" value={true} />
+               {...register("write")} type="checkbox" />
          </div>
          {errors.write && <p role="alert" className="text-red self-end">⚠ {errors.write?.message}</p>}
 
