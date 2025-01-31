@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 export interface NodeIface {
-   name: string,
+   name: string | undefined,
    synced: boolean
 }
 
