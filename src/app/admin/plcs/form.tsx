@@ -74,7 +74,9 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset,
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.type ? 'border-foreground' : 'border-red'}`}
                {...register("type", { required: 'Field Required' })}>
                <option key='' value=''>Select...</option>
-               <option key='s7_endpoint' value='s7 endpoint'>s7 endpoint</option>
+               <option key='siemens' value='siemens'>Siemens</option>
+               <option key='modbus' value='modbus'>Modbus</option>
+               <option key='omron' value='omron'>Omron</option>
             </select>
          </div>
          {errors.type && <p role="alert" className="text-red self-end">⚠ {errors.type?.message}</p>}
