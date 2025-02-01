@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
+import _ from "lodash"
 import SensorSchema, { SensorIface } from '@/schemas/sensor'
 import PlcSchema, { PlcIface } from '@/schemas/plc'
 import { NextResponse } from "next/server";
@@ -25,6 +26,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
 
       const sensors = (await db.models.sensor.find().lean()) as SensorIface[];
       const plcs = (await db.models.plc.find({ node: node }).lean()) as PlcIface[];
+      const sensorByName = _.groupBy(sensors, 'plc_name');
 
       let nodes = [
          {
@@ -91,7 +93,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          {
             "id": "fb64f4acee62767d",
             "type": "mqtt-broker",
-            "name": "broker",
+            "name": "MQTT_Fornet",
             "broker": process.env.MQTT_BROKER,
             "port": "1883",
             "clientid": "",
@@ -125,13 +127,13 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          }
       ];
 
+      let y = 100;
       plcs.forEach(plc => {
-         let y = 100;
          switch (plc.type) {
             case 'siemens':
                let vartables: any = [];
-               sensors.forEach(sensor => {
-                  if (sensor.line == plc.line && sensor.plc_name == plc.name) {
+               sensorByName[plc.name].forEach(sensor => {
+                  if (sensor.line == plc.line) {
                      vartables.push({
                         "addr": sensor.address,
                         "name": sensor.name
@@ -160,26 +162,26 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                }
                nodes.push(endpoint)
 
-               sensors.forEach(sensor => {
-                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.read) {
-                     let endpoint;
-                     let read;
-                     for (let i = 0; i < plcs.length; i++) {
-                        if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
-                           endpoint = plcs[i]._id.toString();
-                           read = true;
-                           y = y + 50;
-                           break;
-                        }
-                     }
+               sensorByName[plc.name].forEach(sensor => {
+                  if (sensor.line == plc.line && (sensor.read || sensor.write)) {
+                     if (sensor.read) {
+                        let endpoint;
+                        // let read;
+                        // for (let i = 0; i < plcs.length; i++) {
+                        //    if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
+                        //       endpoint = plcs[i]._id.toString();
+                        //       read = true;
+                        //       y = y + 50;
+                        //       break;
+                        //    }
+                        // }
 
-                     if (read) {
                         //read
                         const s7in: any = {
                            "id": 'i' + sensor._id.toString(),
                            "type": "s7 in",
                            "z": "0116f42dcdc8f6bb",
-                           "endpoint": endpoint,
+                           "endpoint": plc._id.toString(),
                            "mode": "single",
                            "variable": sensor.name,
                            "diff": true,
@@ -213,65 +215,66 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                               ]
                            ]
                         }
-
                         nodes.push(s7in)
                         nodes.push(s7func);
+
                      }
-                  }
-                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.write) {
-                     let endpoint;
-                     let write;
-                     for (let i = 0; i < plcs.length; i++) {
-                        if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
-                           endpoint = plcs[i]._id.toString();
-                           write = true;
-                           y = y + 50;
-                           break;
+                     if (sensor.write) {
+                        let endpoint;
+                        // let write;
+                        // for (let i = 0; i < plcs.length; i++) {
+                        //    if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
+                        //       endpoint = plcs[i]._id.toString();
+                        //       write = true;
+                        //       y = y + 50;
+                        //       break;
+                        //    }
+                        // }
+                        //write
+                        const s7out: any = {
+                           "id": 'o' + sensor._id.toString(),
+                           "type": "s7 out",
+                           "z": "c6c280ebbc516f5b",
+                           "endpoint": plc._id.toString(),
+                           "variable": sensor.name,
+                           "name": sensor.name,
+                           "x": 1300,
+                           "y": y,
+                           "wires": []
                         }
-                     }
-                     //write
-                     const s7out: any = {
-                        "id": 'o' + sensor._id.toString(),
-                        "type": "s7 out",
-                        "z": "c6c280ebbc516f5b",
-                        "endpoint": endpoint,
-                        "variable": sensor.name,
-                        "name": sensor.name,
-                        "x": 1300,
-                        "y": y,
-                        "wires": []
-                     }
-                     nodes.push(s7out)
-                     //write
-                     const mqtt: any = {
-                        "id": 'm' + sensor._id.toString(),
-                        "type": "mqtt in",
-                        "z": "c6c280ebbc516f5b",
-                        "name": sensor.name,
-                        "topic": "fornet" + sensor._id.toString(),
-                        "qos": "2",
-                        "datatype": "utf8",
-                        "broker": "abf8899ee04d3094",
-                        "nl": false,
-                        "rap": true,
-                        "rh": 0,
-                        "inputs": 0,
-                        "x": 1000,
-                        "y": y,
-                        "wires": [
-                           [
-                              'o' + sensor._id.toString(),
+                        nodes.push(s7out)
+                        //write
+                        const mqtt: any = {
+                           "id": 'm' + sensor._id.toString(),
+                           "type": "mqtt in",
+                           "z": "c6c280ebbc516f5b",
+                           "name": sensor.name,
+                           "topic": "fornet" + sensor._id.toString(),
+                           "qos": "2",
+                           "datatype": "utf8",
+                           "broker": "fb64f4acee62767d",
+                           "nl": false,
+                           "rap": true,
+                           "rh": 0,
+                           "inputs": 0,
+                           "x": 1000,
+                           "y": y,
+                           "wires": [
+                              [
+                                 'o' + sensor._id.toString(),
+                              ]
                            ]
-                        ]
+                        }
+                        nodes.push(mqtt)
                      }
-                     nodes.push(mqtt)
+                     y = y + 50;
                   }
                }
                );
                break;
             case 'modbus':
                const endpoint_modbus: any = {
-                  "id": "cdd93fd3a751f30a",
+                  "id": plc._id.toString(),
                   "type": "modbus-client",
                   "name": "PLC SCHNEIDER",
                   "clienttype": "tcp",
@@ -301,19 +304,19 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                }
                nodes.push(endpoint_modbus)
 
-               sensors.forEach(sensor => {
-                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.read) {
-                     let endpoint;
-                     let read;
-                     for (let i = 0; i < plcs.length; i++) {
-                        if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
-                           endpoint = plcs[i]._id.toString();
-                           read = true;
-                           y = y + 50;
-                           break;
-                        }
-                     }
-                     if (read) {
+               sensorByName[plc.name].forEach(sensor => {
+                  if (sensor.line == plc.line && (sensor.read || sensor.write)) {
+                     if (sensor.read) {
+                        let endpoint;
+                        // let read;
+                        // for (let i = 0; i < plcs.length; i++) {
+                        //    if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
+                        //       endpoint = plcs[i]._id.toString();
+                        //       read = true;
+                        //       y = y + 50;
+                        //       break;
+                        //    }
+                        // }
                         //read
                         const modbus_read: any = {
                            "id": "e191115593eeeef7",
@@ -333,13 +336,13 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "rateUnit": "s",
                            "delayOnStart": false,
                            "startDelayTime": "",
-                           "server": "cdd93fd3a751f30a",
+                           "server": plc._id.toString(),
                            "useIOFile": false,
                            "ioFile": "",
                            "useIOForPayload": false,
                            "emptyMsgOnFail": false,
-                           "x": 150,
-                           "y": 120,
+                           "x": 180,
+                           "y": y,
                            "wires": [
                               [],
                               [
@@ -359,79 +362,68 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "initialize": "",
                            "finalize": "",
                            "libs": [],
-                           "x": 340,
-                           "y": 120,
+                           "x": 320,
+                           "y": y,
                            "wires": [
                               [
                                  "ee5456395837bb6f"
                               ]
                            ]
                         }
-
                         nodes.push(modbus_read)
                         nodes.push(modbus_func);
                      }
-                  }
-                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.write) {
-                     let endpoint;
-                     let write;
-                     for (let i = 0; i < plcs.length; i++) {
-                        if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
-                           endpoint = plcs[i]._id.toString();
-                           write = true;
-                           y = y + 50;
-                           break;
-                        }
-                     }
-                     //write
-                     const modbus_out: any = {
-                        "id": 'm' + sensor._id.toString(),
-                        "type": "mqtt in",
-                        "z": "c6c280ebbc516f5b",
-                        "name": sensor.name,
-                        "topic": "fornet" + sensor._id.toString(),
-                        "qos": "2",
-                        "datatype": "utf8",
-                        "broker": "abf8899ee04d3094",
-                        "nl": false,
-                        "rap": true,
-                        "rh": 0,
-                        "inputs": 0,
-                        "x": 1000,
-                        "y": y,
-                        "wires": [
-                           [
-                              'o' + sensor._id.toString(),
+                     if (sensor.write) {
+                        const modbus_out: any = {
+                           "id": 'm' + sensor._id.toString(),
+                           "type": "mqtt in",
+                           "z": "c6c280ebbc516f5b",
+                           "name": sensor.name,
+                           "topic": "fornet" + sensor._id.toString(),
+                           "qos": "2",
+                           "datatype": "utf8",
+                           "broker": "fb64f4acee62767d",
+                           "nl": false,
+                           "rap": true,
+                           "rh": 0,
+                           "inputs": 0,
+                           "x": 1000,
+                           "y": y,
+                           "wires": [
+                              [
+                                 'o' + sensor._id.toString(),
+                              ]
                            ]
-                        ]
+                        }
+                        nodes.push(modbus_out)
+                        //write
+                        const mqtt: any = {
+                           "id": 'o' + sensor._id.toString(),
+                           "type": "modbus-write",
+                           "z": "67e50ff7c3bb3610",
+                           "name": "",
+                           "showStatusActivities": false,
+                           "showErrors": false,
+                           "showWarnings": true,
+                           "unitid": "",
+                           "dataType": "Coil", //{Coil, HoldingRegister, MCoils, MHoldingRegisters}
+                           "adr": sensor.address,
+                           "quantity": "1",
+                           "server": plc._id.toString(),
+                           "emptyMsgOnFail": false,
+                           "keepMsgProperties": false,
+                           "delayOnStart": false,
+                           "startDelayTime": "",
+                           "x": 1300,
+                           "y": y,
+                           "wires": [
+                              [],
+                              []
+                           ]
+                        }
+                        nodes.push(mqtt)
                      }
-                     nodes.push(modbus_out)
-                     //write
-                     const mqtt: any = {
-                        "id": 'o' + sensor._id.toString(),
-                        "type": "modbus-write",
-                        "z": "67e50ff7c3bb3610",
-                        "name": "",
-                        "showStatusActivities": false,
-                        "showErrors": false,
-                        "showWarnings": true,
-                        "unitid": "",
-                        "dataType": "Coil", //{Coil, HoldingRegister, MCoils, MHoldingRegisters}
-                        "adr": sensor.address,
-                        "quantity": "1",
-                        "server": "cdd93fd3a751f30a",
-                        "emptyMsgOnFail": false,
-                        "keepMsgProperties": false,
-                        "delayOnStart": false,
-                        "startDelayTime": "",
-                        "x": 1200,
-                        "y": 120,
-                        "wires": [
-                           [],
-                           []
-                        ]
-                     }
-                     nodes.push(mqtt)
+                     y = y + 50;
                   }
                }
                );
