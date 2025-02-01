@@ -161,7 +161,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                nodes.push(endpoint)
 
                sensors.forEach(sensor => {
-                  if (sensor.read) {
+                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.read) {
                      let endpoint;
                      let read;
                      for (let i = 0; i < plcs.length; i++) {
@@ -218,7 +218,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                         nodes.push(s7func);
                      }
                   }
-                  if (sensor.write) {
+                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.write) {
                      let endpoint;
                      let write;
                      for (let i = 0; i < plcs.length; i++) {
@@ -302,7 +302,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                nodes.push(endpoint_modbus)
 
                sensors.forEach(sensor => {
-                  if (sensor.read) {
+                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.read) {
                      let endpoint;
                      let read;
                      for (let i = 0; i < plcs.length; i++) {
@@ -372,7 +372,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                         nodes.push(modbus_func);
                      }
                   }
-                  if (sensor.write) {
+                  if (sensor.line == plc.line && sensor.plc_name == plc.name && sensor.write) {
                      let endpoint;
                      let write;
                      for (let i = 0; i < plcs.length; i++) {
