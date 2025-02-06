@@ -7,7 +7,8 @@ export interface SensorIface {
    plc_name: string,
    unit?: string,
    address?: string,
-   active?: boolean,
+   read?: boolean,
+   write?: boolean,
    node?: string
 }
 
@@ -29,7 +30,10 @@ const SensorSchema = new mongoose.Schema({
    address: {
       type: String
    },
-   active: {
+   read: {
+      type: Boolean
+   },
+   write: {
       type: Boolean
    },
    node: {

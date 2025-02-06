@@ -119,8 +119,14 @@ export function AdminTable({ sensors, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Active',
-         selector: (row: any) => row.active ? "X" : "",
+         name: 'Read',
+         selector: (row: any) => row.read ? "X" : "",
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Write',
+         selector: (row: any) => row.write ? "X" : "",
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },

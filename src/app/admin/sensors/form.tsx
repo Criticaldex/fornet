@@ -113,12 +113,20 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          {errors.address && <p role="alert" className="text-red self-end">⚠ {errors.address?.message}</p>}
 
          <div className="inline-flex justify-end">
-            <label htmlFor="active" className="self-center">Active:</label>
-            <input id="active"
+            <label htmlFor="read" className="self-center">Read:</label>
+            <input id="read"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("active")} type="checkbox" value={true} />
+               {...register("read")} type="checkbox" value={true} />
          </div>
-         {errors.active && <p role="alert" className="text-red self-end">⚠ {errors.active?.message}</p>}
+         {errors.read && <p role="alert" className="text-red self-end">⚠ {errors.read?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="write" className="self-center">Write:</label>
+            <input id="write"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
+               {...register("write")} type="checkbox" />
+         </div>
+         {errors.write && <p role="alert" className="text-red self-end">⚠ {errors.write?.message}</p>}
 
          <div className="inline-flex justify-around">
             <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
