@@ -8,7 +8,7 @@ import { getSession } from "next-auth/react"
 export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, reset, resetField, setPlcName, plcNames, plcType, setModbusDataType, modbusDataType, modbusRead, modbusWrite }: any) => {
    const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
-      const upsert = await upsertSensor(data, session?.user.db);
+      const upsert = await upsertSensor(data, session?.user.db, plcType);
       const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
 
       if (upsert.lastErrorObject?.updatedExisting) {
@@ -116,24 +116,20 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          </div>
          {errors.write && <p role="alert" className="text-red self-end">⚠ {errors.write?.message}</p>}
 
-         {plcType == 'modbus' &&
-            <>
-               <div className="inline-flex justify-end">
-                  <label htmlFor="dataType" className="flex self-center">DataType:</label>
-                  <select id="dataType"
-                     className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.dataType ? 'border-foreground' : 'border-red'}`}
-                     {...register("dataType")}>
-                     <option key='' value=''>Select...</option>
-                     {modbusDataType.map((name: any) => {
-                        return <option key={name} value={`${name}`}>
-                           {name}
-                        </option>
-                     })}
-                  </select>
-               </div>
-               {errors.plc_name && <p role="alert" className="text-red self-end">⚠ {errors.plc_name?.message}</p>}
-            </>
-         }
+         <div className={`inline-flex justify-end ${plcType == 'modbus' ? '' : 'hidden'}`}>
+            <label htmlFor="dataType" className="flex self-center">DataType:</label>
+            <select id="dataType"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.dataType ? 'border-foreground' : 'border-red'}`}
+               {...register("dataType")}>
+               <option key='' value=''>Select...</option>
+               {modbusDataType.map((name: any) => {
+                  return <option key={name} value={`${name}`}>
+                     {name}
+                  </option>
+               })}
+            </select>
+         </div>
+         {errors.plc_name && <p role="alert" className="text-red self-end">⚠ {errors.plc_name?.message}</p>}
 
          <div className="inline-flex justify-around">
             <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />

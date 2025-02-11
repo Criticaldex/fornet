@@ -22,12 +22,16 @@ export function AdminTable({ sensors, session }: any) {
    const [plcName, setPlcName] = useState('');
    const [plcNames, setPlcNames] = useState(['-']);
    const [plcType, setPlcType] = useState('');
-   const [modbusDataType, setModbusDataType] = useState(['-']);
+   const [modbusDataType, setModbusDataType] = useState(['Coil', 'Input', 'HoldingRegister', 'InputRegister']);
    const modbusRead = ['Coil', 'Input', 'HoldingRegister', 'InputRegister'];
    const modbusWrite = ['Coil', 'HoldingRegister', 'MCoils', 'MHoldingRegisters'];
 
 
    useEffect(() => {
+      getTypes(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            setPlcType(res[0])
+         });
       getLines(session?.user.db, { name: plcName })
          .then((res: any) => {
             resetField("line", { defaultValue: res[0] })
@@ -35,10 +39,6 @@ export function AdminTable({ sensors, session }: any) {
       getNodes(session?.user.db, { name: plcName })
          .then((res: any) => {
             resetField("node", { defaultValue: res[0] })
-         });
-      getTypes(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            setPlcType(res[0])
          });
    }, [plcName, session?.user.db])
 
@@ -83,15 +83,20 @@ export function AdminTable({ sensors, session }: any) {
    } = useForm<SensorIface>();
 
    const editHandler = (row: SensorIface, reset: UseFormReset<SensorIface>) => (event: any) => {
-      reset(row)
-      setPlcName(row.plc_name)
-      if (plcType == 'modbus') {
-         if (row.read) {
-            setModbusDataType(modbusRead)
-         } else if (row.write) {
-            setModbusDataType(modbusWrite)
-         }
+      switch (plcType) {
+         case 'modbus':
+            if (row.read) {
+               setModbusDataType(modbusRead)
+            } else if (row.write) {
+               setModbusDataType(modbusWrite);
+            }
+            break;
+
+         default:
+            break;
       }
+      setPlcName(row.plc_name);
+      reset(row);
    }
 
    const deleteHandler = (row: any) => (event: any) => {
