@@ -1,38 +1,14 @@
 'use client';
 
 import { SensorIface } from "@/schemas/sensor";
-import { getNames, getLines, getNodes } from '@/services/plcs';
 import { getSensors, upsertSensor } from "@/services/sensors";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
-import { useEffect, useState } from "react";
 
-export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, isDirty, dirtyFields, reset, resetField, session }: any) => {
-   const [plcName, setPlcName] = useState('');
-   const [plcNames, setPlcNames] = useState(['-']);
-
-
-   useEffect(() => {
-      getLines(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            resetField("line", { defaultValue: res[0] })
-         });
-      getNodes(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            resetField("node", { defaultValue: res[0] })
-         });
-   }, [plcName, resetField, session?.user.db])
-
-   useEffect(() => {
-      getNames(session?.user.db)
-         .then((res: any) => {
-            setPlcNames(res);
-         });
-   }, [session?.user.db])
-
+export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, reset, resetField, setPlcName, plcNames, plcType, setModbusDataType, modbusDataType, modbusRead, modbusWrite }: any) => {
    const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
-      const upsert = await upsertSensor(data, session?.user.db);
+      const upsert = await upsertSensor(data, session?.user.db, plcType);
       const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
 
       if (upsert.lastErrorObject?.updatedExisting) {
@@ -116,7 +92,13 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
             <label htmlFor="read" className="self-center">Read:</label>
             <input id="read"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("read")} type="checkbox" value={true} />
+               {...register("read")} type="checkbox" value={true}
+               onChange={e => {
+                  if (plcType == 'modbus') {
+                     resetField("write", { defaultValue: !e.target.value })
+                     setModbusDataType(modbusRead)
+                  }
+               }} />
          </div>
          {errors.read && <p role="alert" className="text-red self-end">⚠ {errors.read?.message}</p>}
 
@@ -124,9 +106,30 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
             <label htmlFor="write" className="self-center">Write:</label>
             <input id="write"
                className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("write")} type="checkbox" />
+               {...register("write")} type="checkbox"
+               onChange={e => {
+                  if (plcType == 'modbus') {
+                     resetField("read", { defaultValue: !e.target.value })
+                     setModbusDataType(modbusWrite)
+                  }
+               }} />
          </div>
          {errors.write && <p role="alert" className="text-red self-end">⚠ {errors.write?.message}</p>}
+
+         <div className={`inline-flex justify-end ${plcType == 'modbus' ? '' : 'hidden'}`}>
+            <label htmlFor="dataType" className="flex self-center">DataType:</label>
+            <select id="dataType"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.dataType ? 'border-foreground' : 'border-red'}`}
+               {...register("dataType")}>
+               <option key='' value=''>Select...</option>
+               {modbusDataType.map((name: any) => {
+                  return <option key={name} value={`${name}`}>
+                     {name}
+                  </option>
+               })}
+            </select>
+         </div>
+         {errors.plc_name && <p role="alert" className="text-red self-end">⚠ {errors.plc_name?.message}</p>}
 
          <div className="inline-flex justify-around">
             <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />

@@ -12,12 +12,42 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
+import { getLines, getNames, getNodes, getTypes } from '@/services/plcs';
 
 export function AdminTable({ sensors, session }: any) {
 
    const [rows, setRows] = useState(sensors);
    const [filterText, setFilterText] = useState('');
    const [isClient, setIsClient] = useState(false);
+   const [plcName, setPlcName] = useState('');
+   const [plcNames, setPlcNames] = useState(['-']);
+   const [plcType, setPlcType] = useState('');
+   const [modbusDataType, setModbusDataType] = useState(['Coil', 'Input', 'HoldingRegister', 'InputRegister']);
+   const modbusRead = ['Coil', 'Input', 'HoldingRegister', 'InputRegister'];
+   const modbusWrite = ['Coil', 'HoldingRegister', 'MCoils', 'MHoldingRegisters'];
+
+
+   useEffect(() => {
+      getTypes(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            setPlcType(res[0])
+         });
+      getLines(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("line", { defaultValue: res[0] })
+         });
+      getNodes(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("node", { defaultValue: res[0] })
+         });
+   }, [plcName, session?.user.db])
+
+   useEffect(() => {
+      getNames(session?.user.db)
+         .then((res: any) => {
+            setPlcNames(res);
+         });
+   }, [session?.user.db])
 
    useEffect(() => {
       setIsClient(true)
@@ -53,7 +83,20 @@ export function AdminTable({ sensors, session }: any) {
    } = useForm<SensorIface>();
 
    const editHandler = (row: SensorIface, reset: UseFormReset<SensorIface>) => (event: any) => {
-      reset(row)
+      switch (plcType) {
+         case 'modbus':
+            if (row.read) {
+               setModbusDataType(modbusRead)
+            } else if (row.write) {
+               setModbusDataType(modbusWrite);
+            }
+            break;
+
+         default:
+            break;
+      }
+      setPlcName(row.plc_name);
+      reset(row);
    }
 
    const deleteHandler = (row: any) => (event: any) => {
@@ -131,6 +174,12 @@ export function AdminTable({ sensors, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
+         name: 'Modbus DataType',
+         selector: (row: any) => row.dataType,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
          name: 'Accions',
          cell: (row: any) => (
             <div className='flex flex-row'>
@@ -169,11 +218,15 @@ export function AdminTable({ sensors, session }: any) {
                      clearErrors={clearErrors}
                      setRows={setRows}
                      toast={toast}
-                     isDirty={isDirty}
-                     dirtyFields={dirtyFields}
                      reset={reset}
                      resetField={resetField}
-                     session={session}
+                     setPlcName={setPlcName}
+                     plcNames={plcNames}
+                     plcType={plcType}
+                     setModbusDataType={setModbusDataType}
+                     modbusDataType={modbusDataType}
+                     modbusRead={modbusRead}
+                     modbusWrite={modbusWrite}
                   />
                </div>
             </div>

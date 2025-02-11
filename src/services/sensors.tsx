@@ -59,7 +59,14 @@ export const getSensorsbyLine = async (db?: string) => {
    return _.groupBy(data, 'line');
 }
 
-export const upsertSensor = async (filter: SensorIface, db: string | undefined) => {
+export const upsertSensor = async (filter: SensorIface, db: string | undefined, plcType?: string | undefined) => {
+   let data = filter;
+   if (plcType != 'modbus') {
+      const { dataType, ...dataWithoutType } = filter;
+      data = dataWithoutType;
+   } else {
+      data = filter
+   }
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${db}`,
       {
          method: 'PATCH',
@@ -67,7 +74,7 @@ export const upsertSensor = async (filter: SensorIface, db: string | undefined) 
             'Content-type': 'application/json',
             token: `${process.env.NEXT_PUBLIC_API_KEY}`,
          },
-         body: JSON.stringify(filter)
+         body: JSON.stringify(data)
       }).then(res => res.json());
 }
 
