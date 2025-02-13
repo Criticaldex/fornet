@@ -104,3 +104,15 @@ export const deleteMqtt = async (filter: MqttIface, db: string | undefined) => {
          body: JSON.stringify(filter)
       }).then(res => res.json());
 }
+
+export const sendMqtt = async (data: MqttIface) => {
+   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mqtt/send/fornet${data._id}`,
+      {
+         method: 'POST',
+         headers: {
+            'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+         },
+         body: JSON.stringify(data.value)
+      }).then(res => res.json());
+}
