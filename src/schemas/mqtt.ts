@@ -1,13 +1,13 @@
 import mongoose, { Schema } from 'mongoose'
 
 export interface MqttIface {
-    _id: any,
-    name: string,
+    _id?: any,
+    name?: string,
     line: string,
-    ip: string,
+    ip?: string,
     plc: string,
-    sensor: string,
-    value: string
+    sensor?: string,
+    value?: string
 }
 
 const MqttSchema = new mongoose.Schema({
@@ -20,19 +20,15 @@ const MqttSchema = new mongoose.Schema({
     },
     ip: {
         type: String,
-        required: [true, 'Ip is mandatory!']
     },
     plc: {
         type: String,
-        required: [true, 'Plc is mandatory!']
     },
     sensor: {
         type: String,
-        required: [true, 'Sensor is mandatory!']
     },
     value: {
         type: String,
-        required: [true, 'Value is mandatory!']
     }
 });
 

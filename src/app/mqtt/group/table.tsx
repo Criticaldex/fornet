@@ -11,12 +11,39 @@ import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
+import { getLines, getNames } from '@/services/plcs';
+import { getNames as getNamesSensors } from '@/services/sensors';
 
-export function MqttTable({ mqtts, nodes, session }: any) {
+
+export function MqttTable({ mqtts, session }: any) {
 
    const [rows, setRows] = useState(mqtts);
    const [filterText, setFilterText] = useState('');
    const [isClient, setIsClient] = useState(false);
+   const [formLoaded, setformLoaded] = useState(false);
+   const [plcName, setPlcName] = useState('');
+   const [plcNames, setPlcNames] = useState(['-']);
+   const [sensorNames, setSensorNames] = useState(['-']);
+
+   useEffect(() => {
+      setformLoaded(false);
+      getLines(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("line", { defaultValue: res[0] })
+         });
+      getNamesSensors(plcName, session?.user.db)
+         .then((res: any) => {
+            setSensorNames(res);
+            setformLoaded(true);
+         });
+   }, [plcName, session?.user.db])
+
+   useEffect(() => {
+      getNames(session?.user.db)
+         .then((res: any) => {
+            setPlcNames(res);
+         });
+   }, [session?.user.db])
 
    useEffect(() => {
       setIsClient(true)
@@ -107,25 +134,33 @@ export function MqttTable({ mqtts, nodes, session }: any) {
       register,
       handleSubmit,
       reset,
+      resetField,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
    } = useForm<MqttIface>();
 
    const editHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
+      setPlcName(row.plc);
       reset(row)
    }
 
    const deleteHandler = (row: any) => (event: any) => {
+      let filter = row;
+      let message = '⚠️ Deleting mqtt for ' + row.sensor + ' from ' + row.plc + ' plc ⚠️ Are you sure?'
+      if (row.subtable) {
+         filter = { line: row.line, name: row.name }
+         message = '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?'
+      }
       confirmAlert({
-         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?',
+         message: message,
          buttons: [
             {
                label: 'Yes',
                onClick: async () => {
-                  const mqtt = await deleteMqtt(row, session?.user.db);
+                  const mqtt = await deleteMqtt(filter, session?.user.db);
                   if (mqtt) {
                      toast.error('Value Deleted!!', { theme: "colored" });
-                     setRows(await getMqttConfigs(session?.user.db));
+                     setRows(await getMqttConfigs(session?.user.db, { name: { '$not': { $eq: 'null' } } }));
                   }
                }
             },
@@ -184,17 +219,21 @@ export function MqttTable({ mqtts, nodes, session }: any) {
                   />
                </div>
                <div className="flex basis-1/4 rounded-md bg-light">
-                  <MqttForm
-                     register={register}
-                     handleSubmit={handleSubmit}
-                     errors={errors}
-                     setRows={setRows}
-                     toast={toast}
-                     reset={reset}
-                     clearErrors={clearErrors}
-                     session={session}
-                     nodes={nodes}
-                  />
+                  {formLoaded ?
+                     <MqttForm
+                        register={register}
+                        handleSubmit={handleSubmit}
+                        errors={errors}
+                        setRows={setRows}
+                        toast={toast}
+                        reset={reset}
+                        clearErrors={clearErrors}
+                        resetField={resetField}
+                        setPlcName={setPlcName}
+                        plcNames={plcNames}
+                        sensorNames={sensorNames}
+                     />
+                     : <Loading />}
                </div>
             </div>
             : <Loading />}

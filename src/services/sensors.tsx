@@ -40,7 +40,19 @@ const getFilteredSensors = async (db?: string, filter?: any, fields?: string[], 
       }).then(res => res.json());
 }
 
-export const getNames = async (line: string, db?: string) => {
+export const getNames = async (plc: string, db?: string) => {
+   const data = await getFilteredSensors(db, { plc_name: plc }, ['-_id', 'name'], 'name');
+   let groupByName = _.groupBy(data, 'name');
+
+   let names: string[] = [];
+
+   for (const [key, value] of (Object.entries(groupByName) as [string, any][])) {
+      names.push(key);
+   }
+   return names;
+}
+
+export const getNamesUnits = async (line: string, db?: string) => {
    const data = await getFilteredSensors(db, { line: line }, ['-_id', 'name', 'unit'], 'name');
    let groupByName = _.groupBy(data, 'name');
 
