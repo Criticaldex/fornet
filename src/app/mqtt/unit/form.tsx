@@ -5,7 +5,7 @@ import { getFilteredMqtts, upsertMqtt } from "@/services/mqtts";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 
-export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, session, nodes }: any) => {
+export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, setPlcName, plcNames, sensorNames }: any) => {
 
    const onSubmit = handleSubmit(async (data: MqttIface) => {
       const session = await getSession();
@@ -33,23 +33,43 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
             <div className="inline-flex justify-end">
                <label htmlFor="line" className="flex self-center">Line:</label>
                <input id="line" type="text" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.line ? 'border-foreground' : 'border-red'}`}
-                  {...register("line", { required: 'Field Required' })} />
+                  {...register("line", { required: 'Field Required' })}
+                  disabled />
             </div>
             {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
 
             <div className="inline-flex justify-end">
-               <label htmlFor="plc" className="flex self-center">Plc:</label>
-               <input id="plc" type="text" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}
-                  {...register("plc", { required: 'Field Required' })} />
+               <label htmlFor="plc" className="flex self-center">PLC:</label>
+               <select id="plc"
+                  className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}
+                  {...register("plc", { required: 'Field Required' })}
+                  onChange={e => {
+                     setPlcName(e.target.value)
+                  }}>
+                  <option key='' value=''>Select...</option>
+                  {plcNames.map((name: any) => {
+                     return <option key={name} value={`${name}`}>
+                        {name}
+                     </option>
+                  })}
+               </select>
             </div>
             {errors.plc && <p role="alert" className="text-red self-end">⚠ {errors.plc?.message}</p>}
 
             <div className="inline-flex justify-end">
                <label htmlFor="sensor" className="flex self-center">Sensor:</label>
-               <input id="sensor" type="text" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.sensor ? 'border-foreground' : 'border-red'}`}
-                  {...register("sensor", { required: 'Field Required' })} />
+               <select id="sensor"
+                  className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.sensor ? 'border-foreground' : 'border-red'}`}
+                  {...register("sensor", { required: 'Field Required' })}>
+                  <option key='' value=''>Select...</option>
+                  {sensorNames.map((name: any) => {
+                     return <option key={name} value={`${name}`}>
+                        {name}
+                     </option>
+                  })}
+               </select>
             </div>
-            {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
+            {errors.sensor && <p role="alert" className="text-red self-end">⚠ {errors.sensor?.message}</p>}
 
             <div className="inline-flex justify-end">
                <label htmlFor="value" className="flex self-center">Value:</label>

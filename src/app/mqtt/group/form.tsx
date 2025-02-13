@@ -43,9 +43,9 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
             {errors.line && <p role="alert" className="text-red self-end">⚠ {errors.line?.message}</p>}
 
             <div className="inline-flex justify-end">
-               <label htmlFor="plc" className="flex self-center">PLC Name:</label>
+               <label htmlFor="plc" className="flex self-center">PLC:</label>
                <select id="plc"
-                  className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}
+                  className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}
                   {...register("plc", { required: 'Field Required' })}
                   onChange={e => {
                      setPlcName(e.target.value)
@@ -61,9 +61,9 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
             {errors.plc && <p role="alert" className="text-red self-end">⚠ {errors.plc?.message}</p>}
 
             <div className="inline-flex justify-end">
-               <label htmlFor="sensor" className="flex self-center">PLC Name:</label>
+               <label htmlFor="sensor" className="flex self-center">Sensor:</label>
                <select id="sensor"
-                  className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.sensor ? 'border-foreground' : 'border-red'}`}
+                  className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.sensor ? 'border-foreground' : 'border-red'}`}
                   {...register("sensor", { required: 'Field Required' })}>
                   <option key='' value=''>Select...</option>
                   {sensorNames.map((name: any) => {

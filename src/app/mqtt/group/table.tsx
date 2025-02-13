@@ -20,19 +20,21 @@ export function MqttTable({ mqtts, session }: any) {
    const [rows, setRows] = useState(mqtts);
    const [filterText, setFilterText] = useState('');
    const [isClient, setIsClient] = useState(false);
+   const [formLoaded, setformLoaded] = useState(false);
    const [plcName, setPlcName] = useState('');
    const [plcNames, setPlcNames] = useState(['-']);
    const [sensorNames, setSensorNames] = useState(['-']);
 
    useEffect(() => {
+      setformLoaded(false);
       getLines(session?.user.db, { name: plcName })
          .then((res: any) => {
             resetField("line", { defaultValue: res[0] })
          });
       getNamesSensors(plcName, session?.user.db)
          .then((res: any) => {
-            console.log('res: ', res);
             setSensorNames(res);
+            setformLoaded(true);
          });
    }, [plcName, session?.user.db])
 
@@ -138,16 +140,19 @@ export function MqttTable({ mqtts, session }: any) {
    } = useForm<MqttIface>();
 
    const editHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
+      setPlcName(row.plc);
       reset(row)
    }
 
    const deleteHandler = (row: any) => (event: any) => {
       let filter = row;
+      let message = '⚠️ Deleting mqtt for ' + row.sensor + ' from ' + row.plc + ' plc ⚠️ Are you sure?'
       if (row.subtable) {
          filter = { line: row.line, name: row.name }
+         message = '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?'
       }
       confirmAlert({
-         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?',
+         message: message,
          buttons: [
             {
                label: 'Yes',
@@ -214,19 +219,21 @@ export function MqttTable({ mqtts, session }: any) {
                   />
                </div>
                <div className="flex basis-1/4 rounded-md bg-light">
-                  <MqttForm
-                     register={register}
-                     handleSubmit={handleSubmit}
-                     errors={errors}
-                     setRows={setRows}
-                     toast={toast}
-                     reset={reset}
-                     clearErrors={clearErrors}
-                     resetField={resetField}
-                     setPlcName={setPlcName}
-                     plcNames={plcNames}
-                     sensorNames={sensorNames}
-                  />
+                  {formLoaded ?
+                     <MqttForm
+                        register={register}
+                        handleSubmit={handleSubmit}
+                        errors={errors}
+                        setRows={setRows}
+                        toast={toast}
+                        reset={reset}
+                        clearErrors={clearErrors}
+                        resetField={resetField}
+                        setPlcName={setPlcName}
+                        plcNames={plcNames}
+                        sensorNames={sensorNames}
+                     />
+                     : <Loading />}
                </div>
             </div>
             : <Loading />}

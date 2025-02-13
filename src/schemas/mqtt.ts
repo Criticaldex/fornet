@@ -5,7 +5,7 @@ export interface MqttIface {
     name?: string,
     line: string,
     ip?: string,
-    plc?: string,
+    plc: string,
     sensor?: string,
     value?: string
 }
