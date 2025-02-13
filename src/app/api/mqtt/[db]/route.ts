@@ -101,18 +101,14 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
          return NextResponse.json(`line Missing!`);
       } else if (!body.name) {
          return NextResponse.json(`name Missing!`);
-      } else if (!body.plc) {
-         return NextResponse.json(`plc Missing!`);
-      } else if (!body.sensor) {
-         return NextResponse.json(`sensor Missing!`);
       }
 
-      const filter = {
-         line: body.line,
-         name: body.name,
-         plc: body.plc,
-         sensor: body.sensor
-      }
+      // const filter = {
+      //    line: body.line,
+      //    name: body.name,
+      //    plc: body.plc,
+      //    sensor: body.sensor
+      // }
 
       const dbName = params.db;
 
@@ -121,7 +117,7 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       if (!db.models.mqtt) {
          db.model('mqtt', MqttSchema);
       }
-      const res = await db.models.mqtt.findOneAndDelete(filter);
+      const res = await db.models.mqtt.deleteMany(body);
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message });

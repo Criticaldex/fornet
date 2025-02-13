@@ -11,12 +11,37 @@ import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
+import { getLines, getNames } from '@/services/plcs';
+import { getNames as getNamesSensors } from '@/services/sensors';
 
-export function MqttTable({ mqtts, nodes, session }: any) {
+
+export function MqttTable({ mqtts, session }: any) {
 
    const [rows, setRows] = useState(mqtts);
    const [filterText, setFilterText] = useState('');
    const [isClient, setIsClient] = useState(false);
+   const [plcName, setPlcName] = useState('');
+   const [plcNames, setPlcNames] = useState(['-']);
+   const [sensorNames, setSensorNames] = useState(['-']);
+
+   useEffect(() => {
+      getLines(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("line", { defaultValue: res[0] })
+         });
+      getNamesSensors(plcName, session?.user.db)
+         .then((res: any) => {
+            console.log('res: ', res);
+            setSensorNames(res);
+         });
+   }, [plcName, session?.user.db])
+
+   useEffect(() => {
+      getNames(session?.user.db)
+         .then((res: any) => {
+            setPlcNames(res);
+         });
+   }, [session?.user.db])
 
    useEffect(() => {
       setIsClient(true)
@@ -107,6 +132,7 @@ export function MqttTable({ mqtts, nodes, session }: any) {
       register,
       handleSubmit,
       reset,
+      resetField,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
    } = useForm<MqttIface>();
@@ -116,16 +142,20 @@ export function MqttTable({ mqtts, nodes, session }: any) {
    }
 
    const deleteHandler = (row: any) => (event: any) => {
+      let filter = row;
+      if (row.subtable) {
+         filter = { line: row.line, name: row.name }
+      }
       confirmAlert({
          message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line ⚠️ Are you sure?',
          buttons: [
             {
                label: 'Yes',
                onClick: async () => {
-                  const mqtt = await deleteMqtt(row, session?.user.db);
+                  const mqtt = await deleteMqtt(filter, session?.user.db);
                   if (mqtt) {
                      toast.error('Value Deleted!!', { theme: "colored" });
-                     setRows(await getMqttConfigs(session?.user.db));
+                     setRows(await getMqttConfigs(session?.user.db, { name: { '$not': { $eq: 'null' } } }));
                   }
                }
             },
@@ -192,8 +222,10 @@ export function MqttTable({ mqtts, nodes, session }: any) {
                      toast={toast}
                      reset={reset}
                      clearErrors={clearErrors}
-                     session={session}
-                     nodes={nodes}
+                     resetField={resetField}
+                     setPlcName={setPlcName}
+                     plcNames={plcNames}
+                     sensorNames={sensorNames}
                   />
                </div>
             </div>
