@@ -113,6 +113,6 @@ export const sendMqtt = async (data: MqttIface) => {
             'Content-type': 'application/json',
             token: `${process.env.NEXT_PUBLIC_API_KEY}`,
          },
-         body: JSON.stringify(data.value)
+         body: JSON.stringify({ message: data.value })
       }).then(res => res.json());
 }
