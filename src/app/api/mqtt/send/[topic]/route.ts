@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import mqtt from "mqtt";
 
-
 export async function POST(request: Request, { params }: { params: { topic: string } }) {
    try {
       const topic = params.topic;

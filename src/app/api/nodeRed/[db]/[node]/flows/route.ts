@@ -93,7 +93,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          {
             "id": "fb64f4acee62767d",
             "type": "mqtt-broker",
-            "name": "MQTT_Fornet",
+            "name": "MQTT fornet",
             "broker": process.env.MQTT_BROKER,
             "port": "1883",
             "clientid": "",
