@@ -23,7 +23,7 @@ const getValues = async (filter: any, fields?: string[], db?: string) => {
             {
                fields: fields,
                filter: filter,
-               sort: 'ordre'
+               sort: 'timestamp'
             }
          ),
       }).then(res => res.json());
