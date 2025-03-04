@@ -5,7 +5,7 @@ export interface ValueIface {
    plc_name: string,
    name?: string,
    unit?: string,
-   value?: number | string,
+   value?: number,
    timestamp?: number
 }
 
