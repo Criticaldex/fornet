@@ -165,7 +165,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                sensorByName[plc.name].forEach(sensor => {
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
-                        let endpoint;
+                        //let endpoint;
                         // let read;
                         // for (let i = 0; i < plcs.length; i++) {
                         //    if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
@@ -429,7 +429,125 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                );
                break;
             case 'omron':
+               const FinsConn: any = {
+                  "id": plc._id.toString(),
+                  "type": "FINS Connection",
+                  "name": plc.name, //igual es la ID
+                  "host": plc.ip,
+                  "port": "9600",
+                  "MODE": "",
+                  "MODEType": "CP",
+                  "protocol": "",
+                  "protocolType": "tcp",
+                  "ICF": "0x80",
+                  "DNA": "0",
+                  "DA1": plc.ip.split(".")[3],
+                  "DA2": "0",
+                  "SNA": "0",
+                  "SA1": plc.node.split(".")[3],
+                  "SA2": "0",
+                  "autoConnect": true
+               }
+               nodes.push(FinsConn);
 
+               sensorByName[plc.name].forEach(sensor => {
+                  if (sensor.line == plc.line && (sensor.read || sensor.write)) {
+                     if (sensor.read) {
+
+                        const FinsRead: any = {
+                           "id": 'or' + sensor._id.toString(),
+                           "type": "FINS Read",
+                           "z": "dd8ce168801a13c1",
+                           "name": sensor.name,
+                           "connection": plc._id.toString(),
+                           "addressType": "str",
+                           "address": sensor.address,
+                           "countType": "num",
+                           "count": 1,
+                           "msgPropertyType": "msg",
+                           "msgProperty": "payload",
+                           "outputFormatType": "unsignedkv",
+                           "outputFormat": "",
+                           "x": 180,
+                           "y": y,
+                           "wires": [
+                              [
+                                 'ofr' + sensor._id.toString()
+                              ]
+                           ]
+                        }
+
+                        const FinsFunc: any = {
+                           "id": 'ofr' + sensor._id.toString(),
+                           "type": "function",
+                           "z": "c6c280ebbc516f5b",
+                           "name": "Process",
+                           "func": "var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"lubricadora\";\nda.line = \"Random\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"Temperatura\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;",
+                           "outputs": 1,
+                           "noerr": 0,
+                           "initialize": "",
+                           "finalize": "",
+                           "libs": [],
+                           "x": 320,
+                           "y": y,
+                           "wires": [
+                              [
+                                 "ee5456395837bb6f"
+                              ]
+                           ]
+                        }
+
+                        nodes.push(FinsRead)
+                        nodes.push(FinsFunc);
+
+                     }
+                     if (sensor.write) {
+                        //write
+                        const finsWrite: any = {
+                           "id": 'ofw' + sensor._id.toString(),
+                           "type": "FINS Write",
+                           "z": "dd8ce168801a13c1",
+                           "name": sensor.name,
+                           "connection": plc._id.toString(),
+                           "addressType": "msg",
+                           "address": sensor.address,
+                           "dataType": "msg",
+                           "data": "payload",
+                           "msgPropertyType": "str",
+                           "msgProperty": "payload",
+                           "x": 1300,
+                           "y": y,
+                           "wires": []
+                        }
+
+                        const OmronMqttIn: any = {
+                           "id": 'ofmqtt' + sensor._id.toString(),
+                           "type": "mqtt in",
+                           "z": "dd8ce168801a13c1",
+                           "name": sensor.name,
+                           "topic": "fornet" + sensor._id.toString(),
+                           "datatype": "utf8",
+                           "broker": "d8848f83c2ef4443",
+                           "nl": false,
+                           "rap": true,
+                           "rh": 0,
+                           "inputs": 0,
+                           "x": 1000,
+                           "y": y,
+                           "wires": [
+                              [
+                                 'ofw' + sensor._id.toString(),
+                              ]
+                           ]
+                        }
+
+                        nodes.push(finsWrite);
+                        nodes.push(OmronMqttIn);
+                     }
+                     y = y + 50;
+                  }
+               }
+               );
                break;
             default:
                break;
