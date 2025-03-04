@@ -431,8 +431,8 @@ export async function GET(request: Request, { params }: { params: { db: string, 
             case 'omron':
                const FinsConn: any = {
                   "id": plc._id.toString(),
-                  "name": plc.name,
-                  "vartable": vartables,
+                  "type": "FINS Connection",
+                  "name": plc.name, //igual es la ID
                   "host": plc.ip,
                   "port": "9600",
                   "MODE": "",
@@ -444,7 +444,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                   "DA1": plc.ip.split(".")[3],
                   "DA2": "0",
                   "SNA": "0",
-                  "SA1": "55", //ultims numeros de la IP del ELASTEL
+                  "SA1": plc.node.split(".")[3],
                   "SA2": "0",
                   "autoConnect": true
                }
@@ -459,9 +459,9 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "type": "FINS Read",
                            "z": "dd8ce168801a13c1",
                            "name": sensor.name,
-                           "connection": "d8848f83c2ef4443", //Coincideix amb el id del broker segons la teva nomenclatura
+                           "connection": plc._id.toString(),
                            "addressType": "str",
-                           "address": "CIO100.0", //adress del formulari de configuració de sensors
+                           "address": sensor.address,
                            "countType": "num",
                            "count": 1,
                            "msgPropertyType": "msg",
@@ -472,13 +472,13 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "y": y,
                            "wires": [
                               [
-                                 'ofw' + sensor._id.toString()
+                                 'ofr' + sensor._id.toString()
                               ]
                            ]
                         }
 
                         const FinsFunc: any = {
-                           "id": 'ofw' + sensor._id.toString(),
+                           "id": 'ofr' + sensor._id.toString(),
                            "type": "function",
                            "z": "c6c280ebbc516f5b",
                            "name": "Process",
@@ -492,7 +492,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "y": y,
                            "wires": [
                               [
-                                 "ee5456395837bb6f" //AQUEST ES EL ID DEL BLOCK INSERT DE MONGO.
+                                 "ee5456395837bb6f"
                               ]
                            ]
                         }
@@ -503,46 +503,46 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                      }
                      if (sensor.write) {
                         //write
-                        const OmronMqttIn: any = {
+                        const finsWrite: any = {
                            "id": 'ofw' + sensor._id.toString(),
+                           "type": "FINS Write",
+                           "z": "dd8ce168801a13c1",
+                           "name": sensor.name,
+                           "connection": plc._id.toString(),
+                           "addressType": "msg",
+                           "address": sensor.address,
+                           "dataType": "msg",
+                           "data": "payload",
+                           "msgPropertyType": "str",
+                           "msgProperty": "payload",
+                           "x": 1300,
+                           "y": y,
+                           "wires": []
+                        }
+
+                        const OmronMqttIn: any = {
+                           "id": 'ofmqtt' + sensor._id.toString(),
                            "type": "mqtt in",
                            "z": "dd8ce168801a13c1",
-                           "name": "Piezas_OK", //NAME DE LA VARIABLE
-                           "topic": "fornet674a05504f42d7ffa9944f82", //fornet + id de la variable del sensor de mongo
-                           "qos": "2",
+                           "name": sensor.name,
+                           "topic": "fornet" + sensor._id.toString(),
                            "datatype": "utf8",
-                           "broker": "d8848f83c2ef4443", //o el que tu tinguis en teoris es aquest
+                           "broker": "d8848f83c2ef4443",
                            "nl": false,
                            "rap": true,
                            "rh": 0,
                            "inputs": 0,
-                           "x": 160, //SEGONS LA TEVA NOMENCLATURA
-                           "y": 140, //SEGONS LA TEVA NOMENCLATURA
+                           "x": 1000,
+                           "y": y,
                            "wires": [
                               [
-                                 "0821f3570ee78169" //AQUEST ID ES EL QUE INDIQUIS EN EL ID D'ABAIX
+                                 'ofw' + sensor._id.toString(),
                               ]
                            ]
                         }
-                        const finsWrite: any = {
-                           "id": "0821f3570ee78169", //SEGONS NOMENCLATURA
-                           "type": "FINS Write", //PER DEFECTE
-                           "z": "dd8ce168801a13c1", //PER DEFECTE
-                           "name": "", //NOM DEL SENSOR
-                           "connection": "7f90376e492c83e9", //ID DEL BROKER DE OMRON endpoint
-                           "addressType": "msg", //DEFECTE
-                           "address": "CIO100.00", //ADRESS DEL SENSOR QUE TINGUIN EN EL FORMULARI
-                           "dataType": "msg", //DEFECTE
-                           "data": "payload", //DEFECTE
-                           "msgPropertyType": "str", //DEFECTE
-                           "msgProperty": "payload", //DEFECTE
-                           "x": 350, //SEGONS NOMENCLATUA
-                           "y": 140, //SEGONS NOMENCLATURA
-                           "wires": []
-                        }
 
-                        nodes.push(OmronMqttIn);
                         nodes.push(finsWrite);
+                        nodes.push(OmronMqttIn);
                      }
                      y = y + 50;
                   }
