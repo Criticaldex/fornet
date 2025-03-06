@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
     }
     const dbName = 'empresa2';
     const interval = 8;
-    const turn = new Date().getHours()
     let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
 
     const fields = [
@@ -68,7 +67,6 @@ export async function GET(req: NextRequest) {
                 year: new Date(timestamp).getFullYear(),
                 month: new Date(timestamp).getMonth(),
                 day: new Date(timestamp).getDate(),
-                turn: turn,
             }
             for (const value of values) {
                 if (value.value != undefined && summary.max != undefined && summary.min != undefined && summary.avg != undefined) {

@@ -11,7 +11,6 @@ export interface SummaryIface {
    year: number
    month: number
    day: number
-   turn: number
 }
 
 const SummarySchema = new mongoose.Schema({
@@ -59,14 +58,9 @@ const SummarySchema = new mongoose.Schema({
       type: Number,
       required: [true, 'Day is mandatory!'],
       index: true
-   },
-   turn: {
-      type: Number,
-      required: [true, 'Turn is mandatory!'],
-      index: true
-   },
+   }
 });
 
-SummarySchema.index({ line: 1, plc_name: 1, name: 1, year: 1, month: 1, day: 1, turn: 1 }, { unique: true });
+SummarySchema.index({ line: 1, plc_name: 1, name: 1, year: 1, month: 1, day: 1 }, { unique: true });
 
 export default SummarySchema;
