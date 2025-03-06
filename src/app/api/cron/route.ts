@@ -88,6 +88,8 @@ export async function GET(req: NextRequest) {
             },
             body: JSON.stringify(summaries)
         }).then(res => res.json());
-    console.log(insert);
+    if (insert.ERROR) {
+        return NextResponse.json(insert, { status: 500 })
+    }
     return NextResponse.json(insert);
 }
