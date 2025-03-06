@@ -88,5 +88,6 @@ export async function GET(req: NextRequest) {
             },
             body: JSON.stringify(summaries)
         }).then(res => res.json());
+    console.log(insert);
     return NextResponse.json(insert);
 }
