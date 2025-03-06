@@ -3,29 +3,32 @@ import mongoose from 'mongoose'
 export interface SummaryIface {
    line: string,
    plc_name: string,
-   name?: string,
+   name: string,
    unit?: string,
-   max?: number,
-   min?: number,
-   avg?: number,
-   year?: number
-   month?: number
-   day?: number
-   turn?: number
+   max: number,
+   min: number,
+   avg: number,
+   year: number
+   month: number
+   day: number
+   turn: number
 }
 
 const SummarySchema = new mongoose.Schema({
    line: {
       type: String,
-      required: [true, 'Line is mandatory!']
+      required: [true, 'Line is mandatory!'],
+      index: true
    },
    plc_name: {
       type: String,
-      required: [true, 'Plc_name is mandatory!']
+      required: [true, 'Plc_name is mandatory!'],
+      index: true
    },
    name: {
       type: String,
-      required: [true, 'Name is mandatory!']
+      required: [true, 'Name is mandatory!'],
+      index: true
    },
    unit: {
       type: String,
@@ -44,20 +47,26 @@ const SummarySchema = new mongoose.Schema({
    },
    year: {
       type: Number,
-      required: [true, 'Year is mandatory!']
+      required: [true, 'Year is mandatory!'],
+      index: true
    },
    month: {
       type: Number,
-      required: [true, 'Month is mandatory!']
+      required: [true, 'Month is mandatory!'],
+      index: true
    },
    day: {
       type: Number,
-      required: [true, 'Day is mandatory!']
+      required: [true, 'Day is mandatory!'],
+      index: true
    },
    turn: {
       type: Number,
-      required: [true, 'Turn is mandatory!']
+      required: [true, 'Turn is mandatory!'],
+      index: true
    },
 });
+
+SummarySchema.index({ line: 1, plc_name: 1, name: 1, year: 1, month: 1, day: 1, turn: 1 }, { unique: true });
 
 export default SummarySchema;

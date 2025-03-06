@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import GetNav from './routing'
 import { NextAuthProvider } from "./providers";
 import { getSession } from "@/services/session"
+import { scheduleSummary } from "@/services/summary";
 
 const inter = Inter({
    subsets: ['latin'],
@@ -20,6 +21,7 @@ export const metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
    const session = await getSession();
+   scheduleSummary();
    return (
       <html lang="en">
          <body className={`${inter.variable} font-sans`}>
