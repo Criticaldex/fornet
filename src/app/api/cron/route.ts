@@ -1,10 +1,13 @@
-import cron from 'node-cron'
-import _ from "lodash"
+import { NextRequest, NextResponse } from 'next/server';
 import { SummaryIface } from '@/schemas/summary';
 
-export const createSummary = async (turn: number) => {
+export async function GET(req: NextRequest) {
+    // if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+    //     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // }
     const dbName = 'empresa2';
     const interval = 8;
+    const turn = new Date().getHours()
     let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
 
     const fields = [
@@ -76,7 +79,6 @@ export const createSummary = async (turn: number) => {
             summaries.push(summary);
         }
     };
-    console.log('summaries: ', summaries);
     const insert = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summaries/${dbName}`,
         {
             method: 'PATCH',
@@ -86,15 +88,5 @@ export const createSummary = async (turn: number) => {
             },
             body: JSON.stringify(summaries)
         }).then(res => res.json());
-    console.log('insert: ', insert);
-}
-
-export const scheduleSummary = async () => {
-    cron.schedule('0 0,8,16 * * *', () => {
-        console.log('running a task at 0:00 8:00 and 16:00 ');
-        createSummary(new Date().getHours());
-    }, {
-        scheduled: true,
-        timezone: "Europe/Madrid"
-    });
+    return NextResponse.json(insert);
 }
