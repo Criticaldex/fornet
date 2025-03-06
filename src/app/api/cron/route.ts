@@ -1,8 +1,12 @@
-import cron from 'node-cron'
-import _ from "lodash"
+import { NextRequest, NextResponse } from 'next/server';
 import { SummaryIface } from '@/schemas/summary';
+import { headers } from 'next/headers';
 
-export const createSummary = async (turn: number) => {
+
+export async function GET(req: NextRequest) {
+    if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+        return NextResponse.json({ ERROR: 'Bad Auth' });
+    }
     const dbName = 'empresa2';
     const interval = 8;
     let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
@@ -63,7 +67,6 @@ export const createSummary = async (turn: number) => {
                 year: new Date(timestamp).getFullYear(),
                 month: new Date(timestamp).getMonth(),
                 day: new Date(timestamp).getDate(),
-                turn: turn,
             }
             for (const value of values) {
                 if (value.value != undefined && summary.max != undefined && summary.min != undefined && summary.avg != undefined) {
@@ -76,7 +79,6 @@ export const createSummary = async (turn: number) => {
             summaries.push(summary);
         }
     };
-    console.log('summaries: ', summaries);
     const insert = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summaries/${dbName}`,
         {
             method: 'PATCH',
@@ -86,15 +88,5 @@ export const createSummary = async (turn: number) => {
             },
             body: JSON.stringify(summaries)
         }).then(res => res.json());
-    console.log('insert: ', insert);
-}
-
-export const scheduleSummary = async () => {
-    cron.schedule('0 0,8,16 * * *', () => {
-        console.log('running a task at 0:00 8:00 and 16:00 ');
-        createSummary(new Date().getHours());
-    }, {
-        scheduled: true,
-        timezone: "Europe/Madrid"
-    });
+    return NextResponse.json(insert);
 }
