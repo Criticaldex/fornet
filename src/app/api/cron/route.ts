@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ ERROR: 'Bad Auth' });
     }
     const dbName = 'empresa2';
-    const interval = 8;
+    const interval = 24;
     let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
 
     const fields = [
