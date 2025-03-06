@@ -1,11 +1,8 @@
 import cron from 'node-cron'
 import _ from "lodash"
-import { getSession } from "@/services/session"
-import { ValueIface } from "@/schemas/value";
-import { SensorIface } from "@/schemas/sensor";
 import { SummaryIface } from '@/schemas/summary';
 
-export const createSummary = async () => {
+export const createSummary = async (turn: number) => {
     const dbName = 'empresa2';
     const interval = 8;
     let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
@@ -66,7 +63,7 @@ export const createSummary = async () => {
                 year: new Date(timestamp).getFullYear(),
                 month: new Date(timestamp).getMonth(),
                 day: new Date(timestamp).getDate(),
-                turn: 1,
+                turn: turn,
             }
             for (const value of values) {
                 if (value.value != undefined && summary.max != undefined && summary.min != undefined && summary.avg != undefined) {
@@ -75,9 +72,29 @@ export const createSummary = async () => {
                     summary.avg += value.value;
                 }
             };
-            summary.avg = (summary.avg) ? (summary.avg / values.length) : 0;
+            summary.avg = (summary.avg) ? parseFloat((summary.avg / values.length).toFixed(2)) : 0;
             summaries.push(summary);
         }
     };
-    console.log('summaries: ', summaries)
+    console.log('summaries: ', summaries);
+    const insert = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summaries/${dbName}`,
+        {
+            method: 'PATCH',
+            headers: {
+                'Content-type': 'application/json',
+                token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+            },
+            body: JSON.stringify(summaries)
+        }).then(res => res.json());
+    console.log('insert: ', insert);
+}
+
+export const scheduleSummary = async () => {
+    cron.schedule('0 0,8,16 * * *', () => {
+        console.log('running a task at 0:00 8:00 and 16:00 ');
+        createSummary(new Date().getHours());
+    }, {
+        scheduled: true,
+        timezone: "Europe/Madrid"
+    });
 }

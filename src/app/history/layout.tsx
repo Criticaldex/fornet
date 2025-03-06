@@ -2,11 +2,9 @@ import { getSession } from "@/services/session";
 import { GetTimeIntervals } from "./routing";
 import { FaCog } from "react-icons/fa"
 import Link from "next/link";
-import { createSummary } from "@/services/summary";
 
 export default async function MqttLayout({ children }: any) {
    const session = await getSession();
-   createSummary();
    return (
       <div>
          <title>MQTT</title>
