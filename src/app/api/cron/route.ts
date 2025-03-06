@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SummaryIface } from '@/schemas/summary';
+import { headers } from 'next/headers';
+
 
 export async function GET(req: NextRequest) {
-    // if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    //     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+        return NextResponse.json({ ERROR: 'Bad Auth' });
+    }
     const dbName = 'empresa2';
     const interval = 8;
     const turn = new Date().getHours()
