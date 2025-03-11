@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { SummaryIface } from '@/schemas/summary';
 import { headers } from 'next/headers';
 
 
-export async function GET(req: NextRequest) {
-    if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-        return NextResponse.json({ ERROR: 'Bad Auth' });
-    }
+export async function GET() {
+    //if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+    //    console.log('ERROR: Bad Auth');
+    //    return NextResponse.json({ ERROR: 'Bad Auth' });
+    //}
     const dbName = 'empresa2';
     const interval = 24;
     let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));

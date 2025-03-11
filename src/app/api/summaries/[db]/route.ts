@@ -23,7 +23,7 @@ export async function POST(request: Request, { params }: { params: { db: string 
       const indicator: any = await db.models.summary.find(body.filter).select(fields).sort(body.sort).lean();
       return NextResponse.json(indicator);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
