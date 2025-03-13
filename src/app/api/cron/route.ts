@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { SummaryIface } from '@/schemas/summary';
 import { headers } from 'next/headers';
 
-
 export async function GET() {
     //if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
     //    console.log('ERROR: Bad Auth');
