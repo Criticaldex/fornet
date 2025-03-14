@@ -8,7 +8,7 @@ import { headers } from 'next/headers';
 export async function GET(request: Request, { params }: { params: { email: string } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const dbName = 'Auth';
       await dbConnect();
@@ -20,14 +20,14 @@ export async function GET(request: Request, { params }: { params: { email: strin
 
       return NextResponse.json(user);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
 export async function DELETE(request: Request, { params }: { params: { email: string } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       // const body: UserIface = await request.json();
       if (!params.email) {
@@ -42,6 +42,6 @@ export async function DELETE(request: Request, { params }: { params: { email: st
       const res = await db.models.user.findOneAndDelete(params);
       return NextResponse.json(res);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }

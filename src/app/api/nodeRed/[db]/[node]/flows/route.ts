@@ -9,7 +9,7 @@ import { headers } from 'next/headers'
 export async function GET(request: Request, { params }: { params: { db: string, node: string } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
 
       const dbName = params.db;
@@ -555,6 +555,6 @@ export async function GET(request: Request, { params }: { params: { db: string, 
       });
       return NextResponse.json(nodes);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }

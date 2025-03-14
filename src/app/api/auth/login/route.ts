@@ -20,15 +20,15 @@ export async function POST(request: Request) {
                const { hash, ...userWithoutHash } = user;
                return NextResponse.json(userWithoutHash);
             } else {
-               return NextResponse.json({ ERROR: "La llicencia ha caducat!" });
+               return NextResponse.json({ ERROR: "Expired license, payment required!" }, { status: 403 });
             }
          } else {
-            return NextResponse.json({ ERROR: "Email o contrasenya incorrectes!" });
+            return NextResponse.json({ ERROR: "Incorrect Credentials!" }, { status: 401 });
          }
       } catch (err) {
-         return NextResponse.json({ ERROR: (err as Error).message });
+         return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
       }
    } else {
-      return NextResponse.json({ ERROR: 'Email i contrasenya obligatoris!' });
+      return NextResponse.json({ ERROR: 'Mail and Password required!' }, { status: 400 });
    }
 }

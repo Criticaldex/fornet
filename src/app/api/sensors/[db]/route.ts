@@ -7,7 +7,7 @@ import { headers } from 'next/headers';
 export async function GET(request: Request, { params }: { params: { db: string } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const dbName = params.db;
       await dbConnect();
@@ -20,14 +20,14 @@ export async function GET(request: Request, { params }: { params: { db: string }
 
       return NextResponse.json(sensors);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
 export async function POST(request: Request, { params }: { params: { db: string } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const body = await request.json();
       if (!params.db) {
@@ -45,14 +45,14 @@ export async function POST(request: Request, { params }: { params: { db: string 
 
       return NextResponse.json(sensors);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
 export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const body: SensorIface = await request.json();
       if (!params.db) {
@@ -85,14 +85,14 @@ export async function PATCH(request: Request, { params }: { params: { db: string
 
       return NextResponse.json(res);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
 export async function DELETE(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const body: SensorIface = await request.json();
       if (!params.db) {
@@ -113,6 +113,6 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       const res = await db.models.sensor.deleteMany(body);
       return NextResponse.json(res);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }

@@ -25,6 +25,6 @@ export async function POST(request: Request, { params }: { params: { topic: stri
       });
       return NextResponse.json('OK');
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }

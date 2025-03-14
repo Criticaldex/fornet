@@ -8,7 +8,7 @@ import { headers } from 'next/headers';
 export async function POST(request: Request) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const session = true;
 
@@ -45,14 +45,14 @@ export async function POST(request: Request) {
       const user = await db.models.user.create(fields);
       return NextResponse.json(`Usuari ${user.email} creat!`);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
 export async function GET(request: Request) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const { searchParams } = new URL(request.url)
       const database = searchParams.get('db');
@@ -68,14 +68,14 @@ export async function GET(request: Request) {
 
       return NextResponse.json(users);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
 export async function PATCH(request: Request) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const body: UserIface = await request.json();
       if (!body.email) {
@@ -97,6 +97,6 @@ export async function PATCH(request: Request) {
       res.value = userWithoutHash;
       return NextResponse.json(res);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
