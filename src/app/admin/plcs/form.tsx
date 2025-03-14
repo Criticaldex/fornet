@@ -4,7 +4,7 @@ import { PlcIface } from "@/schemas/plc";
 import { getPlcs, upsertPlc } from "@/services/plcs";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
-import { updateSensors, upsertSensor } from "@/services/sensors";
+import { updateSensors } from "@/services/sensors";
 
 export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, session, nodes }: any) => {
 
