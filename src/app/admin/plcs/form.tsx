@@ -4,6 +4,7 @@ import { PlcIface } from "@/schemas/plc";
 import { getPlcs, upsertPlc } from "@/services/plcs";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
+import { updateSensors, upsertSensor } from "@/services/sensors";
 
 export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, session, nodes }: any) => {
 
@@ -13,6 +14,14 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset,
       const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });
+         const updateSens = await updateSensors({
+            line: upsert.value.line,
+            node: upsert.value.node,
+            plc_name: upsert.value.name
+         }, session?.user.db);
+         if (updateSens.modifiedCount) {
+            toast.success(updateSens.modifiedCount + ' Sensors modified!', { theme: "colored" });
+         }
       } else {
          toast.success('Object Added!', { theme: "colored" });
       }

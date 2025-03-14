@@ -90,6 +90,18 @@ export const upsertSensor = async (filter: SensorIface, db: string | undefined, 
       }).then(res => res.json());
 }
 
+export const updateSensors = async (filter: SensorIface, db: string | undefined) => {
+   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/plcs/${db}/sensors`,
+      {
+         method: 'PATCH',
+         headers: {
+            'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+         },
+         body: JSON.stringify(filter)
+      }).then(res => res.json());
+}
+
 export const deleteSensor = async (filter: SensorIface, db: string | undefined) => {
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${db}`,
       {
