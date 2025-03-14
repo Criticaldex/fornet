@@ -7,7 +7,7 @@ import { headers } from 'next/headers'
 export async function POST(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const body = await request.json()
       if (!params.db) {
@@ -30,7 +30,7 @@ export async function POST(request: Request, { params }: { params: { db: string 
 export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const body: SummaryIface = await request.json()
       if (!params.db) {
@@ -45,14 +45,14 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       const res = await db.models.summary.insertMany(body);
       return NextResponse.json(res);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
 
 export async function DELETE(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' });
+         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
       const body: SummaryIface = await request.json();
       if (!params.db) {

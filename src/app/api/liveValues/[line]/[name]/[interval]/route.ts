@@ -33,6 +33,6 @@ export async function GET(request: Request, { params }: { params: { line: string
       // const liveValues = filteredValues.map((val) => ([val.timestamp, val.value]));
       return NextResponse.json(filteredValues);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }

@@ -5,7 +5,7 @@ import { headers } from 'next/headers';
 export async function GET() {
     //if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
     //    console.log('ERROR: Bad Auth');
-    //    return NextResponse.json({ ERROR: 'Bad Auth' });
+    //    return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
     //}
     const dbName = 'empresa2';
     const interval = 24;

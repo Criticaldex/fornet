@@ -28,6 +28,6 @@ export async function GET(request: Request, { params }: { params: { line: string
       const liveValues = [[values[0].timestamp, values[0].value], [values[0].timestamp, values[0].value]];
       return NextResponse.json(liveValues);
    } catch (err) {
-      return NextResponse.json({ ERROR: (err as Error).message });
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
    }
 }
