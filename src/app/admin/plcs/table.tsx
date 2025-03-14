@@ -73,7 +73,7 @@ export function PlcTable({ plcs, nodes, session }: any) {
                      setRows(await getPlcs(session?.user.db));
                   }
                   if (dSensor.acknowledged) {
-                     toast.error(dSensor.deletedCount + 'Sensors Deleted!!', { theme: "colored" });
+                     toast.error(dSensor.deletedCount + ' Sensors Deleted!!', { theme: "colored" });
                   }
                   if (dValue.acknowledged) {
                      toast.error(dValue.deletedCount + ' Values Deleted!!', { theme: "colored" });
