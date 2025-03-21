@@ -6,9 +6,9 @@ import { headers } from 'next/headers'
 
 export async function GET(request: Request, { params }: { params: { db: string } }) {
    try {
-      if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
-         return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
-      }
+      // if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
+      //    return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
+      // }
       const dbName = params.db;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
