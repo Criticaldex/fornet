@@ -68,7 +68,8 @@ export const getNamesUnits = async (line: string, db?: string) => {
 
 export const getSensorsbyLine = async (db?: string) => {
    const data = await getSensors(db);
-   return _.groupBy(data, 'line');
+   const data2 = await getFilteredSensors(db, { read: true }, ['-_id', 'name', 'unit', 'line'], 'name');
+   return _.groupBy(data2, 'line');
 }
 
 export const upsertSensor = async (filter: SensorIface, db: string | undefined, plcType?: string | undefined) => {

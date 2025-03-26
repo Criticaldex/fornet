@@ -79,3 +79,13 @@ export const deleteSummaries = async (filter: SummaryIface, db: string | undefin
          body: JSON.stringify(filter)
       }).then(res => res.json());
 }
+
+export const getYears = async () => {
+   const data = await getSummaries({}, ['year']);
+   const yearsGroup = _.groupBy(data, 'year');
+   let years: string[] = []
+   for (const [key, value] of (Object.entries(yearsGroup) as [string, any][])) {
+      years.push(key);
+   }
+   return years;
+}

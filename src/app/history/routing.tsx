@@ -46,23 +46,22 @@ export function GetNames({ names, units, name, setter, setUnit }: any) {
    )
 }
 
-export function GetTimeIntervals() {
+export function GetLinksYears({ years }: any) {
    const pathname = usePathname();
    const router = useRouter();
    const pathArray: string[] = (pathname) ? pathname.split('/') : [];
-   const interval = (pathArray[2]) ? pathArray[2] : process.env.LIVE_DEFAULT_INTERVAL;
-   const ints = [1, 2, 4, 8, 12, 24]
+   const year = (pathArray[2]) ? pathArray[2] : process.env.SUMMARY_DEFAULT_YEAR;
    return (
       <>
-         <select value={`/live/${interval}`}
+         <select value={`/live/${year}`}
             className={'my-1 mx-2 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark hover:bg-bgLight'}
             onChange={e => {
                router.push(e.target.value)
             }}>
 
-            {ints.map((int: any) => {
-               return <option key={int} value={`/live/${int}`}>
-                  {int}
+            {years.map((year: any) => {
+               return <option key={year} value={`/live/${year}`}>
+                  {year}
                </option>
             })}
          </select>
