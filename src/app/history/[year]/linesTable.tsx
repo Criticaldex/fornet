@@ -70,46 +70,17 @@ const ExpandedComponent = ({ data }: any) => {
          {
             layoutConf.map((chart: any, index: number) => {
                chart.i = index.toString();
-               if (chart.type == 'line') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
-                     </div>
-                     {/* <LiveChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                        unit={chart.unit}
-                        interval={data.interval}
-                     /> */}
+               return < div key={chart.i} className='bg-bgLight rounded-md'>
+                  <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
+                     <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name}</span>
+                     <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
                   </div>
-               } else if (chart.type == 'gauge') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
-                     </div>
-                     {/* <GaugeChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                        unit={chart.unit}
-                     /> */}
-                  </div>
-               } else if (chart.type == 'bool') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name}</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
-                     </div>
-                     {/* <BoolChart
+                  {/* <BoolChart
                         i={chart.i}
                         line={data.line}
                         name={chart.name}
                      /> */}
-                  </div>
-               }
+               </div>
             })
          }
       </GridLayout >
@@ -129,22 +100,9 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
       y: maxY,
       w: 4,
       h: 11,
-      type: selected[row.line].type,
       name: selected[row.line].sensor,
       unit: selected[row.line].unit
    };
-   switch (selected[row.line].type) {
-      case 'gauge':
-         newData.w = 2;
-         newData.h = 7
-         break;
-      case 'bool':
-         newData.w = 1;
-         newData.h = 3
-         break;
-      default:
-         break;
-   }
 
    user.config.summary[row.line].push(newData);
    update(user);
