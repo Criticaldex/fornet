@@ -31,16 +31,67 @@ const getSummaries = async (filter: any, fields?: string[], db?: string) => {
 
 export const getChartSummaries = async (filter: SummaryIface) => {
    const data: [] = await getSummaries(filter);
-   const summaries = [{
-      name: 'Productividad',
-      data: [] as any
+   const dataByMonth = _.groupBy(data, 'month')
+   let chartData: any = [{
+      type: 'spline',
+      name: 'Mitjana',
+      color: 'var(--accent)',
+      zIndex: 1,
+      marker: {
+         fillColor: 'white',
+         lineWidth: 2,
+         lineColor: 'var(--accent)'
+      },
+      data: []
+   }, {
+      type: 'columnrange',
+      name: 'Rang',
+      color: 'var(--accent)',
+      lineWidth: 0,
+      linkedTo: ':previous',
+      opacity: 0.6,
+      zIndex: 0,
+      marker: {
+         enabled: false
+      },
+      data: []
    }];
 
-   data.forEach((i: any) => {
-      let val = [i.timestamp, i.value];
-      summaries[0].data.push(val);
-   })
-   return summaries;
+   for (const [month, monthData] of (Object.entries(dataByMonth) as [string, any][])) {
+      let avgSum = 0;
+      let min = monthData[0].min;
+      let max = monthData[0].max;
+      monthData.map((dia: any) => {
+         avgSum += dia.avg;
+         min = (dia.min < min) ? dia.min : min;
+         max = (dia.max > max) ? dia.max : max;
+      })
+      const avg = (avgSum / monthData.length);
+      chartData[0].data.push({
+         name: month,
+         y: avg,
+      });
+      chartData[1].data.push({
+         name: month,
+         high: max,
+         low: min,
+      });
+   };
+   return chartData;
+}
+
+export const getLineSummaries = async (line: string, year: number) => {
+   const session = await getSession();
+   let lineData: any = {};
+   for await (const lineConf of session?.user.config.summary[line]) {
+      // await session?.user.config.summary[line].forEach(async (lineConf: any) => {
+      lineData[lineConf.name] = await getChartSummaries({
+         line: line,
+         name: lineConf.name,
+         year: year
+      });
+   }
+   return lineData;
 }
 
 export const getLines = async (db?: any) => {

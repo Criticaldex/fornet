@@ -3,13 +3,11 @@ import React, { MouseEventHandler, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { updateConfig } from "@/services/users";
 import { useSession } from 'next-auth/react';
-//import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
 import { Loading } from "@/components/loading.component";
-//import { GaugeChart } from './gaugeChart';
-//import { BoolChart } from './boolChart';
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import RGL, { WidthProvider } from "react-grid-layout";
+import { SummaryChart } from './chart';
 
 const GridLayout = WidthProvider(RGL);
 
@@ -22,6 +20,7 @@ const ExpandedComponent = ({ data }: any) => {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
             setLayoutConf(session?.user.config.summary[data.line] as any)
+
          } else {
             user.config.summary[data.line] = [];
             update(user);
@@ -75,11 +74,11 @@ const ExpandedComponent = ({ data }: any) => {
                      <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name}</span>
                      <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
                   </div>
-                  {/* <BoolChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                     /> */}
+                  <SummaryChart
+                     i={chart.i}
+                     name={chart.name}
+                     data={data.chartsData[chart.name]}
+                  />
                </div>
             })
          }
@@ -108,7 +107,7 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
    update(user);
 }
 
-export function LinesTable({ lines, interval, sensors, selected }: any) {
+export function LinesTable({ lines, year, sensors, selected, chartsData }: any) {
    const { data: session, status, update } = useSession();
    let columns: any = [{
       name: 'Line',
@@ -155,9 +154,10 @@ export function LinesTable({ lines, interval, sensors, selected }: any) {
    const data = lines.map((line: string) => {
       return ({
          line: line,
-         interval: interval,
          type: 'line',
-         sensor: sensors[line] ? sensors[line][0].name : null
+         year: year,
+         sensor: sensors[line] ? sensors[line][0].name : null,
+         chartsData: chartsData[line]
       })
    });
 
