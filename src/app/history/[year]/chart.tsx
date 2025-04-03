@@ -26,11 +26,6 @@ export function SummaryChart({ name, data }: any) {
          text: name
       },
       series: data,
-      yAxis: [{
-         title: {
-            text: 'Dies demora Mes'
-         }
-      }],
       xAxis: {
          type: 'category'
       },

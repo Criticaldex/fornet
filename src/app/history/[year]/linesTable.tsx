@@ -13,9 +13,10 @@ import { getChartSummaries, getLineSummaries } from '@/services/summaries';
 const GridLayout = WidthProvider(RGL);
 
 const ExpandedComponent = ({ data }: any) => {
+
    const { data: session, status, update } = useSession();
    const [layoutConf, setLayoutConf] = useState([]);
-   const [lineCharts, setLineCharts] = useState({});
+   const [lineCharts, setLineCharts] = useState(data.chartsData);
    const [isLoading, setIsLoading] = useState(true);
 
    useEffect(() => {
@@ -25,16 +26,17 @@ const ExpandedComponent = ({ data }: any) => {
             setLayoutConf(session?.user.config.summary[data.line] as any)
             getLineSummaries(data.line, data.year, session)
                .then((res: any) => {
-                  console.log('res: ', res);
                   setLineCharts(res);
                   setIsLoading(false);
                });
+            setIsLoading(false);
+
          } else {
             user.config.summary[data.line] = [];
             update(user);
          }
       }
-   }, [session])
+   }, [data.line, data.year, session, update])
 
    function handleDel(i: any): void {
       if (session) {
@@ -165,7 +167,7 @@ export function LinesTable({ lines, year, sensors, selected, chartsData }: any) 
          type: 'line',
          year: year,
          sensor: sensors[line] ? sensors[line][0].name : null,
-         //chartsData: chartsData[line]
+         chartsData: chartsData[line]
       })
    });
 
