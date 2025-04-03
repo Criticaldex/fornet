@@ -29,8 +29,8 @@ const getSummaries = async (filter: any, fields?: string[], db?: string) => {
       }).then(res => res.json());
 }
 
-export const getChartSummaries = async (filter: SummaryIface) => {
-   const data: [] = await getSummaries(filter);
+export const getChartSummaries = async (filter: SummaryIface, session: any) => {
+   const data: [] = await getSummaries(filter, ['-id'], session.user.db);
    const dataByMonth = _.groupBy(data, 'month')
    let chartData: any = [{
       type: 'spline',
@@ -80,16 +80,14 @@ export const getChartSummaries = async (filter: SummaryIface) => {
    return chartData;
 }
 
-export const getLineSummaries = async (line: string, year: number) => {
-   const session = await getSession();
+export const getLineSummaries = async (line: string, year: number, session: any) => {
    let lineData: any = {};
    for await (const lineConf of session?.user.config.summary[line]) {
-      // await session?.user.config.summary[line].forEach(async (lineConf: any) => {
       lineData[lineConf.name] = await getChartSummaries({
          line: line,
          name: lineConf.name,
          year: year
-      });
+      }, session);
    }
    return lineData;
 }

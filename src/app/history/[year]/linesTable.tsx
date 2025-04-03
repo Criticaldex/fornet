@@ -8,25 +8,33 @@ import { Loading } from "@/components/loading.component";
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { SummaryChart } from './chart';
+import { getChartSummaries, getLineSummaries } from '@/services/summaries';
 
 const GridLayout = WidthProvider(RGL);
 
 const ExpandedComponent = ({ data }: any) => {
    const { data: session, status, update } = useSession();
    const [layoutConf, setLayoutConf] = useState([]);
+   const [lineCharts, setLineCharts] = useState({});
+   const [isLoading, setIsLoading] = useState(true);
 
    useEffect(() => {
       if (session) {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
             setLayoutConf(session?.user.config.summary[data.line] as any)
-
+            getLineSummaries(data.line, data.year, session)
+               .then((res: any) => {
+                  console.log('res: ', res);
+                  setLineCharts(res);
+                  setIsLoading(false);
+               });
          } else {
             user.config.summary[data.line] = [];
             update(user);
          }
       }
-   }, [data, session, update])
+   }, [session])
 
    function handleDel(i: any): void {
       if (session) {
@@ -36,7 +44,7 @@ const ExpandedComponent = ({ data }: any) => {
       }
    }
 
-   if (layoutConf == undefined) return <Loading />
+   if (layoutConf == undefined || isLoading) return <Loading />
 
    const width = window.innerWidth - 105;
 
@@ -77,7 +85,7 @@ const ExpandedComponent = ({ data }: any) => {
                   <SummaryChart
                      i={chart.i}
                      name={chart.name}
-                     data={data.chartsData[chart.name]}
+                     data={lineCharts[chart.name]}
                   />
                </div>
             })
@@ -157,7 +165,7 @@ export function LinesTable({ lines, year, sensors, selected, chartsData }: any) 
          type: 'line',
          year: year,
          sensor: sensors[line] ? sensors[line][0].name : null,
-         chartsData: chartsData[line]
+         //chartsData: chartsData[line]
       })
    });
 

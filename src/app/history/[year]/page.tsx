@@ -12,16 +12,13 @@ export default async function Dashboard({ params }: any) {
    let chartsData: any = {};
 
    // for (const [line, configLine] of (Object.entries(session?.user.config.summary) as [string, any][])) {
-   chartsData.Random = await getLineSummaries('Random', year);
+   //chartsData.Random = await getLineSummaries('Random', year);
    // const summaries = await getChartSummaries({
    //    line: "Random",
    //    plc_name: "Maquina1",
    //    name: "Temperatura",
    //    year: 2025
    // })
-
-   console.log('chartdata: ', chartsData);
-   console.log('chartdataRAND: ', chartsData.Random);
 
    let selected = {} as any;
    lines.map((line) => { selected[line] = { sensor: sensors[line][0].name, unit: sensors[line][0].unit } });
@@ -35,7 +32,7 @@ export default async function Dashboard({ params }: any) {
                   year={year}
                   sensors={sensors}
                   selected={selected}
-                  chartsData={chartsData}
+               //chartsData={chartsData}
                />
             </div>
          </div>
