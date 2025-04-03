@@ -3,31 +3,40 @@ import React, { MouseEventHandler, useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { updateConfig } from "@/services/users";
 import { useSession } from 'next-auth/react';
-//import { LiveChart } from "./liveChart";
 import { createThemes } from "@/styles/themes";
 import { Loading } from "@/components/loading.component";
-//import { GaugeChart } from './gaugeChart';
-//import { BoolChart } from './boolChart';
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import RGL, { WidthProvider } from "react-grid-layout";
+import { SummaryChart } from './chart';
+import { getChartSummaries, getLineSummaries } from '@/services/summaries';
 
 const GridLayout = WidthProvider(RGL);
 
 const ExpandedComponent = ({ data }: any) => {
+
    const { data: session, status, update } = useSession();
    const [layoutConf, setLayoutConf] = useState([]);
+   const [lineCharts, setLineCharts] = useState(data.chartsData);
+   const [isLoading, setIsLoading] = useState(true);
 
    useEffect(() => {
       if (session) {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
             setLayoutConf(session?.user.config.summary[data.line] as any)
+            getLineSummaries(data.line, data.year, session)
+               .then((res: any) => {
+                  setLineCharts(res);
+                  setIsLoading(false);
+               });
+            setIsLoading(false);
+
          } else {
             user.config.summary[data.line] = [];
             update(user);
          }
       }
-   }, [data, session, update])
+   }, [data.line, data.year, session, update])
 
    function handleDel(i: any): void {
       if (session) {
@@ -37,7 +46,7 @@ const ExpandedComponent = ({ data }: any) => {
       }
    }
 
-   if (layoutConf == undefined) return <Loading />
+   if (layoutConf == undefined || isLoading) return <Loading />
 
    const width = window.innerWidth - 105;
 
@@ -70,46 +79,17 @@ const ExpandedComponent = ({ data }: any) => {
          {
             layoutConf.map((chart: any, index: number) => {
                chart.i = index.toString();
-               if (chart.type == 'line') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
-                     </div>
-                     {/* <LiveChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                        unit={chart.unit}
-                        interval={data.interval}
-                     /> */}
+               return < div key={chart.i} className='bg-bgLight rounded-md'>
+                  <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
+                     <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name}</span>
+                     <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
                   </div>
-               } else if (chart.type == 'gauge') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
-                     </div>
-                     {/* <GaugeChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                        unit={chart.unit}
-                     /> */}
-                  </div>
-               } else if (chart.type == 'bool') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name}</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
-                     </div>
-                     {/* <BoolChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                     /> */}
-                  </div>
-               }
+                  <SummaryChart
+                     i={chart.i}
+                     name={chart.name}
+                     data={lineCharts[chart.name]}
+                  />
+               </div>
             })
          }
       </GridLayout >
@@ -129,28 +109,15 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
       y: maxY,
       w: 4,
       h: 11,
-      type: selected[row.line].type,
       name: selected[row.line].sensor,
       unit: selected[row.line].unit
    };
-   switch (selected[row.line].type) {
-      case 'gauge':
-         newData.w = 2;
-         newData.h = 7
-         break;
-      case 'bool':
-         newData.w = 1;
-         newData.h = 3
-         break;
-      default:
-         break;
-   }
 
    user.config.summary[row.line].push(newData);
    update(user);
 }
 
-export function LinesTable({ lines, interval, sensors, selected }: any) {
+export function LinesTable({ lines, year, sensors, selected, chartsData }: any) {
    const { data: session, status, update } = useSession();
    let columns: any = [{
       name: 'Line',
@@ -197,9 +164,10 @@ export function LinesTable({ lines, interval, sensors, selected }: any) {
    const data = lines.map((line: string) => {
       return ({
          line: line,
-         interval: interval,
          type: 'line',
-         sensor: sensors[line] ? sensors[line][0].name : null
+         year: year,
+         sensor: sensors[line] ? sensors[line][0].name : null,
+         chartsData: chartsData[line]
       })
    });
 

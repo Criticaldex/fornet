@@ -21,11 +21,6 @@ export const chartOptions = {
          color: '#666666'
       },
    },
-   data: {
-      rowsURL: 'https://demo-live-data.highcharts.com/time-rows.json',
-      enablePolling: true,
-      dataRefreshRate: 1
-   },
    xAxis: {
       type: 'datetime',
       dateTimeLabelFormats: {

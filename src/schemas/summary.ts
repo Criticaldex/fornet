@@ -2,15 +2,15 @@ import mongoose from 'mongoose'
 
 export interface SummaryIface {
    line: string,
-   plc_name: string,
+   plc_name?: string,
    name: string,
    unit?: string,
-   max: number,
-   min: number,
-   avg: number,
-   year: number
-   month: number
-   day: number
+   max?: number,
+   min?: number,
+   avg?: number,
+   year?: number
+   month?: number
+   day?: number
 }
 
 const SummarySchema = new mongoose.Schema({
