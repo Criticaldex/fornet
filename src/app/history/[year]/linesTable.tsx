@@ -8,7 +8,8 @@ import { Loading } from "@/components/loading.component";
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { SummaryChart } from './chart';
-import { getChartSummaries, getLineSummaries } from '@/services/summaries';
+import { getLineDrilldown, getLineSummaries } from '@/services/summaries';
+import { when } from 'jquery';
 
 const GridLayout = WidthProvider(RGL);
 
@@ -23,14 +24,19 @@ const ExpandedComponent = ({ data }: any) => {
       if (session) {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
-            setLayoutConf(session?.user.config.summary[data.line] as any)
-            getLineSummaries(data.line, data.year, session)
-               .then((res: any) => {
-                  setLineCharts(res);
-                  setIsLoading(false);
-               });
-            setIsLoading(false);
-
+            when(
+               setLayoutConf(session?.user.config.summary[data.line] as any),
+               getLineSummaries(data.line, data.year, session)
+                  .then((res: any) => {
+                     setLineCharts(res);
+                  }),
+               getLineDrilldown(data.line, data.year, session)
+                  .then((res: any) => {
+                     setLineCharts(res);
+                  })
+            ).done(() => {
+               setIsLoading(false)
+            })
          } else {
             user.config.summary[data.line] = [];
             update(user);

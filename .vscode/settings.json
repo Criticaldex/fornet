@@ -23,4 +23,6 @@
   "git.confirmSync": false,
   "terminal.external.linuxExec": "/usr/bin/zsh '-i'",
   "terminal.integrated.defaultProfile.linux": "zsh",
+  "editor.fontFamily": "DejaVuSansM Nerd Font",
+  "editor.fontSize": 12,
 }
