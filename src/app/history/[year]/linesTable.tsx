@@ -23,21 +23,15 @@ const ExpandedComponent = ({ data }: any) => {
       if (session) {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
-            // when(
             setLayoutConf(session?.user.config.summary[data.line] as any),
                getLineSummaries(data.line, data.year, session)
                   .then((res: any) => {
                      setLineCharts(res);
-                     // setIsLoading(false);
+                  }),
+               getLineDrilldown(data.line, data.year, session)
+                  .then((res: any) => {
+                     setDrilldown(res);
                   })
-            // getLineDrilldown(data.line, data.year, session)
-            //    .then((res: any) => {
-            //       console.log('drilldown: ', res);
-
-            //       // setLineCharts(res);
-            //    })
-            // ).done(() => {
-            // })
          } else {
             user.config.summary[data.line] = [];
             update(user);

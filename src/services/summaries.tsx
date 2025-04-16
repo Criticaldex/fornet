@@ -71,13 +71,13 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
       chartData[0].data.push({
          name: monthStr[month],
          y: avg,
-         drilldown: monthStr[month]
+         drilldown: 'M' + monthStr[month]
       });
       chartData[1].data.push({
          name: monthStr[month],
          high: max,
          low: min,
-         drilldown: monthStr[month]
+         drilldown: 'R' + monthStr[month]
       });
    };
    return chartData;
@@ -108,35 +108,35 @@ export const getChartDrilldown = async (filter: SummaryIface, session: any) => {
    };
 
    let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'Setember', 'October', 'November', 'December']
-   let mitja = {
-      type: 'spline',
-      name: 'Mitjana',
-      id: '',
-      color: 'var(--accent)',
-      zIndex: 1,
-      marker: {
-         fillColor: 'white',
-         lineWidth: 2,
-         lineColor: 'var(--accent)'
-      },
-      data: []
-   }
-   let rang = {
-      type: 'columnrange',
-      name: 'Rang',
-      id: '',
-      color: 'var(--accent)',
-      lineWidth: 0,
-      opacity: 0.6,
-      zIndex: 0,
-      marker: {
-         enabled: false
-      },
-      data: []
-   }
-   let mitjanes: any = [];
-   let rangs: any = [];
    for (const [month, monthData] of (Object.entries(dataByMonth) as unknown as [number, any][])) {
+      let mitja = {
+         type: 'spline',
+         name: 'Mitjana',
+         id: '',
+         color: 'var(--accent)',
+         zIndex: 1,
+         marker: {
+            fillColor: 'white',
+            lineWidth: 2,
+            lineColor: 'var(--accent)'
+         },
+         data: []
+      }
+      let rang = {
+         type: 'columnrange',
+         name: 'Rang',
+         id: '',
+         color: 'var(--accent)',
+         lineWidth: 0,
+         opacity: 0.6,
+         zIndex: 0,
+         marker: {
+            enabled: false
+         },
+         data: []
+      }
+      let mitjanes: any = [];
+      let rangs: any = [];
       const orderedDays = _.orderBy(monthData, 'day');
       orderedDays.map((dia: any) => {
          mitjanes.push({
@@ -149,13 +149,14 @@ export const getChartDrilldown = async (filter: SummaryIface, session: any) => {
             low: dia.min,
          });
       })
-      mitja.id = monthStr[month]
-      rang.id = monthStr[month]
+      mitja.id = 'M' + monthStr[month];
+      rang.id = 'R' + monthStr[month];
+      mitja.data = mitjanes;
+      rang.data = rangs;
+      chartData.series.push(rang);
+      chartData.series.push(mitja);
    };
 
-   mitja.data = mitjanes;
-   rang.data = rangs;
-   chartData.series.push(rang);
    return chartData;
 }
 
