@@ -6,6 +6,7 @@ import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsAccessibility from 'highcharts/modules/accessibility'
 import HighchartsReact from 'highcharts-react-official'
 import HighchartsNoData from 'highcharts/modules/no-data-to-display'
+import highchartsDrilldown from "highcharts/modules/drilldown";
 import { chartOptions } from '@/components/chart.components'
 
 if (typeof Highcharts === "object") {
@@ -14,9 +15,10 @@ if (typeof Highcharts === "object") {
    HighchartsNoData(Highcharts)
    HighchartsAccessibility(Highcharts)
    HighchartsMore(Highcharts)
+   highchartsDrilldown(Highcharts);
 }
 
-export function SummaryChart({ name, data }: any) {
+export function SummaryChart({ name, data, dd }: any) {
    const options = {
       ...chartOptions,
       chart: {
@@ -26,6 +28,7 @@ export function SummaryChart({ name, data }: any) {
          text: name
       },
       series: data,
+      drilldown: dd,
       xAxis: {
          type: 'category'
       },
@@ -50,6 +53,7 @@ export function SummaryChart({ name, data }: any) {
          }
       }
    }
+   console.log('options: ', options);
 
    return (
       <HighchartsReact

@@ -57,7 +57,8 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
       data: []
    }];
 
-   for (const [month, monthData] of (Object.entries(dataByMonth) as [string, any][])) {
+   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'Setember', 'October', 'November', 'December']
+   for (const [month, monthData] of (Object.entries(dataByMonth) as unknown as [number, any][])) {
       let avgSum = 0;
       let min = monthData[0].min;
       let max = monthData[0].max;
@@ -68,13 +69,15 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
       })
       const avg = (avgSum / monthData.length);
       chartData[0].data.push({
-         name: month,
+         name: monthStr[month],
          y: avg,
+         drilldown: monthStr[month]
       });
       chartData[1].data.push({
-         name: month,
+         name: monthStr[month],
          high: max,
          low: min,
+         drilldown: monthStr[month]
       });
    };
    return chartData;
@@ -104,113 +107,113 @@ export const getChartDrilldown = async (filter: SummaryIface, session: any) => {
       series: []
    };
 
-   for (const [month, monthData] of (Object.entries(dataByMonth) as [string, any][])) {
-      for (const [day, dayData] of monthData as [string, any][]) {
-         let mitja = {
-            type: 'spline',
-            name: 'Mitjana',
-            id: month,
-            color: 'var(--accent)',
-            zIndex: 1,
-            marker: {
-               fillColor: 'white',
-               lineWidth: 2,
-               lineColor: 'var(--accent)'
-            },
-            data: []
-         }
-         let rang = {
-            type: 'columnrange',
-            name: 'Rang',
-            id: month,
-            color: 'var(--accent)',
-            lineWidth: 0,
-            linkedTo: ':previous',
-            opacity: 0.6,
-            zIndex: 0,
-            marker: {
-               enabled: false
-            },
-            data: []
-         }
-
-         let avgSum = 0;
-         let min = monthData[0].min;
-         let max = monthData[0].max;
-         monthData.map((dia: any) => {
-            avgSum += dia.avg;
-            min = (dia.min < min) ? dia.min : min;
-            max = (dia.max > max) ? dia.max : max;
-         })
-         const avg = (avgSum / monthData.length);
-         chartData.series[0].data.push({
-            name: month,
-            y: avg,
+   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'Setember', 'October', 'November', 'December']
+   let mitja = {
+      type: 'spline',
+      name: 'Mitjana',
+      id: '',
+      color: 'var(--accent)',
+      zIndex: 1,
+      marker: {
+         fillColor: 'white',
+         lineWidth: 2,
+         lineColor: 'var(--accent)'
+      },
+      data: []
+   }
+   let rang = {
+      type: 'columnrange',
+      name: 'Rang',
+      id: '',
+      color: 'var(--accent)',
+      lineWidth: 0,
+      opacity: 0.6,
+      zIndex: 0,
+      marker: {
+         enabled: false
+      },
+      data: []
+   }
+   let mitjanes: any = [];
+   let rangs: any = [];
+   for (const [month, monthData] of (Object.entries(dataByMonth) as unknown as [number, any][])) {
+      const orderedDays = _.orderBy(monthData, 'day');
+      orderedDays.map((dia: any) => {
+         mitjanes.push({
+            name: dia.day,
+            y: dia.avg,
          });
-         chartData.series[1].data.push({
-            name: month,
-            high: max,
-            low: min,
+         rangs.push({
+            name: dia.day,
+            high: dia.max,
+            low: dia.min,
          });
-      };
-      return chartData;
-   }
+      })
+      mitja.id = monthStr[month]
+      rang.id = monthStr[month]
+   };
 
-   export const getLineDrilldown = async (line: string, year: number, session: any) => {
-      let lineData: any = {};
-      for await (const lineConf of session?.user.config.summary[line]) {
-         lineData[lineConf.name] = await getChartDrilldown({
-            line: line,
-            name: lineConf.name,
-            year: year
-         }, session);
-      }
-      return lineData;
-   }
+   mitja.data = mitjanes;
+   rang.data = rangs;
+   chartData.series.push(rang);
+   return chartData;
+}
 
-   export const getLines = async (db?: any) => {
-      const fields = ['-_id', 'line']
-      const data = await getSummaries({}, fields, db);
-      let groupBySec = _.groupBy(data, 'line');
-      let lines: string[] = [];
-      for (const [key, value] of (Object.entries(groupBySec) as [string, any][])) {
-         lines.push(key);
-      }
-      return lines;
+export const getLineDrilldown = async (line: string, year: number, session: any) => {
+   let lineData: any = {};
+   for await (const lineConf of session?.user.config.summary[line]) {
+      lineData[lineConf.name] = await getChartDrilldown({
+         line: line,
+         name: lineConf.name,
+         year: year
+      }, session);
    }
+   return lineData;
+}
 
-   export const getNames = async (filter?: SummaryIface, db?: any) => {
-      const fields = ['-_id', 'name', 'unit']
-      const data = await getSummaries(filter, fields, db);
-      let groupByName = _.groupBy(data, 'name');
-
-      let names: string[] = [];
-      let units: string[] = [];
-      for (const [key, value] of (Object.entries(groupByName) as [string, any][])) {
-         names.push(key);
-         units.push(value[0].unit);
-      }
-      return { names, units };
+export const getLines = async (db?: any) => {
+   const fields = ['-_id', 'line']
+   const data = await getSummaries({}, fields, db);
+   let groupBySec = _.groupBy(data, 'line');
+   let lines: string[] = [];
+   for (const [key, value] of (Object.entries(groupBySec) as [string, any][])) {
+      lines.push(key);
    }
+   return lines;
+}
 
-   export const deleteSummaries = async (filter: SummaryIface, db: string | undefined) => {
-      return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summaries/${db}`,
-         {
-            method: 'DELETE',
-            headers: {
-               'Content-type': 'application/json',
-               token: `${process.env.NEXT_PUBLIC_API_KEY}`,
-            },
-            body: JSON.stringify(filter)
-         }).then(res => res.json());
-   }
+export const getNames = async (filter?: SummaryIface, db?: any) => {
+   const fields = ['-_id', 'name', 'unit']
+   const data = await getSummaries(filter, fields, db);
+   let groupByName = _.groupBy(data, 'name');
 
-   export const getYears = async () => {
-      const data = await getSummaries({}, ['year']);
-      const yearsGroup = _.groupBy(data, 'year');
-      let years: string[] = []
-      for (const [key, value] of (Object.entries(yearsGroup) as [string, any][])) {
-         years.push(key);
-      }
-      return years;
+   let names: string[] = [];
+   let units: string[] = [];
+   for (const [key, value] of (Object.entries(groupByName) as [string, any][])) {
+      names.push(key);
+      units.push(value[0].unit);
    }
+   return { names, units };
+}
+
+export const deleteSummaries = async (filter: SummaryIface, db: string | undefined) => {
+   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summaries/${db}`,
+      {
+         method: 'DELETE',
+         headers: {
+            'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+         },
+         body: JSON.stringify(filter)
+      }).then(res => res.json());
+}
+
+export const getYears = async () => {
+   const data = await getSummaries({}, ['year']);
+   const yearsGroup = _.groupBy(data, 'year');
+   let years: string[] = []
+   for (const [key, value] of (Object.entries(yearsGroup) as [string, any][])) {
+      years.push(key);
+   }
+   return years;
+}
