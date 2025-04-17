@@ -25,7 +25,7 @@ const getSummaries = async (filter: any, fields?: string[], db?: string) => {
                filter: filter,
                sort: 'timestamp'
             }
-         ),
+         )
       }).then(res => res.json());
 }
 
@@ -57,7 +57,8 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
       data: []
    }];
 
-   for (const [month, monthData] of (Object.entries(dataByMonth) as [string, any][])) {
+   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'Setember', 'October', 'November', 'December']
+   for (const [month, monthData] of (Object.entries(dataByMonth) as unknown as [number, any][])) {
       let avgSum = 0;
       let min = monthData[0].min;
       let max = monthData[0].max;
@@ -68,13 +69,15 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
       })
       const avg = (avgSum / monthData.length);
       chartData[0].data.push({
-         name: month,
+         name: monthStr[month],
          y: avg,
+         drilldown: 'M' + monthStr[month]
       });
       chartData[1].data.push({
-         name: month,
+         name: monthStr[month],
          high: max,
          low: min,
+         drilldown: 'R' + monthStr[month]
       });
    };
    return chartData;
@@ -84,6 +87,83 @@ export const getLineSummaries = async (line: string, year: number, session: any)
    let lineData: any = {};
    for await (const lineConf of session?.user.config.summary[line]) {
       lineData[lineConf.name] = await getChartSummaries({
+         line: line,
+         name: lineConf.name,
+         year: year
+      }, session);
+   }
+   return lineData;
+}
+
+export const getChartDrilldown = async (filter: SummaryIface, session: any) => {
+   const data: [] = await getSummaries(filter, ['-id'], session.user.db);
+   const dataByMonth = _.groupBy(data, 'month')
+   let chartData: any = {
+      breadcrumbs: {
+         position: {
+            align: 'right'
+         }
+      },
+      series: []
+   };
+
+   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'Setember', 'October', 'November', 'December']
+   for (const [month, monthData] of (Object.entries(dataByMonth) as unknown as [number, any][])) {
+      let mitja = {
+         type: 'spline',
+         name: 'Mitjana',
+         id: '',
+         color: 'var(--accent)',
+         zIndex: 1,
+         marker: {
+            fillColor: 'white',
+            lineWidth: 2,
+            lineColor: 'var(--accent)'
+         },
+         data: []
+      }
+      let rang = {
+         type: 'columnrange',
+         name: 'Rang',
+         id: '',
+         color: 'var(--accent)',
+         lineWidth: 0,
+         opacity: 0.6,
+         zIndex: 0,
+         marker: {
+            enabled: false
+         },
+         data: []
+      }
+      let mitjanes: any = [];
+      let rangs: any = [];
+      const orderedDays = _.orderBy(monthData, 'day');
+      orderedDays.map((dia: any) => {
+         mitjanes.push({
+            name: dia.day,
+            y: dia.avg,
+         });
+         rangs.push({
+            name: dia.day,
+            high: dia.max,
+            low: dia.min,
+         });
+      })
+      mitja.id = 'M' + monthStr[month];
+      rang.id = 'R' + monthStr[month];
+      mitja.data = mitjanes;
+      rang.data = rangs;
+      chartData.series.push(rang);
+      chartData.series.push(mitja);
+   };
+
+   return chartData;
+}
+
+export const getLineDrilldown = async (line: string, year: number, session: any) => {
+   let lineData: any = {};
+   for await (const lineConf of session?.user.config.summary[line]) {
+      lineData[lineConf.name] = await getChartDrilldown({
          line: line,
          name: lineConf.name,
          year: year

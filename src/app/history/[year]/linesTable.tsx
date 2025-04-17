@@ -4,11 +4,11 @@ import DataTable from 'react-data-table-component';
 import { updateConfig } from "@/services/users";
 import { useSession } from 'next-auth/react';
 import { createThemes } from "@/styles/themes";
-import { Loading } from "@/components/loading.component";
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { SummaryChart } from './chart';
-import { getChartSummaries, getLineSummaries } from '@/services/summaries';
+import { getLineDrilldown, getLineSummaries } from '@/services/summaries';
+import { when } from 'jquery';
 
 const GridLayout = WidthProvider(RGL);
 
@@ -17,20 +17,21 @@ const ExpandedComponent = ({ data }: any) => {
    const { data: session, status, update } = useSession();
    const [layoutConf, setLayoutConf] = useState([]);
    const [lineCharts, setLineCharts] = useState(data.chartsData);
-   const [isLoading, setIsLoading] = useState(true);
+   const [drilldown, setDrilldown] = useState(data.drilldown);
 
    useEffect(() => {
       if (session) {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
-            setLayoutConf(session?.user.config.summary[data.line] as any)
             getLineSummaries(data.line, data.year, session)
                .then((res: any) => {
                   setLineCharts(res);
-                  setIsLoading(false);
-               });
-            setIsLoading(false);
-
+                  getLineDrilldown(data.line, data.year, session)
+                     .then((res: any) => {
+                        setDrilldown(res);
+                        setLayoutConf(session?.user.config.summary[data.line] as any);
+                     })
+               })
          } else {
             user.config.summary[data.line] = [];
             update(user);
@@ -45,8 +46,6 @@ const ExpandedComponent = ({ data }: any) => {
          update(user);
       }
    }
-
-   if (layoutConf == undefined || isLoading) return <Loading />
 
    const width = window.innerWidth - 105;
 
@@ -88,6 +87,7 @@ const ExpandedComponent = ({ data }: any) => {
                      i={chart.i}
                      name={chart.name}
                      data={lineCharts[chart.name]}
+                     dd={drilldown[chart.name]}
                   />
                </div>
             })
@@ -117,7 +117,7 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
    update(user);
 }
 
-export function LinesTable({ lines, year, sensors, selected, chartsData }: any) {
+export function LinesTable({ lines, year, sensors, selected, chartsData, drilldown }: any) {
    const { data: session, status, update } = useSession();
    let columns: any = [{
       name: 'Line',
@@ -167,7 +167,8 @@ export function LinesTable({ lines, year, sensors, selected, chartsData }: any) 
          type: 'line',
          year: year,
          sensor: sensors[line] ? sensors[line][0].name : null,
-         chartsData: chartsData[line]
+         chartsData: chartsData[line],
+         drilldown: drilldown[line]
       })
    });
 
