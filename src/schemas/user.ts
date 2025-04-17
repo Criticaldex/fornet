@@ -13,7 +13,8 @@ export interface UserIface {
    db: string,
    role: string,
    config: {
-      live: any
+      live: any,
+      summary: any
    }
 }
 

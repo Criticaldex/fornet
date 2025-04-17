@@ -27,6 +27,11 @@ const nextConfig = {
             source: '/mqtt',
             destination: `/mqtt/${process.env.MQTT_DEFAULT}`,
             permanent: false,
+         },
+         {
+            source: '/history',
+            destination: `/history/${process.env.SUMMARY_DEFAULT_YEAR}`,
+            permanent: false,
          }
       ];
    }
