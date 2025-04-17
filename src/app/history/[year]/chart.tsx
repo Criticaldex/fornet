@@ -8,6 +8,8 @@ import HighchartsReact from 'highcharts-react-official'
 import HighchartsNoData from 'highcharts/modules/no-data-to-display'
 import highchartsDrilldown from "highcharts/modules/drilldown";
 import { chartOptions } from '@/components/chart.components'
+import { useEffect, useState } from 'react'
+import Loading from '../loading'
 
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
@@ -19,6 +21,16 @@ if (typeof Highcharts === "object") {
 }
 
 export function SummaryChart({ name, data, dd }: any) {
+
+   const [isLoading, setIsLoading] = useState(true);
+   useEffect(() => {
+      if (dd && data) {
+         setIsLoading(false);
+      }
+   }, [dd, data]);
+
+   if (isLoading) return <Loading />
+
    const options = {
       ...chartOptions,
       chart: {
@@ -53,7 +65,6 @@ export function SummaryChart({ name, data, dd }: any) {
          }
       }
    }
-   console.log('options: ', options);
 
    return (
       <HighchartsReact

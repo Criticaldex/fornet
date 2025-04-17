@@ -23,15 +23,15 @@ const ExpandedComponent = ({ data }: any) => {
       if (session) {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
-            setLayoutConf(session?.user.config.summary[data.line] as any),
-               getLineSummaries(data.line, data.year, session)
-                  .then((res: any) => {
-                     setLineCharts(res);
-                  }),
-               getLineDrilldown(data.line, data.year, session)
-                  .then((res: any) => {
-                     setDrilldown(res);
-                  })
+            getLineSummaries(data.line, data.year, session)
+               .then((res: any) => {
+                  setLineCharts(res);
+                  getLineDrilldown(data.line, data.year, session)
+                     .then((res: any) => {
+                        setDrilldown(res);
+                        setLayoutConf(session?.user.config.summary[data.line] as any);
+                     })
+               })
          } else {
             user.config.summary[data.line] = [];
             update(user);
@@ -46,9 +46,6 @@ const ExpandedComponent = ({ data }: any) => {
          update(user);
       }
    }
-
-   console.log('drilldown: ', drilldown);
-
 
    const width = window.innerWidth - 105;
 
