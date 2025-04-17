@@ -29,7 +29,7 @@ export function SummaryChart({ name, data, dd }: any) {
       }
    }, [dd, data]);
 
-   if (isLoading) return <Loading />
+   if (isLoading) return (<Loading />);
 
    const options = {
       ...chartOptions,
