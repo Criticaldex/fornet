@@ -29,8 +29,6 @@ export function SummaryChart({ name, data, dd }: any) {
       }
    }, [dd, data]);
 
-   if (isLoading) return (<Loading />);
-
    const options = {
       ...chartOptions,
       chart: {
@@ -67,9 +65,13 @@ export function SummaryChart({ name, data, dd }: any) {
    }
 
    return (
-      <HighchartsReact
-         highcharts={Highcharts}
-         options={options}
-      />
+      <>
+         {!isLoading ?
+            <HighchartsReact
+               highcharts={Highcharts}
+               options={options}
+            />
+            : <Loading />}
+      </>
    )
 }
