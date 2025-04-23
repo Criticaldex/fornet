@@ -9,7 +9,8 @@ import HighchartsNoData from 'highcharts/modules/no-data-to-display'
 import highchartsDrilldown from "highcharts/modules/drilldown";
 import { chartOptions } from '@/components/chart.components'
 import { useEffect, useState } from 'react'
-import Loading from '../loading'
+import { Loading } from "@/components/loading.component";
+
 
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
