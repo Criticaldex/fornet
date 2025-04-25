@@ -7,7 +7,7 @@ export default async function ContractsLayout({ children }: any) {
    const session = await getSession();
    return (
       <div>
-         <title>MQTT</title>
+         <title>Fornet | MQTT</title>
          <div className="mt-2 ml-4 bg-light text-right flex justify-between items-center">
             <div>
                <GetLinksAdmin />

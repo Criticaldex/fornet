@@ -9,7 +9,7 @@ export default async function MqttLayout({ children }: any) {
    const years = await getYears();
    return (
       <div>
-         <title>MQTT</title>
+         <title>Fornet | Summary</title>
          <div className="mt-2 ml-4 bg-light text-right flex justify-between items-center">
             <div>
                <label>Display Hours: </label>
