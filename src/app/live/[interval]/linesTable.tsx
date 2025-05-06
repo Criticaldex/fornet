@@ -10,6 +10,7 @@ import { GaugeChart } from './gaugeChart';
 import { BoolChart } from './boolChart';
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import RGL, { WidthProvider } from "react-grid-layout";
+import { CandleChart } from './candleChart';
 
 const GridLayout = WidthProvider(RGL);
 
@@ -76,7 +77,16 @@ const ExpandedComponent = ({ data }: any) => {
                         <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
                         <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
                      </div>
+                     {/*
                      <LiveChart
+                        i={chart.i}
+                        line={data.line}
+                        name={chart.name}
+                        unit={chart.unit}
+                        interval={data.interval}
+                     />
+                     */}
+                     <CandleChart
                         i={chart.i}
                         line={data.line}
                         name={chart.name}
