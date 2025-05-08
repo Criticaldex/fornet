@@ -34,6 +34,11 @@ export default function GetNav({ session }: any) {
          label: 'Logs',
          icon: FaReceipt,
          route: '/logs'
+      },
+      {
+         label: 'OData Config',
+         icon: FaCapsules,
+         route: '/odata-config'
       }
    ]
 
