@@ -8,7 +8,7 @@ export function GetLinksAdmin({ session }: any) {
    let links: object[] = [
       {
          label: 'Odata',
-         route: `/odata-config/comunicacion`
+         route: `/odata-config/odata`
       },
       {
          label: 'Consultas',

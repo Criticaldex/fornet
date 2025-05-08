@@ -52,7 +52,7 @@ export default function ODataForm() {
         <>
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="bg-black p-6 rounded-lg shadow-lg border border-orange-500"
+                className="bg-gray-900 p-6 rounded-lg shadow-lg border border-orange-500"
             >
                 <h2 className="text-xl font-semibold mb-4 text-orange-500">Configuración OData</h2>
 
