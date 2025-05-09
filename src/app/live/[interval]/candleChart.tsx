@@ -17,7 +17,7 @@ if (typeof Highcharts === "object") {
 }
 
 export function CandleChart() {
-    const candleDuration = 5 * 60 * 1000; // Per actualitzar la vela als 5 minuts
+    const candleDuration = 1 * 60 * 1000; // Per actualitzar la vela als 5 minuts
     const currentCandleRef = useRef<any>({
         open: 100,
         high: 100,
