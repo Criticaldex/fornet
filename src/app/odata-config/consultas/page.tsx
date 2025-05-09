@@ -57,7 +57,7 @@ export default function SimpleTable() {
                         <tr className="bg-gray-700 text-orange-400">
                             <th className="py-2 px-4 text-left">Seleccionar</th>
                             <th className="py-2 px-4 text-left">Nombre de la tabla</th>
-                            <th className="py-2 px-4 text-left">Acción</th>
+                            <th className="py-2 px-4 text-left">  </th>
                         </tr>
                     </thead>
                     <tbody className="text-gray-300">
