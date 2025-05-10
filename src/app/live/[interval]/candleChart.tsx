@@ -6,7 +6,7 @@ import HighchartsAccessibility from 'highcharts/modules/accessibility'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsData from 'highcharts/modules/data'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 
 if (typeof Highcharts === "object") {
     HighchartsExporting(Highcharts)
@@ -17,7 +17,7 @@ if (typeof Highcharts === "object") {
 }
 
 export function CandleChart() {
-    const candleDuration = 1 * 60 * 1000; // Per actualitzar la vela als 5 minuts
+    const candleDuration = 1 * 60 * 1000;
     const currentCandleRef = useRef<any>({
         open: 100,
         high: 100,
@@ -37,10 +37,7 @@ export function CandleChart() {
 
     const updateCandleData = (series: any, timestamp: number) => {
         try {
-            // Verificar que existeix la serie, si no salta error al principi
-            if (!series || !series.data) {
-                return;
-            }
+            if (!series || !series.data) return;
 
             const now = timestamp || Date.now();
             const shouldCreateNewCandle = !lastTimestampRef.current ||
@@ -49,12 +46,12 @@ export function CandleChart() {
             if (shouldCreateNewCandle) {
                 if (currentCandleRef.current) {
                     series.addPoint([
-                        lastTimestampRef.current,
+                        currentCandleRef.current.timestamp,
                         currentCandleRef.current.open,
                         currentCandleRef.current.high,
                         currentCandleRef.current.low,
                         currentCandleRef.current.close
-                    ], true, true);
+                    ], true, false);
                 }
 
                 const lastClose = series.data.length > 0
@@ -68,8 +65,15 @@ export function CandleChart() {
                     close: lastClose,
                     timestamp: now
                 };
-
                 lastTimestampRef.current = now;
+
+                series.addPoint([
+                    now,
+                    lastClose,
+                    lastClose,
+                    lastClose,
+                    lastClose
+                ], true, false);
             } else {
                 const newPrice = currentCandleRef.current.close + (Math.random() - 0.5) * 2;
 
@@ -83,15 +87,13 @@ export function CandleChart() {
 
                 setLastPrice(newPrice);
 
-                if (series.data.length > 0) {
-                    const lastPoint = series.data[series.data.length - 1];
-                    if (lastPoint && lastPoint.update) {
-                        lastPoint.update({
-                            high: currentCandleRef.current.high,
-                            low: currentCandleRef.current.low,
-                            close: currentCandleRef.current.close
-                        }, true);
-                    }
+                const lastPoint = series.data[series.data.length - 1];
+                if (lastPoint && lastPoint.update) {
+                    lastPoint.update({
+                        high: currentCandleRef.current.high,
+                        low: currentCandleRef.current.low,
+                        close: currentCandleRef.current.close
+                    }, true);
                 }
             }
         } catch (error) {
@@ -100,16 +102,14 @@ export function CandleChart() {
     };
 
     const options = {
-        title: {
-            text: ''
-        },
+        title: { text: '' },
         chart: {
             events: {
                 load: function (this: any) {
                     const chart = this;
                     const series = chart.series[0];
 
-                    if (series && series.data && series.data.length > 0) {
+                    if (series && series.data.length > 0) {
                         const lastPoint = series.data[series.data.length - 1];
                         currentCandleRef.current = {
                             open: lastPoint.open,
@@ -119,6 +119,7 @@ export function CandleChart() {
                             timestamp: lastPoint.x
                         };
                         setLastPrice(lastPoint.close);
+                        lastTimestampRef.current = lastPoint.x;
                     }
 
                     const intervalId = setInterval(() => {
@@ -145,46 +146,42 @@ export function CandleChart() {
             opposite: false
         },
         rangeSelector: {
-            enabled: false,
-            buttons: [{
-                type: 'minute',
-                count: 15,
-                text: '15m'
-            }, {
-                type: 'hour',
-                count: 1,
-                text: '1h'
-            }, {
-                type: 'all',
-                text: 'All'
-            }],
-            selected: 1,
-            inputEnabled: false
+            enabled: false
         },
         navigator: {
-            enabled: false,
-            series: {
-                color: '#000000'
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        tooltip: {
+            backgroundColor: '#f76f20',
+            borderColor: '#ff9900',
+            borderRadius: 8,
+            style: {
+                color: 'white',
+                fontWeight: 'bold'
             }
         },
         plotOptions: {
             candlestick: {
-                dataGrouping: {
-                    enabled: false
-                },
+                dataGrouping: { enabled: false },
                 lastPrice: {
                     enabled: true,
-                    color: '#FF7F7F',
+                    color: '#f76f20',
                     label: {
                         enabled: true,
                         align: 'left',
                         x: 10,
                         y: 0,
                         style: {
-                            color: '#FFFFFF',
+                            color: '#f76f20',
                             fontWeight: 'bold'
                         },
-                        backgroundColor: '#FF7F7F',
+                        backgroundColor: '#f76f20',
                         borderColor: '#FF0000',
                         borderRadius: 3,
                         borderWidth: 1,
@@ -213,5 +210,5 @@ export function CandleChart() {
                 options={options}
             />
         </div>
-    )
+    );
 }
