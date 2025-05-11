@@ -10,6 +10,7 @@ import highchartsMore from "highcharts/highcharts-more"
 import solidGauge from "highcharts/modules/solid-gauge";
 import { GetNames } from '../routing'
 import { useState } from 'react'
+import { sendTelegram, sendMail } from "@/services/alertes";
 
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
@@ -88,6 +89,13 @@ export function BoolChart({ line, name }: any) {
 
    return (
       <div className="m-2">
+         <button
+            onClick={() => {
+               sendTelegram();
+            }}
+            className="bg-orange-500 text-white px-4 py-1 rounded hover:bg-orange-600 mr-4">
+            Test Telegram
+         </button>
          <HighchartsReact
             highcharts={Highcharts}
             options={options}
