@@ -1,6 +1,7 @@
 "use client";
 import { useForm, useFieldArray } from "react-hook-form";
-import { useState } from "react"; // Importamos useState para manejar el diálogo
+import { executeODataQuery } from "@/services/odata";
+import { useState } from "react";
 
 type FormValues = {
     serviceUrl: string;
@@ -43,10 +44,49 @@ export default function ODataForm() {
         alert("Configuración guardada correctamente");
     };
 
-    // Función para manejar el clic en el botón Ejecutar
-    const handleExecute = () => {
-        setShowDialog(true);
+    const [queryResults, setQueryResults] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [queryName, setQueryName] = useState("");
+
+    const handleSaveQuery = (name: string) => {
+        console.log("Guardando consulta:", name, queryResults);
     };
+
+    const handleExecute = handleSubmit(async (data: FormValues) => {
+        setIsLoading(true);
+        setError(null);
+        setShowDialog(true); // Mostrar el diálogo inmediatamente
+
+        try {
+            const response = await fetch('/api/odata', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    serviceUrl: data.serviceUrl,
+                    entity: data.entity,
+                    username: data.username,
+                    password: data.password,
+                    filters: data.filters.filter(f => f.property && f.value)
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error en la consulta');
+            }
+
+            const results = await response.json();
+            setQueryResults(results);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Error desconocido');
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    });
 
     return (
         <>
@@ -73,7 +113,7 @@ export default function ODataForm() {
                 <div className="mb-4">
                     <label className="block text-sm font-medium mb-1 text-orange-400">Entidad *</label>
                     <input
-                        {...register("entity", { required: "Campo obligatorio" })}
+                        {...register("entity")}
                         type="text"
                         className="w-full p-2 border border-orange-500 rounded bg-gray-900 text-white placeholder-gray-400"
                         placeholder="Ej: Productos"
@@ -87,7 +127,7 @@ export default function ODataForm() {
                     <div>
                         <label className="block text-sm font-medium mb-1 text-orange-400">Usuario *</label>
                         <input
-                            {...register("username", { required: "Campo obligatorio" })}
+                            {...register("username")}
                             type="text"
                             className="w-full p-2 border border-orange-500 rounded bg-gray-900 text-white"
                         />
@@ -178,42 +218,59 @@ export default function ODataForm() {
                             </button>
                         </div>
                         <div className="flex-1 overflow-auto bg-gray-800 p-4 rounded border border-gray-700">
-                            {/* Aquí iría el contenido del EDMX o respuesta OData */}
-                            <pre className="text-gray-300 text-sm">
-                                {`Este es un ejemplo de cómo se mostrarían los resultados.
-Puedes mostrar aquí el EDMX o la respuesta JSON de OData.
-
-Ejemplo de respuesta:
-{
-  "@odata.context": "https://services.odata.org/V4/TripPinService/$metadata",
-  "value": [
-    {
-      "name": "People",
-      "kind": "EntitySet",
-      "url": "People"
-    },
-    {
-      "name": "Airlines",
-      "kind": "EntitySet",
-      "url": "Airlines"
-    }
-  ]
-}`}
-                            </pre>
+                            {isLoading ? (
+                                <div className="flex justify-center items-center h-full">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                                </div>
+                            ) : error ? (
+                                <div className="text-red-400 p-4 bg-red-900 rounded">
+                                    <strong>Error:</strong> {error}
+                                </div>
+                            ) : queryResults ? (
+                                <pre className="text-gray-300 text-sm overflow-auto">
+                                    {JSON.stringify(queryResults, null, 2)}
+                                </pre>
+                            ) : (
+                                <div className="text-gray-400">No hay resultados para mostrar</div>
+                            )}
                         </div>
-                        <div className="mt-4 flex justify-between">
-                            <button
-                                type="submit"
-                                className="bg-orange-600 text-black py-2 px-4 rounded hover:bg-orange-500 font-bold transition-colors"
-                            >
-                                Guardar Consulta
-                            </button>
-                            <button
-                                onClick={() => setShowDialog(false)}
-                                className="bg-orange-600 text-black py-2 px-4 rounded hover:bg-orange-500 font-bold transition-colors"
-                            >
-                                Cerrar
-                            </button>
+                        <div className="mt-4 flex items-center justify-between">
+                            <div className="flex-1 flex items-center space-x-2 mr-4">
+                                <input
+                                    type="text"
+                                    value={queryName}
+                                    onChange={(e) => setQueryName(e.target.value)}
+                                    className="flex-1 p-2 border border-orange-500 rounded bg-gray-900 text-white placeholder-gray-400"
+                                    placeholder="Nombre de la consulta"
+                                    required
+                                />
+                                {!queryName && (
+                                    <span className="text-sm text-orange-300">*</span>
+                                )}
+                            </div>
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={() => {
+                                        if (!queryName.trim()) {
+                                            alert("Debes ingresar un nombre para la consulta");
+                                            return;
+                                        }
+                                        // Aquí ejecutas tu función para guardar
+                                        handleSaveQuery(queryName);
+                                        setShowDialog(false);
+                                        setQueryName("");
+                                    }}
+                                    className="bg-orange-600 text-black py-2 px-4 rounded hover:bg-orange-500 font-bold transition-colors"
+                                >
+                                    Guardar Consulta
+                                </button>
+                                <button
+                                    onClick={() => setShowDialog(false)}
+                                    className="bg-orange-600 text-black py-2 px-4 rounded hover:bg-orange-500 font-bold transition-colors"
+                                >
+                                    Cerrar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

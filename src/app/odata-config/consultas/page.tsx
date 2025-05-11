@@ -56,7 +56,7 @@ export default function SimpleTable() {
                     <thead>
                         <tr className="bg-gray-700 text-orange-400">
                             <th className="py-2 px-4 text-left">Seleccionar</th>
-                            <th className="py-2 px-4 text-left">Nombre de la tabla</th>
+                            <th className="py-2 px-4 text-left">Nombre de la Consulta</th>
                             <th className="py-2 px-4 text-left">  </th>
                         </tr>
                     </thead>
