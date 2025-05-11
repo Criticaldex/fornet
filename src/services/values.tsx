@@ -79,3 +79,17 @@ export const deleteValues = async (filter: ValueIface, db: string | undefined) =
          body: JSON.stringify(filter)
       }).then(res => res.json());
 }
+
+export const getMappedCandleValues = async (filter?: ValueIface, db?: any) => {
+   const data = await getValues(filter, db);
+   let a = "A";
+   // let groupByName = _.groupBy(data, 'name');
+
+   // let names: string[] = [];
+   // let units: string[] = [];
+   // for (const [key, value] of (Object.entries(groupByName) as [string, any][])) {
+   //    names.push(key);
+   //    units.push(value[0].unit);
+   // }
+   // return { names, units };
+}

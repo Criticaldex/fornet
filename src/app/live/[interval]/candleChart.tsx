@@ -7,6 +7,9 @@ import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsData from 'highcharts/modules/data'
 import { useRef, useState } from 'react'
+import { chartOptions } from '@/components/chart.components'
+import { getMappedCandleValues } from '@/services/values'
+import { useSession } from 'next-auth/react';
 
 if (typeof Highcharts === "object") {
     HighchartsExporting(Highcharts)
@@ -16,7 +19,7 @@ if (typeof Highcharts === "object") {
     HighchartsAccessibility(Highcharts)
 }
 
-export function CandleChart() {
+export function CandleChart({ i, line, name, unit, interval }: any) {
     const candleDuration = 1 * 60 * 1000;
     const currentCandleRef = useRef<any>({
         open: 100,
@@ -34,6 +37,10 @@ export function CandleChart() {
         [Date.now() - 120000, 103, 105, 102, 104],
         [Date.now() - 60000, 104, 106, 103, 105]
     ]);
+    const { data: session } = useSession();
+    const initialData1 = getMappedCandleValues({ line, name, interval }, session?.user.db);
+    // const { data: session } = useSession();
+    // const allData = await getMappedCandleValues({ line: line, name: name, interval: interval }, session?.user.db);
 
     const updateCandleData = (series: any, timestamp: number) => {
         try {
@@ -103,12 +110,12 @@ export function CandleChart() {
 
     const options = {
         title: { text: '' },
+        ...chartOptions,
         chart: {
             events: {
                 load: function (this: any) {
                     const chart = this;
                     const series = chart.series[0];
-
                     if (series && series.data.length > 0) {
                         const lastPoint = series.data[series.data.length - 1];
                         currentCandleRef.current = {
@@ -139,6 +146,9 @@ export function CandleChart() {
             type: 'datetime',
             gridLineWidth: 2
         },
+        legend: {
+            enabled: false,
+        },
         yAxis: {
             labels: {
                 align: "left"
@@ -152,7 +162,7 @@ export function CandleChart() {
             enabled: false
         },
         exporting: {
-            enabled: false
+            enabled: true
         },
         credits: {
             enabled: false
