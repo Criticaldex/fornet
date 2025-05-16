@@ -34,6 +34,11 @@ export default function GetNav({ session }: any) {
          label: 'Logs',
          icon: FaReceipt,
          route: '/logs'
+      },
+      {
+         label: 'PowerBi',
+         icon: FaChartBar,
+         route: '/powerbi'
       }
    ]
 
@@ -41,7 +46,7 @@ export default function GetNav({ session }: any) {
       {
          label: 'PowerBi',
          icon: FaChartBar,
-         route: 'https://app.powerbi.com/groups/d8792594-3b20-4154-9892-77fe3e41f43e/reports/209d6e8f-97c1-4550-9518-8ab93ecf0c37/ea75936307d815500425?experience=power-bi'
+         route: '/powerbi'
       }
    ]
 
@@ -76,7 +81,7 @@ export default function GetNav({ session }: any) {
                         External
                      </h1>
                   </div>
-                  {externalLinks.map((navTI) => (
+                  {/* {externalLinks.map((navTI) => (
                      <Link key={navTI.label} href={navTI.route} rel="noopener noreferrer" target="_blank" className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
                      ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
                         <navTI.icon size={19} />
@@ -84,7 +89,7 @@ export default function GetNav({ session }: any) {
                            {navTI.label}
                         </span>
                      </Link>
-                  ))}
+                  ))} */}
                </div>
             </div>
             <div>

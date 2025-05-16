@@ -13,6 +13,8 @@
       "info": "next info"
    },
    "dependencies": {
+      "@fluentui/web-components": "^2.6.1",
+      "@microsoft/fast-react-wrapper": "^0.3.25",
       "@svgr/webpack": "^8.1.0",
       "@types/bcryptjs": "^2.4.2",
       "@types/jquery": "^3.5.16",
@@ -43,6 +45,8 @@
       "next-auth": "^4.22.1",
       "node-cron": "^3.0.3",
       "postcss": "^8.4.31",
+      "powerbi-client-react": "^2.0.0",
+      "powerbi-report-authoring": "^2.0.0",
       "prettier": "^2.8.8",
       "react": "18.2.0",
       "react-confirm-alert": "^3.0.6",
