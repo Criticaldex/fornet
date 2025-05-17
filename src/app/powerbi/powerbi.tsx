@@ -18,7 +18,7 @@ export function PowerBi({ entraToken, embedURL }: any) {
       <PowerBIEmbed
          embedConfig={{
             type: 'report',   // Supported types: report, dashboard, tile, visual, qna, paginated report and create
-            id: '<Report Id>',
+            id: '5615fe53-6829-41c9-913c-60f82bf0bb8e',
             embedUrl: embedURL,
             accessToken: entraToken,
             tokenType: models.TokenType.Embed, // Use models.TokenType.Aad for SaaS embed
