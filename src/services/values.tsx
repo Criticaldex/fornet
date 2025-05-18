@@ -80,8 +80,9 @@ export const deleteValues = async (filter: ValueIface, db: string | undefined) =
       }).then(res => res.json());
 }
 
-export const getMappedCandleValues = async (filter?: ValueIface, db?: any) => {
-   const data = await getValues(filter, db);
+export const getMappedCandleValues = async (filter?: any, db?: any) => {
+   const fields = ['-_id']
+   const data = await getValues(filter, fields, db);
    let a = "A";
    // let groupByName = _.groupBy(data, 'name');
 

@@ -38,7 +38,7 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         [Date.now() - 60000, 104, 106, 103, 105]
     ]);
     const { data: session } = useSession();
-    const initialData1 = getMappedCandleValues({ line, name, interval }, session?.user.db);
+    const initialData1 = getMappedCandleValues({ line: line, name: name, interval: interval }, session?.user.db);
     // const { data: session } = useSession();
     // const allData = await getMappedCandleValues({ line: line, name: name, interval: interval }, session?.user.db);
 
