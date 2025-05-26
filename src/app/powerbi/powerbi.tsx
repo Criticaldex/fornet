@@ -43,7 +43,7 @@ export function PowerBi({ entraToken, embedURL }: any) {
             ])
          }
 
-         cssClassName={"reportClass"}
+         cssClassName={"reportClass h-full"}
 
          getEmbeddedComponent={(embedObject: Embed) => {
             console.log(`Embedded object of type "${embedObject.embedtype}" received`);
