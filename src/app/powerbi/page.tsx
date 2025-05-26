@@ -11,8 +11,12 @@ export default async function Dashboard() {
 
    return (
       <>
-         <div className="flex flex-grow-max mx-2 mb-2">
-            <div className="flex flex-col grow p-2 bg-bgLight rounded-md ">
+         <div className="h-full flex flex-col mx-2 mb-2">
+            <div className="flex mt-auto flex-col grow justify-end h-screen p-2 bg-bgLight rounded-md">
+               <PbiForm
+                  setEntraToken={setEntraToken}
+                  setEmbedURL={setEmbedURL}
+               />
                <PowerBi
                   entraToken={token}
                   embedURL={embedUrl}
