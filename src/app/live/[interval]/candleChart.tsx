@@ -6,10 +6,10 @@ import HighchartsAccessibility from 'highcharts/modules/accessibility'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsData from 'highcharts/modules/data'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { chartOptions } from '@/components/chart.components'
 import { getMappedCandleValues } from '@/services/values'
-import { useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react'
 
 if (typeof Highcharts === "object") {
     HighchartsExporting(Highcharts)
@@ -30,17 +30,24 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
     });
     const lastTimestampRef = useRef<number>(0);
     const [lastPrice, setLastPrice] = useState(100);
-    const [initialData] = useState([
-        [Date.now() - 300000, 100, 102, 99, 101],
-        [Date.now() - 240000, 101, 103, 100, 102],
-        [Date.now() - 180000, 102, 104, 101, 103],
-        [Date.now() - 120000, 103, 105, 102, 104],
-        [Date.now() - 60000, 104, 106, 103, 105]
-    ]);
+    const [initialData, setInitialData] = useState<any[]>([]);
     const { data: session } = useSession();
-    const initialData1 = getMappedCandleValues({ line: line, name: name, interval: interval }, session?.user.db);
-    // const { data: session } = useSession();
-    // const allData = await getMappedCandleValues({ line: line, name: name, interval: interval }, session?.user.db);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await getMappedCandleValues(
+                    { line: line, name: name, interval: interval },
+                    session?.user.db
+                );
+                setInitialData(data);
+            } catch (error) {
+                console.error('Error fetching candle data:', error);
+            }
+        };
+
+        fetchData();
+    }, [line, name, interval, session]);
 
     const updateCandleData = (series: any, timestamp: number) => {
         try {
@@ -211,6 +218,10 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
             data: initialData
         }]
     };
+
+    if (initialData.length === 0) {
+        return <div className="m-2">Loading chart data...</div>;
+    }
 
     return (
         <div className="m-2">
