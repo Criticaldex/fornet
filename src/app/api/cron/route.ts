@@ -7,6 +7,8 @@ export async function GET() {
     //    console.log('ERROR: Bad Auth');
     //    return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
     //}
+    console.log('Beginning Cron!!');
+
     const dbName = 'empresa2';
     const interval = 24;
     let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
@@ -16,6 +18,7 @@ export async function GET() {
     ];
 
     let summaries: SummaryIface[] = [];
+    console.log('fetching sensors...');
 
     const sensors = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${dbName}`,
         {
@@ -31,6 +34,7 @@ export async function GET() {
                 }
             ),
         }).then(res => res.json());
+    console.log('sensord done!', sensors);
 
     for (const sensor of sensors) {
         const filter = {
@@ -38,6 +42,7 @@ export async function GET() {
             "line": sensor.line,
             "name": sensor.name
         };
+        console.log('fetching values!!');
 
         const values = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${dbName}`,
             {
@@ -54,6 +59,7 @@ export async function GET() {
                     }
                 ),
             }).then(res => res.json());
+        console.log('values done!!', values);
 
         if (values[0]) {
             let summary: SummaryIface = {
@@ -79,6 +85,8 @@ export async function GET() {
             summaries.push(summary);
         }
     };
+    console.log('inserting summaries...');
+
     const insert = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/summaries/${dbName}`,
         {
             method: 'PATCH',
@@ -91,5 +99,7 @@ export async function GET() {
     if (insert.ERROR) {
         return NextResponse.json(insert, { status: 500 })
     }
+    console.log('insert done!!', insert);
+
     return NextResponse.json(insert);
 }
