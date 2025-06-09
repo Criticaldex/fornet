@@ -81,61 +81,90 @@ export const deleteValues = async (filter: ValueIface, db: string | undefined) =
 }
 
 export const getMappedCandleValues = async (filter?: any, db?: any) => {
-   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${filter.line}/${filter.name}/${filter.interval}`, {
-      method: 'GET',
-      headers: {
-         'Content-type': 'application/json',
-         token: `${process.env.NEXT_PUBLIC_API_KEY}`,
-      }
-   })
-      .then(res => res.json())
-      .then(data => {
-         // Si los datos son históricos (array de [timestamp, price]), los convertimos a OHLC
-         if (data.length > 0 && Array.isArray(data[0]) && data[0].length === 2) {
-            return convertTicksToOHLC(data, filter.interval * 60000); // Convertir minutos a ms
-         }
-         // Si ya están en formato OHLC, los devolvemos tal cual
-         return data;
-      })
-      .catch(error => {
-         console.error('Error:', error);
-         throw error; // Opcional: re-lanzar el error si quieres manejarlo después
-      });
-}
+   const intervalMs = 30 * 60 * 1000; // 30 minutos
+   const now = Date.now();
+   const endTime = Math.floor(now / intervalMs) * intervalMs;
+   const startTime = endTime - (8 * 60 * 60 * 1000);
 
-function convertTicksToOHLC(data: Array<[number, number]>, intervalMs: number): Array<[number, number, number, number, number]> {
+   return fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${filter.line}/${filter.name}/${filter.interval}?startTime=${startTime}&endTime=${endTime}`,
+      {
+         method: 'GET',
+         headers: {
+            'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+         },
+      }
+   )
+      .then((res) => res.json())
+      .then((data) => {
+         if (data.length > 0 && Array.isArray(data[0]) && data[0].length === 2) {
+            const ohlcData = convertTicksToOHLC(data, intervalMs);
+            if (ohlcData.length === 0) {
+               console.warn('No se generaron velas válidas a partir de los datos.');
+               return [];
+            }
+            return ohlcData;
+         }
+         console.warn('Datos vacíos o formato incorrecto, devolviendo arreglo vacío.');
+         return [];
+      })
+      .catch((error) => {
+         console.error('Error:', error);
+         throw error;
+      });
+};
+
+function convertTicksToOHLC(
+   data: Array<[number, number]>,
+   intervalMs: number
+): Array<[number, number, number, number, number]> {
    if (data.length === 0) return [];
 
    const sortedData = [...data].sort((a, b) => a[0] - b[0]);
    const ohlcData: Array<[number, number, number, number, number]> = [];
    let currentIntervalStart = Math.floor(sortedData[0][0] / intervalMs) * intervalMs;
+   let pricesInInterval: number[] = [sortedData[0][1]];
    let currentOpen = sortedData[0][1];
-   let currentHigh = sortedData[0][1];
-   let currentLow = sortedData[0][1];
-   let currentClose = sortedData[0][1];
+   let lastClose = sortedData[0][1];
 
    for (let i = 1; i < sortedData.length; i++) {
       const [timestamp, price] = sortedData[i];
       const intervalStart = Math.floor(timestamp / intervalMs) * intervalMs;
 
-      // Mismo intervalo: actualiza high, low y close
       if (intervalStart === currentIntervalStart) {
-         currentHigh = Math.max(currentHigh, price);
-         currentLow = Math.min(currentLow, price);
-         currentClose = price;
-      }
-      // Nuevo intervalo: guarda la vela actual y comienza una nueva
-      else {
+         pricesInInterval.push(price);
+      } else {
+         const currentHigh = Math.max(...pricesInInterval, currentOpen);
+         const currentLow = Math.min(...pricesInInterval, currentOpen);
+         const currentClose = pricesInInterval[pricesInInterval.length - 1];
          ohlcData.push([currentIntervalStart, currentOpen, currentHigh, currentLow, currentClose]);
+
          currentIntervalStart = intervalStart;
-         currentOpen = price;
-         currentHigh = price;
-         currentLow = price;
-         currentClose = price;
+         currentOpen = lastClose;
+         pricesInInterval = [price];
+         lastClose = price;
       }
    }
 
-   // Añadir la última vela
-   ohlcData.push([currentIntervalStart, currentOpen, currentHigh, currentLow, currentClose]);
-   return ohlcData;
+   // Procesar la última vela
+   if (pricesInInterval.length > 0) {
+      const currentHigh = Math.max(...pricesInInterval, currentOpen);
+      const currentLow = Math.min(...pricesInInterval, currentOpen);
+      const currentClose = pricesInInterval[pricesInInterval.length - 1];
+      ohlcData.push([currentIntervalStart, currentOpen, currentHigh, currentLow, currentClose]);
+   }
+
+   // Validar todas las velas
+   const validatedOhlcData = ohlcData.filter(([time, open, high, low, close], index) => {
+      if (high < open || high < close || low > open || low > close) {
+         console.warn(
+            `Vela inválida en índice ${index}: [time=${time}, open=${open}, high=${high}, low=${low}, close=${close}]`
+         );
+         return false;
+      }
+      return true;
+   });
+
+   return validatedOhlcData;
 }
