@@ -21,7 +21,7 @@ if (typeof Highcharts === "object") {
 
 export function CandleChart({ i, line, name, unit, interval }: any) {
     const candleDuration = 30 * 60 * 1000; // 30 minutos
-    const currentCandleRef = useRef<any>(null); // Inicializar como null
+    const currentCandleRef = useRef<any>(null);
     const lastTimestampRef = useRef<number>(0);
     const [lastPrice, setLastPrice] = useState<number | null>(null);
     const [initialData, setInitialData] = useState<any[]>([]);
@@ -31,12 +31,11 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         const fetchData = async () => {
             try {
                 const data = await getMappedCandleValues(
-                    { line: line, name: name, interval: interval },
+                    { line, name, interval },
                     session?.user.db
                 );
                 setInitialData(data);
 
-                // Inicializar currentCandleRef con la última vela histórica
                 if (data.length > 0) {
                     const lastCandle = data[data.length - 1];
                     currentCandleRef.current = {
@@ -81,8 +80,16 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
 
             const now = Date.now();
             const candleStart = Math.floor(now / candleDuration) * candleDuration;
+
+            // Alinear a intervalos de XX:00 o XX:30
+            const minutes = new Date(candleStart).getMinutes();
+            const alignedCandleStart =
+                minutes >= 30
+                    ? candleStart - (minutes - 30) * 60 * 1000
+                    : candleStart - minutes * 60 * 1000;
+
             const shouldCreateNewCandle =
-                !currentCandleRef.current || currentCandleRef.current.timestamp < candleStart;
+                !currentCandleRef.current || currentCandleRef.current.timestamp < alignedCandleStart;
 
             const apiValue = await fetchLastValue(line, name);
             if (apiValue === null) return;
@@ -98,22 +105,26 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                             currentCandleRef.current.close,
                         ],
                         true,
-                        false
+                        series.data.length > 100 // Eliminar puntos antiguos si hay más de 100
                     );
                 }
 
-                const lastClose = series.data.length > 0 ? series.data[series.data.length - 1].close : apiValue;
+                const lastClose = currentCandleRef.current?.close ?? apiValue;
 
                 currentCandleRef.current = {
                     open: lastClose,
                     high: apiValue,
                     low: apiValue,
                     close: apiValue,
-                    timestamp: candleStart,
+                    timestamp: alignedCandleStart,
                 };
-                lastTimestampRef.current = candleStart;
+                lastTimestampRef.current = alignedCandleStart;
 
-                series.addPoint([candleStart, lastClose, apiValue, apiValue, apiValue], true, false);
+                series.addPoint(
+                    [alignedCandleStart, lastClose, apiValue, apiValue, apiValue],
+                    true,
+                    series.data.length > 100
+                );
             } else {
                 const newPrice = apiValue;
 
@@ -182,7 +193,7 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         xAxis: {
             type: 'datetime',
             gridLineWidth: 2,
-            tickInterval: 30 * 60 * 1000, // Ticks cada 30 minutos
+            tickInterval: candleDuration, // Ticks cada 30 minutos
         },
         legend: {
             enabled: false,
