@@ -99,7 +99,7 @@ export const getMappedCandleValues = async (filter: { line: string; name: string
 
    try {
       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${filter.line}/${filter.name}/${filter.interval}?startTime=${startTime}&endTime=${endTime}`,
+         `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${filter.line}/${filter.name}/${filter.interval}`, //?startTime=${startTime}&endTime=${endTime}
          {
             method: 'GET',
             headers: {
