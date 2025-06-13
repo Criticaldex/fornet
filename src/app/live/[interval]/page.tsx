@@ -14,20 +14,6 @@ export default async function Dashboard({ params }: any) {
    lines.map((line) => { selected[line] = { type: 'line', sensor: sensors[line][0].name, unit: sensors[line][0].unit } });
 
    const data = await getMappedCandleValues({ line: 'Random', name: 'Temperatura', interval: 8 }, session?.user.db);
-   setInitialData(data);
-
-   // if (data.length > 0) {
-   //    const lastCandle = data[data.length - 1];
-   //    currentCandleRef.current = {
-   //       open: lastCandle[1],
-   //       high: lastCandle[2],
-   //       low: lastCandle[3],
-   //       close: lastCandle[4],
-   //       timestamp: lastCandle[0],
-   //    };
-   //    setLastPrice(lastCandle[4]);
-   //    lastTimestampRef.current = lastCandle[0];
-   // }
 
    return (
       <>
@@ -44,8 +30,4 @@ export default async function Dashboard({ params }: any) {
          </div>
       </>
    )
-}
-
-function setInitialData(data: [number, number, number, number, number][]) {
-   throw new Error("Function not implemented.");
 }
