@@ -12,15 +12,24 @@ export async function GET() {
     console.log('Beginning Cron!!');
 
     const interval = 24;
-    let timestamp = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
+
+    let timestampBegin = Math.floor(Date.now() - (interval * 2 * 60 * 60 * 1000));
+    let timestampEnd = Math.floor(Date.now() - (interval * 60 * 60 * 1000));
 
     const fields = [
         "-_id"
     ];
 
     let summaries: SummaryIface[] = [];
+    let delFilter: any = {
+        "timestamp": {
+            $gte: timestampBegin,
+            $lte: timestampEnd,
+        },
+        $or: []
+    };
     console.log('fetching sensors...');
-    empreses.forEach(async dbName => {
+    const res = await empreses.forEach(async dbName => {
         const sensors = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${dbName}`,
             {
                 method: 'POST',
@@ -39,10 +48,14 @@ export async function GET() {
 
         for (const sensor of sensors) {
             const filter = {
-                "timestamp": { $gte: timestamp },
+                "timestamp": {
+                    $gte: timestampBegin,
+                    $lte: timestampEnd,
+                },
                 "line": sensor.line,
                 "name": sensor.name
             };
+            delFilter.$or.push({ line: sensor.line, name: sensor.name })
             console.log('fetching values!!');
 
             const values = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${dbName}`,
@@ -71,9 +84,9 @@ export async function GET() {
                     max: values[0].value,
                     min: values[0].value,
                     avg: 0,
-                    year: new Date(timestamp).getFullYear(),
-                    month: new Date(timestamp).getMonth(),
-                    day: new Date(timestamp).getDate(),
+                    year: new Date(timestampEnd).getFullYear(),
+                    month: new Date(timestampEnd).getMonth(),
+                    day: new Date(timestampEnd).getDate(),
                 }
                 for (const value of values) {
                     if (value.value != undefined && summary.max != undefined && summary.min != undefined && summary.avg != undefined) {
@@ -99,8 +112,25 @@ export async function GET() {
             }).then(res => res.json());
         if (insert.ERROR) {
             return NextResponse.json(insert, { status: 500 })
+        } else {
+            const del = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${dbName}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-type': 'application/json',
+                        token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+                    },
+                    body: JSON.stringify(
+                        {
+                            fields: fields,
+                            filter: delFilter,
+                            sort: 'timestamp'
+                        }
+                    ),
+                }).then(res => res.json());
+            console.log('del done!!', del);
         }
         console.log('insert done!!', insert);
-    });
+    })
     return NextResponse.json('OK');
 }
