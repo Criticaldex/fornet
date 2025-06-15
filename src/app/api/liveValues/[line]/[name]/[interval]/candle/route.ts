@@ -30,7 +30,7 @@ export async function GET(request: Request, { params }: { params: { line: string
       const filteredValues: any[] = [];
       let arrayVelas: Array<Array<number>> = [];
 
-      for (let i = 0; i <= numVelas; i++) {
+      for (let i = 0; i < numVelas; i++) {
          const timestampVela = duradaVelas * (i + 1);
          let vela = {
             timestamp: startTime + timestampVela,
@@ -46,11 +46,18 @@ export async function GET(request: Request, { params }: { params: { line: string
                   vela.high = val.value
                   vela.low = val.value
                   if (arrayVelas.length >= 1) {
-                     vela.open = (arrayVelas[arrayVelas.length - 1][4] == 0) ?
-                        arrayVelas[arrayVelas.length - 2][4] :
-                        arrayVelas[arrayVelas.length - 1][4];
-                     vela.low = vela.open;
-                     vela.high = vela.open;
+                     for (let i = 1; i <= arrayVelas.length; i++) {
+                        if (arrayVelas[arrayVelas.length - i][4] != 0) {
+                           vela.open = arrayVelas[arrayVelas.length - i][4];
+                           vela.low = vela.open;
+                           vela.high = vela.open;
+                           break;
+                        }
+                     }
+                     // vela.open = (arrayVelas[arrayVelas.length - 1][4] == 0) ?
+                     //    arrayVelas[arrayVelas.length - 2][4] :
+                     //    arrayVelas[arrayVelas.length - 1][4];
+
                   } else {
                      vela.open = val.value
                      vela.low = val.value
@@ -62,8 +69,9 @@ export async function GET(request: Request, { params }: { params: { line: string
                }
                vela.close = val.value;
             })
-
-         arrayVelas.push([vela.timestamp, vela.open, vela.high, vela.low, vela.close])
+         if (vela.open != 0 && vela.high != 0 && vela.low != 0 && vela.close != 0) {
+            arrayVelas.push([vela.timestamp, vela.open, vela.high, vela.low, vela.close])
+         }
       }
       // const liveValues = filteredValues.map((val) => ([val.timestamp, val.value]));
       return NextResponse.json(arrayVelas);
