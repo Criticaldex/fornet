@@ -17,7 +17,7 @@ export function PowerBi({ entraToken, embedURL }: any) {
    return (
       <PowerBIEmbed
          embedConfig={{
-            type: 'report',
+            type: 'report',   // Supported types: report, dashboard, tile, visual, qna, paginated report and create
             embedUrl: embedURL,
             accessToken: entraToken,
             tokenType: models.TokenType.Embed,
