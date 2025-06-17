@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { models, Report, Embed, service } from 'powerbi-client';
+import { models, Report, Embed } from 'powerbi-client';
 import { PowerBIEmbed } from 'powerbi-client-react';
 import 'powerbi-report-authoring';
 
@@ -20,7 +20,7 @@ export function PowerBi({ entraToken, embedURL }: any) {
             type: 'report',   // Supported types: report, dashboard, tile, visual, qna, paginated report and create
             embedUrl: embedURL,
             accessToken: entraToken,
-            tokenType: models.TokenType.Embed, // Use models.TokenType.Aad for SaaS embed
+            tokenType: models.TokenType.Embed,
             settings: {
                panes: {
                   filters: {
