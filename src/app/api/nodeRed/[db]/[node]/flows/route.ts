@@ -221,17 +221,6 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                sensorByName[plc.name].forEach(sensor => {
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
-                        //let endpoint;
-                        // let read;
-                        // for (let i = 0; i < plcs.length; i++) {
-                        //    if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
-                        //       endpoint = plcs[i]._id.toString();
-                        //       read = true;
-                        //       y = y + 50;
-                        //       break;
-                        //    }
-                        // }
-
                         //read
                         const s7in: any = {
                            "id": 'i' + sensor._id.toString(),
@@ -371,19 +360,8 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                         nodes.push(s7Processhtml);
                         nodes.push(s7ProcessMail);
                         nodes.push(s7func);
-
                      }
                      if (sensor.write) {
-                        let endpoint;
-                        // let write;
-                        // for (let i = 0; i < plcs.length; i++) {
-                        //    if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
-                        //       endpoint = plcs[i]._id.toString();
-                        //       write = true;
-                        //       y = y + 50;
-                        //       break;
-                        //    }
-                        // }
                         //write
                         const s7out: any = {
                            "id": 'o' + sensor._id.toString(),
@@ -461,16 +439,6 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                sensorByName[plc.name].forEach(sensor => {
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
-                        let endpoint;
-                        // let read;
-                        // for (let i = 0; i < plcs.length; i++) {
-                        //    if (sensor.line == plcs[i].line && sensor.plc_name == plcs[i].name && plcs[i].node == node) {
-                        //       endpoint = plcs[i]._id.toString();
-                        //       read = true;
-                        //       y = y + 50;
-                        //       break;
-                        //    }
-                        // }
                         //read
                         const modbus_read: any = {
                            "id": "e191115593eeeef7",
