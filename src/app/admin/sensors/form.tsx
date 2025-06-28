@@ -131,6 +131,20 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          </div>
          {errors.plc_name && <p role="alert" className="text-red self-end">⚠ {errors.plc_name?.message}</p>}
 
+         <div className="inline-flex justify-end">
+            <label htmlFor="minrange" className="self-center">MinRange:</label>
+            <input type="number" id="minrange" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.minrange ? 'border-foreground' : 'border-red'}`}
+               {...register("minrange")} />
+         </div>
+         {errors.minrange && <p role="alert" className="text-red self-end">⚠ {errors.minrange?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="maxrange" className="self-center">MaxRange:</label>
+            <input type="number" id="maxrange" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.maxrange ? 'border-foreground' : 'border-red'}`}
+               {...register("maxrange")} />
+         </div>
+         {errors.maxrange && <p role="alert" className="text-red self-end">⚠ {errors.maxrange?.message}</p>}
+
          <div className="inline-flex justify-around">
             <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
             <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />

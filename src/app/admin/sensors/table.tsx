@@ -180,6 +180,18 @@ export function AdminTable({ sensors, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
+         name: 'Min Range',
+         selector: (row: any) => row.minrange,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Max Range',
+         selector: (row: any) => row.maxrange,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
          name: 'Accions',
          cell: (row: any) => (
             <div className='flex flex-row'>

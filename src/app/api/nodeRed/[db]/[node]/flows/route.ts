@@ -271,12 +271,12 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "rules": [
                               {
                                  "t": "gte",
-                                 "v": "1300",         // GERARD AÑADIR AQUI RANGO MAXIMO SENSOR
+                                 "v": sensor.maxrange,
                                  "vt": "num"
                               },
                               {
                                  "t": "lte",
-                                 "v": "100",          // GERARD AÑADIR AQUI RANGO MINIMO SENSOR
+                                 "v": sensor.minrange,
                                  "vt": "num"
                               }
                            ],
@@ -503,12 +503,12 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "rules": [
                               {
                                  "t": "gte",
-                                 "v": "1300",         // GERARD AÑADIR AQUI RANGO MAXIMO SENSOR
+                                 "v": sensor.maxrange,
                                  "vt": "num"
                               },
                               {
                                  "t": "lte",
-                                 "v": "100",          // GERARD AÑADIR AQUI RANGO MINIMO SENSOR
+                                 "v": sensor.minrange,
                                  "vt": "num"
                               }
                            ],
@@ -727,12 +727,12 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "rules": [
                               {
                                  "t": "gte",
-                                 "v": "1300",         // GERARD AÑADIR AQUI RANGO MAXIMO SENSOR
+                                 "v": sensor.maxrange,
                                  "vt": "num"
                               },
                               {
                                  "t": "lte",
-                                 "v": "100",          // GERARD AÑADIR AQUI RANGO MINIMO SENSOR
+                                 "v": sensor.minrange,
                                  "vt": "num"
                               }
                            ],

@@ -10,6 +10,8 @@ export interface SensorIface {
    read?: boolean,
    write?: boolean,
    dataType?: string,
+   maxrange?: string,
+   minrange?: string,
    node?: string
 }
 
@@ -39,6 +41,12 @@ const SensorSchema = new mongoose.Schema({
    },
    dataType: {
       type: String
+   },
+   maxrange: {
+      type: Number
+   },
+   minrange: {
+      type: Number
    },
    node: {
       type: String

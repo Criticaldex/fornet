@@ -95,6 +95,8 @@ const ExpandedComponent = ({ data }: any) => {
                         line={data.line}
                         name={chart.name}
                         unit={chart.unit}
+                        minrange={chart.minrange}
+                        maxrange={chart.maxrange}
                      />
                   </div>
                } else if (chart.type == 'bool') {
@@ -116,13 +118,16 @@ const ExpandedComponent = ({ data }: any) => {
    );
 }
 
-const handleAdd = (row: any, session: any, update: any, selected: any) => async (event: any) => {
+const handleAdd = (row: any, session: any, update: any, selected: any, sensors: any) => async (event: any) => {
    let user = session.user;
    let maxY = 0;
    session.user.config.live[row.line].forEach((element: { h: number; y: number; }) => {
       const suma = element.y + element.h
       maxY = (maxY < suma) ? suma : maxY;
    });
+   const selectedSensor = sensors[row.line].find(
+      (s: any) => s.name === selected[row.line].sensor
+   );
    let newData = {
       i: (user.config.live[row.line].length).toString(),
       x: 0,
@@ -131,7 +136,9 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
       h: 11,
       type: selected[row.line].type,
       name: selected[row.line].sensor,
-      unit: selected[row.line].unit
+      unit: selected[row.line].unit,
+      minrange: selectedSensor.minrange,
+      maxrange: selectedSensor.maxrange
    };
    switch (selected[row.line].type) {
       case 'gauge':
@@ -198,7 +205,7 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
    {
       name: 'Accions',
       cell: (row: any) => (
-         <FaPlus size={20} onClick={handleAdd(row, session, update, selected)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
+         <FaPlus size={20} onClick={handleAdd(row, session, update, selected, sensors)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
       ),
       grow: 1,
       ignoreRowClick: true,
