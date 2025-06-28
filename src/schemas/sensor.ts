@@ -10,6 +10,7 @@ export interface SensorIface {
    read?: boolean,
    write?: boolean,
    dataType?: string,
+   autoinc?: boolean,
    node?: string
 }
 
@@ -39,6 +40,9 @@ const SensorSchema = new mongoose.Schema({
    },
    dataType: {
       type: String
+   },
+   autoinc: {
+      type: Boolean
    },
    node: {
       type: String

@@ -116,6 +116,14 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          </div>
          {errors.write && <p role="alert" className="text-red self-end">⚠ {errors.write?.message}</p>}
 
+         <div className="inline-flex justify-end">
+            <label htmlFor="autoinc" className="self-center">Incremental:</label>
+            <input id="autoinc"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
+               {...register("autoinc")} type="checkbox" />
+         </div>
+         {errors.autoinc && <p role="alert" className="text-red self-end">⚠ {errors.autoinc?.message}</p>}
+
          <div className={`inline-flex justify-end ${plcType == 'modbus' ? '' : 'hidden'}`}>
             <label htmlFor="dataType" className="flex self-center">DataType:</label>
             <select id="dataType"
