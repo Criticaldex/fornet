@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
 import _ from "lodash"
 import SensorSchema, { SensorIface } from '@/schemas/sensor'
+import UserSchema, { UserIface } from '@/schemas/user'
 import PlcSchema, { PlcIface } from '@/schemas/plc'
 import { NextResponse } from "next/server";
 import { headers } from 'next/headers'
@@ -17,6 +18,8 @@ export async function GET(request: Request, { params }: { params: { db: string, 
       const node = params.node;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
+      const dbAuth = mongoose.connection.useDb('Auth', { useCache: false });
+
       if (!db.models.sensor) {
          db.model('sensor', SensorSchema);
       }
@@ -25,9 +28,22 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          db.model('plc', PlcSchema);
       }
 
+      if (!dbAuth.models.user) {
+         dbAuth.model('user', UserSchema, 'users');
+      }
+
       const sensors = (await db.models.sensor.find().lean()) as SensorIface[];
       const plcs = (await db.models.plc.find({ node: node }).lean()) as PlcIface[];
       const sensorByName = _.groupBy(sensors, 'plc_name');
+      const alertEmails = (await dbAuth.models.user.find({ alert: true }).lean()) as UserIface[];
+      let emailsToSendAlerts = "";
+      for (let i = 0; i < alertEmails.length; i++) {
+         if (i === alertEmails.length - 1) {
+            emailsToSendAlerts += alertEmails[i].email;
+         } else {
+            emailsToSendAlerts += alertEmails[i].email + ', ';
+         }
+      }
 
       let nodes = [
          {
@@ -185,10 +201,16 @@ export async function GET(request: Request, { params }: { params: { db: string, 
 
       let y = 100;
       plcs.forEach(plc => {
+         if (!plc._id || !plc.name || !plc.line || !plc.type || !plc.ip) {
+            return;
+         }
          switch (plc.type) {
             case 'siemens':
                let vartables: any = [];
                sensorByName[plc.name].forEach(sensor => {
+                  if (!sensor._id || !sensor.name || !sensor.address || !sensor.line) {
+                     return;
+                  }
                   if (sensor.line == plc.line) {
                      vartables.push({
                         "addr": sensor.address,
@@ -219,6 +241,9 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                nodes.push(endpoint)
 
                sensorByName[plc.name].forEach(sensor => {
+                  if (!sensor._id || !sensor.name || !sensor.address || !sensor.line) {
+                     return;
+                  }
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
                         //read
@@ -339,7 +364,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "type": "function",
                            "z": "c6c280ebbc516f5b",
                            "name": "Transactional Emails",
-                           "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"fornetgle@gmail.com, ll.valls.v@gmail.com, induvalls@gmail.com\"\n   \n};\n\n\nreturn msg;`,     // GERARD AÑADIR AQUI MAILS SEPARADOS POR COMA COMO EN EL EJEMPLO
+                           "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
                            "outputs": 1,
                            "timeout": "",
                            "noerr": 0,
@@ -437,6 +462,9 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                nodes.push(endpoint_modbus)
 
                sensorByName[plc.name].forEach(sensor => {
+                  if (!sensor._id || !sensor.name || !sensor.address || !sensor.line) {
+                     return;
+                  }
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
                         //read
@@ -571,7 +599,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "type": "function",
                            "z": "c6c280ebbc516f5b",
                            "name": "Transactional Emails",
-                           "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"fornetgle@gmail.com, ll.valls.v@gmail.com, induvalls@gmail.com\"\n   \n};\n\n\nreturn msg;`,     // GERARD AÑADIR AQUI MAILS SEPARADOS POR COMA COMO EN EL EJEMPLO
+                           "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
                            "outputs": 1,
                            "timeout": "",
                            "noerr": 0,
@@ -671,6 +699,9 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                nodes.push(FinsConn);
 
                sensorByName[plc.name].forEach(sensor => {
+                  if (!sensor._id || !sensor.name || !sensor.address || !sensor.line) {
+                     return;
+                  }
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
 
@@ -795,7 +826,7 @@ export async function GET(request: Request, { params }: { params: { db: string, 
                            "type": "function",
                            "z": "c6c280ebbc516f5b",
                            "name": "Transactional Emails",
-                           "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"fornetgle@gmail.com, ll.valls.v@gmail.com, induvalls@gmail.com\"\n   \n};\n\n\nreturn msg;`,     // GERARD AÑADIR AQUI MAILS SEPARADOS POR COMA COMO EN EL EJEMPLO
+                           "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
                            "outputs": 1,
                            "timeout": "",
                            "noerr": 0,

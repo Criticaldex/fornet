@@ -26,6 +26,7 @@ export async function POST(request: Request) {
          name: (body.name) ? body.name : null,
          lastname: (body.lastname) ? body.lastname : null,
          email: (body.email) ? body.email : null,
+         alert: (body.alert) ? body.alert : null,
          hash: (body.password) ? await hash(body.password, saltRounds) : null,
          license: {
             token: null,
