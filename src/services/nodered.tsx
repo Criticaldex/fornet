@@ -38,7 +38,7 @@ export function getBaseNodesConfig(dbName: string) {
             "maxTimeMS": "0",
             "handleDocId": false,
             "name": "ForNet",
-            "x": 590,
+            "x": 690,
             "y": 160,
             "wires": [
                 [
@@ -58,7 +58,7 @@ export function getBaseNodesConfig(dbName: string) {
             "complete": "false",
             "statusVal": "",
             "statusType": "auto",
-            "x": 740,
+            "x": 820,
             "y": 160,
             "wires": []
         },
@@ -154,7 +154,6 @@ export function getBaseNodesConfig(dbName: string) {
         }
     ]
 }
-
 //Funcion global para nodos de Siemens
 export function globalSiemensNodes(plc: any, sensorByName: any, nodes: any[]): void {
     let vartables: any = [];
@@ -244,7 +243,6 @@ export function globalOmronNodes(plc: any, nodes: any[]): void {
     }
     nodes.push(FinsConn);
 }
-
 //Function Reads Siemens
 export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
     const s7in: any = {
@@ -278,7 +276,7 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 320,
+        "x": 370,
         "y": y,
         "wires": [
             [
@@ -308,7 +306,7 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 320,
+        "x": 180,
         "y": y + 50,
         "wires": [
             [
@@ -351,7 +349,7 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
         "format": "handlebars",
         "syntax": "mustache",
         "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
-        "x": 370,
+        "x": 180,
         "y": y + 100,
         "wires": [
             [
@@ -386,7 +384,6 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
     nodes.push(s7ProcessMail);
     nodes.push(s7func);
 }
-
 //Function Reads Siemens with Auto Increment
 export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
     const s7in: any = {
@@ -473,7 +470,7 @@ export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: 
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 320,
+        "x": 180,
         "y": y + 50,
         "wires": [
             [
@@ -516,7 +513,7 @@ export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: 
         "format": "handlebars",
         "syntax": "mustache",
         "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
-        "x": 370,
+        "x": 180,
         "y": y + 100,
         "wires": [
             [
@@ -552,7 +549,6 @@ export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: 
     nodes.push(s7ProcessMail);
     nodes.push(s7func);
 }
-
 //Function Writes Siemens
 export function nodeWriteSiemens(sensor: any, plc: any, y: number, nodes: any[]) {
     const s7out: any = {
@@ -567,13 +563,12 @@ export function nodeWriteSiemens(sensor: any, plc: any, y: number, nodes: any[])
         "wires": []
     }
 
-    const mqtt: any = {
-        "id": 'm' + sensor._id.toString(),
+    const mqtt_siemens: any = {
+        "id": 'ms' + sensor._id.toString(),
         "type": "mqtt in",
-        "z": "c6c280ebbc516f5b",
+        "z": "dd8ce168801a13c1",
         "name": sensor.name,
         "topic": "fornet" + sensor._id.toString(),
-        "qos": "2",
         "datatype": "utf8",
         "broker": "d8848f83c2ef4443",
         "nl": false,
@@ -588,10 +583,10 @@ export function nodeWriteSiemens(sensor: any, plc: any, y: number, nodes: any[])
             ]
         ]
     }
-    nodes.push(s7out)
-    nodes.push(mqtt)
-}
 
+    nodes.push(s7out)
+    nodes.push(mqtt_siemens)
+}
 //Function Reads Modbus
 export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
     const modbus_read: any = {
@@ -669,7 +664,7 @@ export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], e
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 320,
+        "x": 180,
         "y": y + 50,
         "wires": [
             [
@@ -712,7 +707,7 @@ export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], e
         "format": "handlebars",
         "syntax": "mustache",
         "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
-        "x": 370,
+        "x": 180,
         "y": y + 100,
         "wires": [
             [
@@ -747,7 +742,6 @@ export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], e
     nodes.push(modbus_ProcessMail);
     nodes.push(modbus_func);
 }
-
 //Function Reads Modbus with Auto Increment
 export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
     const modbus_read: any = {
@@ -851,7 +845,7 @@ export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: a
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 320,
+        "x": 180,
         "y": y + 50,
         "wires": [
             [
@@ -894,7 +888,7 @@ export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: a
         "format": "handlebars",
         "syntax": "mustache",
         "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
-        "x": 370,
+        "x": 180,
         "y": y + 100,
         "wires": [
             [
@@ -930,17 +924,14 @@ export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: a
     nodes.push(modbus_ProcessMail);
     nodes.push(modbus_func);
 }
-
 //Function Writes Modbus
 export function nodeWriteModbus(sensor: any, plc: any, y: number, nodes: any[]) {
-
-    const modbus_out: any = {
-        "id": 'm' + sensor._id.toString(),
+    const mqtt_modbus: any = {
+        "id": 'mm' + sensor._id.toString(),
         "type": "mqtt in",
-        "z": "c6c280ebbc516f5b",
+        "z": "dd8ce168801a13c1",
         "name": sensor.name,
         "topic": "fornet" + sensor._id.toString(),
-        "qos": "2",
         "datatype": "utf8",
         "broker": "d8848f83c2ef4443",
         "nl": false,
@@ -956,7 +947,7 @@ export function nodeWriteModbus(sensor: any, plc: any, y: number, nodes: any[]) 
         ]
     }
 
-    const mqtt: any = {
+    const modbus_out: any = {
         "id": 'o' + sensor._id.toString(),
         "type": "modbus-write",
         "z": "67e50ff7c3bb3610",
@@ -976,14 +967,12 @@ export function nodeWriteModbus(sensor: any, plc: any, y: number, nodes: any[]) 
         "x": 1300,
         "y": y,
         "wires": [
-            [],
             []
         ]
     }
     nodes.push(modbus_out)
-    nodes.push(mqtt)
+    nodes.push(mqtt_modbus)
 }
-
 //Function Reads Omron
 export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
     const FinsRead: any = {
@@ -1051,7 +1040,7 @@ export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], em
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 320,
+        "x": 180,
         "y": y + 50,
         "wires": [
             [
@@ -1094,7 +1083,7 @@ export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], em
         "format": "handlebars",
         "syntax": "mustache",
         "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
-        "x": 370,
+        "x": 180,
         "y": y + 100,
         "wires": [
             [
@@ -1130,7 +1119,6 @@ export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], em
     nodes.push(modbus_Processhtml);
     nodes.push(modbus_ProcessMail);
 }
-
 //Function Reads Omron with Auto Increment
 export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
     const FinsRead: any = {
@@ -1223,7 +1211,7 @@ export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: an
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 320,
+        "x": 180,
         "y": y + 50,
         "wires": [
             [
@@ -1266,7 +1254,7 @@ export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: an
         "format": "handlebars",
         "syntax": "mustache",
         "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
-        "x": 370,
+        "x": 180,
         "y": y + 100,
         "wires": [
             [
@@ -1302,7 +1290,6 @@ export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: an
     nodes.push(modbus_Processhtml);
     nodes.push(modbus_ProcessMail);
 }
-
 //Function Writes Omron
 export function nodeWriteOmron(sensor: any, plc: any, y: number, nodes: any[]) {
     const finsWrite: any = {
