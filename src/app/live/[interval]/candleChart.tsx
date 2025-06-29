@@ -21,16 +21,20 @@ if (typeof Highcharts === "object") {
 export function CandleChart({ i, line, name, unit, interval }: any) {
     const { data: session } = useSession();
     const currentCandleRef = useRef<any>(null);
-    const [initialData, setInitialData] = useState();
+    const [initialData, setInitialData] = useState<any[]>([]);
     const [lastPrice, setLastPrice] = useState<number | null>(null);
     const lastTimestampRef = useRef<number>(0);
+    const [isReady, setIsReady] = useState(false);
+    const chartRef = useRef<any>(null);
+
     const numVelas = 30;
     const candleDuration = ((interval * 60 * 60 * 1000) / numVelas);
 
     useEffect(() => {
+        var a = "A";
         const fetchData = async () => {
             try {
-                let data = await fetch(
+                const res = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/${interval}/candle`,
                     {
                         method: 'GET',
@@ -39,8 +43,10 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                             token: `${process.env.NEXT_PUBLIC_API_KEY}`,
                         },
                     }
-                ).then(res => res.json())
+                );
+                const data = await res.json();
                 setInitialData(data);
+
                 if (data.length > 0) {
                     const lastCandle = data[data.length - 1];
                     currentCandleRef.current = {
@@ -52,6 +58,7 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                     };
                     setLastPrice(lastCandle[4]);
                     lastTimestampRef.current = lastCandle[0];
+                    setIsReady(true);
                 }
             } catch (error) {
                 console.error('Error fetching candle data:', error);
@@ -59,14 +66,16 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         };
 
         fetchData();
-    }, [line, name, interval, session]);
+    }, [line, name, interval]);
 
-    const updateCandleData = async (series: any, timestamp: number, line: string, name: string) => {
+    const updateCandleData = async (series: any) => {
         try {
             if (!series || !series.data) return;
+
             const currentTime = Date.now();
             const alignedCandleStart = Math.floor(currentTime / candleDuration) * candleDuration;
-            const apiValue = await fetch(
+
+            const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/lastValue`,
                 {
                     method: 'GET',
@@ -75,63 +84,56 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                         token: `${process.env.NEXT_PUBLIC_API_KEY}`,
                     },
                 }
-            ).then(res => res.json());
-            if (apiValue === null) return;
+            );
+            const apiValue = await res.json();
+            if (!apiValue || !Array.isArray(apiValue)) return;
 
-            if (!currentCandleRef.current || currentCandleRef.current.timestamp < alignedCandleStart) { // S'ha de crear una vela?
+            const newValue = apiValue[0][1];
+
+            // ¿Es necesario crear nueva vela?
+            if (!currentCandleRef.current || currentCandleRef.current.timestamp < alignedCandleStart) {
                 if (currentCandleRef.current) {
-                    series.addPoint(
-                        [
-                            currentCandleRef.current.timestamp,
-                            currentCandleRef.current.open,
-                            currentCandleRef.current.high,
-                            currentCandleRef.current.low,
-                            currentCandleRef.current.close,
-                        ],
-                        true,
-                        // series.data.length > 100 // Eliminar puntos antiguos si hay más de 100
-                    );
+                    series.addPoint([
+                        currentCandleRef.current.timestamp,
+                        currentCandleRef.current.open,
+                        currentCandleRef.current.high,
+                        currentCandleRef.current.low,
+                        currentCandleRef.current.close,
+                    ], true);
                 }
 
-                const lastClose = currentCandleRef.current?.close ?? apiValue;
-
                 currentCandleRef.current = {
-                    open: lastClose,
-                    high: apiValue,
-                    low: apiValue,
-                    close: apiValue,
+                    open: newValue,
+                    high: newValue,
+                    low: newValue,
+                    close: newValue,
                     timestamp: alignedCandleStart,
                 };
                 lastTimestampRef.current = alignedCandleStart;
 
                 series.addPoint(
-                    [alignedCandleStart, lastClose, apiValue, apiValue, apiValue],
-                    true,
-                    series.data.length > 100
+                    [alignedCandleStart, newValue, newValue, newValue, newValue],
+                    true, // redraw
+                    true  // shift: elimina la primera vela automáticamente
                 );
             } else {
-                const newValue = apiValue[0][1];
-
+                // Actualiza vela actual
                 currentCandleRef.current = {
-                    open: currentCandleRef.current.open,
+                    ...currentCandleRef.current,
                     high: Math.max(currentCandleRef.current.high, newValue),
                     low: Math.min(currentCandleRef.current.low, newValue),
                     close: newValue,
-                    timestamp: currentCandleRef.current.timestamp,
                 };
 
                 setLastPrice(newValue);
 
                 const lastPoint = series.data[series.data.length - 1];
                 if (lastPoint && lastPoint.update) {
-                    lastPoint.update(
-                        {
-                            high: currentCandleRef.current.high,
-                            low: currentCandleRef.current.low,
-                            close: currentCandleRef.current.close,
-                        },
-                        true
-                    );
+                    lastPoint.update({
+                        high: currentCandleRef.current.high,
+                        low: currentCandleRef.current.low,
+                        close: currentCandleRef.current.close,
+                    }, true);
                 }
             }
         } catch (error) {
@@ -139,50 +141,33 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         }
     };
 
+    useEffect(() => {
+        if (!isReady) return;
+
+        const chart = chartRef.current?.chart;
+        const series = chart?.series?.[0];
+        if (!series) return;
+
+        const intervalId = setInterval(() => {
+            updateCandleData(series);
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, [isReady]);
+
     const options = {
         ...chartOptions,
         title: { text: '' },
         chart: {
             marginLeft: 30,
             marginRight: 30,
-            events: {
-                load: function (this: any) {
-                    const chart = this;
-                    const series = chart.series[0];
-                    if (series && series.data.length > 0) {
-                        const lastPoint = series.data[series.data.length - 1];
-                        currentCandleRef.current = {
-                            open: lastPoint.open,
-                            high: lastPoint.high,
-                            low: lastPoint.low,
-                            close: lastPoint.close,
-                            timestamp: lastPoint.x,
-                        };
-                        setLastPrice(lastPoint.close);
-                        lastTimestampRef.current = lastPoint.x;
-                    }
-
-                    const intervalId = setInterval(() => {
-                        updateCandleData(series, Date.now(), line, name);
-                    }, 1000);
-
-                    chart.intervalId = intervalId;
-                },
-                // destroy: function (this: any) {
-                //     if (this.intervalId) {
-                //         clearInterval(this.intervalId);
-                //     }
-                // },
-            },
         },
         xAxis: {
             type: 'datetime',
             gridLineWidth: 2,
             tickInterval: candleDuration,
         },
-        legend: {
-            enabled: false,
-        },
+        legend: { enabled: false },
         yAxis: {
             labels: {
                 align: 'left',
@@ -191,18 +176,10 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
             },
             opposite: false,
         },
-        rangeSelector: {
-            enabled: false,
-        },
-        navigator: {
-            enabled: false,
-        },
-        exporting: {
-            enabled: true,
-        },
-        credits: {
-            enabled: false,
-        },
+        rangeSelector: { enabled: false },
+        navigator: { enabled: false },
+        exporting: { enabled: true },
+        credits: { enabled: false },
         tooltip: {
             backgroundColor: '#f76f20',
             borderColor: '#ff9900',
@@ -238,9 +215,6 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                         borderRadius: 3,
                         borderWidth: 1,
                         padding: 4,
-                        // formatter: function (this: any) {
-                        //     return Highcharts.numberFormat(lastPrice || 0, 2);
-                        // },
                     },
                 },
             },
@@ -258,7 +232,12 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
 
     return (
         <div>
-            <HighchartsReact highcharts={Highcharts} constructorType={'stockChart'} options={options} />
+            <HighchartsReact
+                highcharts={Highcharts}
+                constructorType={'stockChart'}
+                options={options}
+                ref={chartRef}
+            />
         </div>
     );
 }
