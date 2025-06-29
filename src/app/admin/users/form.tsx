@@ -14,6 +14,7 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
                password: data.password,
                name: data.name,
                lastname: data.lastname,
+               alert: data.alert,
                role: "2"
             }
          } else if (session.user.role == '0') {
@@ -23,6 +24,7 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
                password: data.password,
                name: data.name,
                lastname: data.lastname,
+               alert: data.alert,
                role: data.role,
                db: data.db,
                license: data.license
@@ -86,6 +88,7 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
             })} />
          </div>
          {errors.name && <p role="alert" className="text-red self-end">⚠ {errors.name?.message}</p>}
+
          <div className="inline-flex justify-end">
             <label htmlFor="lastname" className="self-center">Cognom:</label>
             <input id="lastname" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.lastname ? 'border-foreground' : 'border-red'}`} {...register("lastname", {
@@ -96,6 +99,13 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
             })} />
          </div>
          {errors.lastname && <p role="alert" className="text-red self-end">⚠ {errors.lastname?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="alert" className="self-center">Alerts:</label>
+            <input type="checkbox" id="alert" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.alert ? 'border-foreground' : 'border-red'}`} {...register("alert")} />
+         </div>
+         {errors.alert && <p role="alert" className="text-red self-end">⚠ {errors.alert?.message}</p>}
+
          {session.user.role == '0' &&
             <>
                <div className="inline-flex justify-end">
@@ -112,6 +122,7 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
                   })} />
                </div>
                {errors.role && <p role="alert" className="text-red self-end">⚠ {errors.role?.message}</p>}
+
                <div className="inline-flex justify-end">
                   <label htmlFor="licenseStart" className="self-center">Inici Llicencia:</label>
                   <input id="licenseStart" type="date" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.license?.start ? 'border-foreground' : 'border-red'}`} {...register("license.start", {

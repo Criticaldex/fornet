@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
 import _ from "lodash"
 import SensorSchema, { SensorIface } from '@/schemas/sensor'
+import UserSchema, { UserIface } from '@/schemas/user'
 import PlcSchema, { PlcIface } from '@/schemas/plc'
 import { NextResponse } from "next/server";
 import { headers } from 'next/headers'
@@ -104,6 +105,61 @@ function getBaseNodesConfig(dbName: string) {
             "user": process.env.MQTT_USER,
             "password": process.env.MQTT_PASS
          }
+      },
+      {
+         "id": "7520a9122b3626a9",
+         "type": "telegram bot",
+         "botname": "Fornet_gle",
+         "token": process.env.TELEGRAM_BOT_TOKEN,
+         "usernames": "",
+         "chatids": "",
+         "baseapiurl": "",
+         "updatemode": "polling",
+         "pollinterval": "300",
+         "usesocks": false,
+         "sockshost": "",
+         "socksport": "6667",
+         "socksusername": "anonymous",
+         "sockspassword": "",
+         "bothost": "",
+         "botpath": "",
+         "localbotport": "8443",
+         "publicbotport": "8443",
+         "privatekey": "",
+         "certificate": "",
+         "useselfsignedcertificate": false,
+         "sslterminated": false,
+         "verboselogging": false
+      },
+      {
+         "id": "6c06b6c6dc43c887",
+         "type": "telegram sender",
+         "z": "c6c280ebbc516f5b",
+         "name": "",
+         "bot": "7520a9122b3626a9",
+         "haserroroutput": false,
+         "outputs": 1,
+         "x": 690,
+         "y": 250,
+         "wires": [
+            []
+         ]
+      },
+      {
+         "id": "98f0503cc1ef7d51",
+         "type": "e-mail",
+         "z": "c6c280ebbc516f5b",
+         "server": "smtp.gmail.com",
+         "port": "465",
+         "secure": true,
+         "tls": true,
+         "userid": process.env.MAIL_FORNET,
+         "password": process.env.API_TOKEN_MAIL,
+         "name": "",
+         "dname": "",
+         "x": 690,
+         "y": 300,
+         "wires": []
       }
    ]
 }
@@ -197,7 +253,7 @@ function globalOmronNodes(plc: any, nodes: any[]): void {
    nodes.push(FinsConn);
 }
 //Function Reads Siemens
-function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[]) {
+function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
    const s7in: any = {
       "id": 'i' + sensor._id.toString(),
       "type": "s7 in",
@@ -211,7 +267,8 @@ function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[]) {
       "y": y,
       "wires": [
          [
-            'f' + sensor._id.toString()
+            'f' + sensor._id.toString(),
+            's' + sensor._id.toString()
          ]
       ]
    }
@@ -236,12 +293,109 @@ function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[]) {
          ]
       ]
    }
-   nodes.push(s7in)
+   const s7Switch: any = {
+      "id": 's' + sensor._id.toString(),
+      "type": "switch",
+      "z": "c6c280ebbc516f5b",
+      "name": "",
+      "property": "payload",
+      "propertyType": "msg",
+      "rules": [
+         {
+            "t": "gte",
+            "v": sensor.maxrange,
+            "vt": "num"
+         },
+         {
+            "t": "lte",
+            "v": sensor.minrange,
+            "vt": "num"
+         }
+      ],
+      "checkall": "true",
+      "repair": false,
+      "outputs": 2,
+      "x": 320,
+      "y": y + 50,
+      "wires": [
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ],
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ]
+      ]
+   };
+   const s7ProcesTelegram: any = {
+      "id": 't' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Process",
+      "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: "🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: ` + "${value}" + `",\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": 0,
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 370,
+      "y": y + 50,
+      "wires": [
+         [
+            "6c06b6c6dc43c887"
+         ]
+      ]
+   }
+   const s7Processhtml: any = {
+      "id": 'm' + sensor._id.toString(),
+      "type": "template",
+      "z": "c6c280ebbc516f5b",
+      "name": "html",
+      "field": "body",
+      "fieldType": "msg",
+      "format": "handlebars",
+      "syntax": "mustache",
+      "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
+      "x": 370,
+      "y": y + 100,
+      "wires": [
+         [
+            'pm' + sensor._id.toString()
+         ]
+      ]
+   }
+   const s7ProcessMail: any = {
+      "id": 'pm' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Transactional Emails",
+      "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": "",
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 420,
+      "y": y + 100,
+      "wires": [
+         [
+            "98f0503cc1ef7d51"
+         ]
+      ]
+   }
+   nodes.push(s7in);
+   nodes.push(s7Switch);
+   nodes.push(s7ProcesTelegram);
+   nodes.push(s7Processhtml);
+   nodes.push(s7ProcessMail);
    nodes.push(s7func);
 }
 
 //Function Reads Siemens with Auto Increment
-function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: any[]) {
+function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
    const s7in: any = {
       "id": 'i' + sensor._id.toString(),
       "type": "s7 in",
@@ -255,7 +409,8 @@ function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: any[]) 
       "y": y,
       "wires": [
          [
-            'r' + sensor._id.toString()
+            'r' + sensor._id.toString(),
+            's' + sensor._id.toString()
          ]
       ]
    }
@@ -303,8 +458,105 @@ function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: any[]) 
          ]
       ]
    }
+   const s7Switch: any = {
+      "id": 's' + sensor._id.toString(),
+      "type": "switch",
+      "z": "c6c280ebbc516f5b",
+      "name": "",
+      "property": "payload",
+      "propertyType": "msg",
+      "rules": [
+         {
+            "t": "gte",
+            "v": sensor.maxrange,
+            "vt": "num"
+         },
+         {
+            "t": "lte",
+            "v": sensor.minrange,
+            "vt": "num"
+         }
+      ],
+      "checkall": "true",
+      "repair": false,
+      "outputs": 2,
+      "x": 320,
+      "y": y + 50,
+      "wires": [
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ],
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ]
+      ]
+   };
+   const s7ProcesTelegram: any = {
+      "id": 't' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Process",
+      "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: "🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: ` + "${value}" + `",\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": 0,
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 370,
+      "y": y + 50,
+      "wires": [
+         [
+            "6c06b6c6dc43c887"
+         ]
+      ]
+   }
+   const s7Processhtml: any = {
+      "id": 'm' + sensor._id.toString(),
+      "type": "template",
+      "z": "c6c280ebbc516f5b",
+      "name": "html",
+      "field": "body",
+      "fieldType": "msg",
+      "format": "handlebars",
+      "syntax": "mustache",
+      "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
+      "x": 370,
+      "y": y + 100,
+      "wires": [
+         [
+            'pm' + sensor._id.toString()
+         ]
+      ]
+   }
+   const s7ProcessMail: any = {
+      "id": 'pm' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Transactional Emails",
+      "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": "",
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 420,
+      "y": y + 100,
+      "wires": [
+         [
+            "98f0503cc1ef7d51"
+         ]
+      ]
+   }
    nodes.push(s7in);
    nodes.push(s7req);
+   nodes.push(s7Switch);
+   nodes.push(s7ProcesTelegram);
+   nodes.push(s7Processhtml);
+   nodes.push(s7ProcessMail);
    nodes.push(s7func);
 }
 //Function Writes Siemens
@@ -320,7 +572,6 @@ function nodeWriteSiemens(sensor: any, plc: any, y: number, nodes: any[]) {
       "y": y,
       "wires": []
    }
-   nodes.push(s7out)
 
    const mqtt: any = {
       "id": 'm' + sensor._id.toString(),
@@ -343,10 +594,11 @@ function nodeWriteSiemens(sensor: any, plc: any, y: number, nodes: any[]) {
          ]
       ]
    }
+   nodes.push(s7out)
    nodes.push(mqtt)
 }
 //Function Reads Modbus
-function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[]) {
+function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
    const modbus_read: any = {
       "id": 'r' + sensor._id.toString(),
       "type": "modbus-read",
@@ -376,6 +628,7 @@ function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[]) {
          [],
          [
             'f' + sensor._id.toString(),
+            's' + sensor._id.toString()
          ]
       ]
    }
@@ -399,11 +652,108 @@ function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[]) {
          ]
       ]
    }
-   nodes.push(modbus_read)
+   const modbus_Switch: any = {
+      "id": 's' + sensor._id.toString(),
+      "type": "switch",
+      "z": "c6c280ebbc516f5b",
+      "name": "",
+      "property": "payload",
+      "propertyType": "msg",
+      "rules": [
+         {
+            "t": "gte",
+            "v": sensor.maxrange,
+            "vt": "num"
+         },
+         {
+            "t": "lte",
+            "v": sensor.minrange,
+            "vt": "num"
+         }
+      ],
+      "checkall": "true",
+      "repair": false,
+      "outputs": 2,
+      "x": 320,
+      "y": y + 50,
+      "wires": [
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ],
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ]
+      ]
+   };
+   const modbus_ProcesTelegram: any = {
+      "id": 't' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Process",
+      "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: "🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: ` + "${value}" + `",\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": 0,
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 370,
+      "y": y + 50,
+      "wires": [
+         [
+            "6c06b6c6dc43c887"
+         ]
+      ]
+   }
+   const modbus_Processhtml: any = {
+      "id": 'm' + sensor._id.toString(),
+      "type": "template",
+      "z": "c6c280ebbc516f5b",
+      "name": "html",
+      "field": "body",
+      "fieldType": "msg",
+      "format": "handlebars",
+      "syntax": "mustache",
+      "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
+      "x": 370,
+      "y": y + 100,
+      "wires": [
+         [
+            'pm' + sensor._id.toString()
+         ]
+      ]
+   }
+   const modbus_ProcessMail: any = {
+      "id": 'pm' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Transactional Emails",
+      "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": "",
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 420,
+      "y": y + 100,
+      "wires": [
+         [
+            "98f0503cc1ef7d51"
+         ]
+      ]
+   }
+   nodes.push(modbus_read);
+   nodes.push(modbus_Switch);
+   nodes.push(modbus_ProcesTelegram);
+   nodes.push(modbus_Processhtml);
+   nodes.push(modbus_ProcessMail);
    nodes.push(modbus_func);
 }
 //Function Reads Modbus with Auto Increment
-function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: any[]) {
+function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
    const modbus_read: any = {
       "id": 'i' + sensor._id.toString(),
       "type": "modbus-read",
@@ -457,7 +807,8 @@ function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: any[]) {
       "y": y,
       "wires": [
          [
-            'f' + sensor._id.toString()
+            'f' + sensor._id.toString(),
+            's' + sensor._id.toString()
          ]
       ]
    }
@@ -482,8 +833,105 @@ function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: any[]) {
          ]
       ]
    }
+   const modbus_Switch: any = {
+      "id": 's' + sensor._id.toString(),
+      "type": "switch",
+      "z": "c6c280ebbc516f5b",
+      "name": "",
+      "property": "payload",
+      "propertyType": "msg",
+      "rules": [
+         {
+            "t": "gte",
+            "v": sensor.maxrange,
+            "vt": "num"
+         },
+         {
+            "t": "lte",
+            "v": sensor.minrange,
+            "vt": "num"
+         }
+      ],
+      "checkall": "true",
+      "repair": false,
+      "outputs": 2,
+      "x": 320,
+      "y": y + 50,
+      "wires": [
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ],
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ]
+      ]
+   };
+   const modbus_ProcesTelegram: any = {
+      "id": 't' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Process",
+      "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: "🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: ` + "${value}" + `",\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": 0,
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 370,
+      "y": y + 50,
+      "wires": [
+         [
+            "6c06b6c6dc43c887"
+         ]
+      ]
+   }
+   const modbus_Processhtml: any = {
+      "id": 'm' + sensor._id.toString(),
+      "type": "template",
+      "z": "c6c280ebbc516f5b",
+      "name": "html",
+      "field": "body",
+      "fieldType": "msg",
+      "format": "handlebars",
+      "syntax": "mustache",
+      "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
+      "x": 370,
+      "y": y + 100,
+      "wires": [
+         [
+            'pm' + sensor._id.toString()
+         ]
+      ]
+   }
+   const modbus_ProcessMail: any = {
+      "id": 'pm' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Transactional Emails",
+      "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": "",
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 420,
+      "y": y + 100,
+      "wires": [
+         [
+            "98f0503cc1ef7d51"
+         ]
+      ]
+   }
    nodes.push(modbus_read);
    nodes.push(modbus_req);
+   nodes.push(modbus_Switch);
+   nodes.push(modbus_ProcesTelegram);
+   nodes.push(modbus_Processhtml);
+   nodes.push(modbus_ProcessMail);
    nodes.push(modbus_func);
 }
 //Function Writes Modbus
@@ -539,7 +987,7 @@ function nodeWriteModbus(sensor: any, plc: any, y: number, nodes: any[]) {
    nodes.push(mqtt)
 }
 //Function Reads Omron
-function nodeReadFins(sensor: any, plc: any, y: number, nodes: any[]) {
+function nodeReadFins(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
    const FinsRead: any = {
       "id": 'or' + sensor._id.toString(),
       "type": "FINS Read",
@@ -558,7 +1006,8 @@ function nodeReadFins(sensor: any, plc: any, y: number, nodes: any[]) {
       "y": y,
       "wires": [
          [
-            'ofr' + sensor._id.toString()
+            'ofr' + sensor._id.toString(),
+            's' + sensor._id.toString()
          ]
       ]
    }
@@ -582,12 +1031,109 @@ function nodeReadFins(sensor: any, plc: any, y: number, nodes: any[]) {
          ]
       ]
    }
+   const modbus_Switch: any = {
+      "id": 's' + sensor._id.toString(),
+      "type": "switch",
+      "z": "c6c280ebbc516f5b",
+      "name": "",
+      "property": "payload",
+      "propertyType": "msg",
+      "rules": [
+         {
+            "t": "gte",
+            "v": sensor.maxrange,
+            "vt": "num"
+         },
+         {
+            "t": "lte",
+            "v": sensor.minrange,
+            "vt": "num"
+         }
+      ],
+      "checkall": "true",
+      "repair": false,
+      "outputs": 2,
+      "x": 320,
+      "y": y + 50,
+      "wires": [
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ],
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ]
+      ]
+   };
+   const modbus_ProcesTelegram: any = {
+      "id": 't' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Process",
+      "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: "🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: ` + "${value}" + `",\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": 0,
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 370,
+      "y": y + 50,
+      "wires": [
+         [
+            "6c06b6c6dc43c887"
+         ]
+      ]
+   }
+   const modbus_Processhtml: any = {
+      "id": 'm' + sensor._id.toString(),
+      "type": "template",
+      "z": "c6c280ebbc516f5b",
+      "name": "html",
+      "field": "body",
+      "fieldType": "msg",
+      "format": "handlebars",
+      "syntax": "mustache",
+      "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
+      "x": 370,
+      "y": y + 100,
+      "wires": [
+         [
+            'pm' + sensor._id.toString()
+         ]
+      ]
+   }
+   const modbus_ProcessMail: any = {
+      "id": 'pm' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Transactional Emails",
+      "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": "",
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 420,
+      "y": y + 100,
+      "wires": [
+         [
+            "98f0503cc1ef7d51"
+         ]
+      ]
+   }
 
-   nodes.push(FinsRead)
+   nodes.push(FinsRead);
    nodes.push(FinsFunc);
+   nodes.push(modbus_Switch);
+   nodes.push(modbus_ProcesTelegram);
+   nodes.push(modbus_Processhtml);
+   nodes.push(modbus_ProcessMail);
 }
 //Function Reads Omron with Auto Increment
-function nodeReadFinsAutoInc(sensor: any, plc: any, y: number, nodes: any[]) {
+function nodeReadFinsAutoInc(sensor: any, plc: any, y: number, nodes: any[], emailsToSendAlerts: string) {
    const FinsRead: any = {
       "id": 'or' + sensor._id.toString(),
       "type": "FINS Read",
@@ -606,7 +1152,8 @@ function nodeReadFinsAutoInc(sensor: any, plc: any, y: number, nodes: any[]) {
       "y": y,
       "wires": [
          [
-            'oreq' + sensor._id.toString()
+            'oreq' + sensor._id.toString(),
+            's' + sensor._id.toString()
          ]
       ]
    }
@@ -655,9 +1202,106 @@ function nodeReadFinsAutoInc(sensor: any, plc: any, y: number, nodes: any[]) {
          ]
       ]
    }
+   const modbus_Switch: any = {
+      "id": 's' + sensor._id.toString(),
+      "type": "switch",
+      "z": "c6c280ebbc516f5b",
+      "name": "",
+      "property": "payload",
+      "propertyType": "msg",
+      "rules": [
+         {
+            "t": "gte",
+            "v": sensor.maxrange,
+            "vt": "num"
+         },
+         {
+            "t": "lte",
+            "v": sensor.minrange,
+            "vt": "num"
+         }
+      ],
+      "checkall": "true",
+      "repair": false,
+      "outputs": 2,
+      "x": 320,
+      "y": y + 50,
+      "wires": [
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ],
+         [
+            't' + sensor._id.toString(),
+            'm' + sensor._id.toString()
+         ]
+      ]
+   };
+   const modbus_ProcesTelegram: any = {
+      "id": 't' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Process",
+      "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: "🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: ` + "${value}" + `",\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": 0,
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 370,
+      "y": y + 50,
+      "wires": [
+         [
+            "6c06b6c6dc43c887"
+         ]
+      ]
+   }
+   const modbus_Processhtml: any = {
+      "id": 'm' + sensor._id.toString(),
+      "type": "template",
+      "z": "c6c280ebbc516f5b",
+      "name": "html",
+      "field": "body",
+      "fieldType": "msg",
+      "format": "handlebars",
+      "syntax": "mustache",
+      "template": `<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\" />\n    <style>\n        /* Reset básico */\n        body, p, div {\n            margin: 0;\n            padding: 0;\n        }\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background-color: #121212;\n            color: #e0e0e0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n            line-height: 1.6;\n        }\n        .container {\n            max-width: 600px;\n            background-color: #1e1e1e;\n            margin: 40px auto;\n            border-radius: 8px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 20px rgba(243,111,33,0.3);\n            border: 2px solid #f36f21;\n        }\n        .logo {\n            text-align: center;\n            margin-bottom: 30px;\n        }\n        .logo img {\n            width: 160px;\n            height: auto;\n            filter: brightness(0) invert(1); /* para logos negros que quieras invertir */\n        }\n        .alert-header {\n            font-size: 26px;\n            font-weight: 700;\n            color: #f36f21;\n            text-align: center;\n            margin-bottom: 25px;\n            letter-spacing: 1px;\n        }\n        .alert-box {\n            background-color: #2c2c2c;\n            border-left: 6px solid #f36f21;\n            padding: 25px 30px;\n            border-radius: 6px;\n            font-size: 18px;\n            color: #ddd;\n        }\n        .alert-box strong {\n            color: #f36f21;\n        }\n        .alert-box span {\n            color: #ff4c00;\n            font-weight: 700;\n        }\n        .footer {\n            text-align: center;\n            font-size: 14px;\n            color: #999999;\n            margin-top: 40px;\n            font-style: italic;\n        }\n        a {\n            color: #f36f21;\n            text-decoration: none;\n        }\n        /* Responsivo */\n        @media only screen and (max-width: 620px) {\n            .container {\n                margin: 20px 15px;\n                padding: 20px;\n            }\n            .alert-header {\n                font-size: 22px;\n            }\n            .alert-box {\n                font-size: 16px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"logo\">\n            <img src=\"https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png\" alt=\"Fornet Logo\" />\n        </div>\n\n        <div class=\"alert-header\">🚨 Alerta de sistema detectada</div>\n\n        <div class=\"alert-box\">\n            Límite superado<br />\n            <strong>PLC:</strong> ${sensor.plc_name}<br />\n            <strong>Sensor:</strong> ${sensor.name}<br />\n            <strong>Valor:</strong> <span>` + "${msg.payload}" + `</span>\n        </div>\n\n        <div class=\"footer\">\n            Esta alerta ha sido generada automáticamente por <strong>Fornet</strong>.\n        </div>\n    </div>\n</body>\n</html>\n`,
+      "x": 370,
+      "y": y + 100,
+      "wires": [
+         [
+            'pm' + sensor._id.toString()
+         ]
+      ]
+   }
+   const modbus_ProcessMail: any = {
+      "id": 'pm' + sensor._id.toString(),
+      "type": "function",
+      "z": "c6c280ebbc516f5b",
+      "name": "Transactional Emails",
+      "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+      "outputs": 1,
+      "timeout": "",
+      "noerr": 0,
+      "initialize": "",
+      "finalize": "",
+      "libs": [],
+      "x": 420,
+      "y": y + 100,
+      "wires": [
+         [
+            "98f0503cc1ef7d51"
+         ]
+      ]
+   }
    nodes.push(FinsRead);
    nodes.push(fins_req);
    nodes.push(fins_func);
+   nodes.push(modbus_Switch);
+   nodes.push(modbus_ProcesTelegram);
+   nodes.push(modbus_Processhtml);
+   nodes.push(modbus_ProcessMail);
 }
 //Function Writes Omron
 function nodeWriteFins(sensor: any, plc: any, y: number, nodes: any[]) {
@@ -713,6 +1357,8 @@ export async function GET(request: Request, { params }: { params: { db: string, 
       const node = params.node;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
+      const dbAuth = mongoose.connection.useDb('Auth', { useCache: false });
+
       if (!db.models.sensor) {
          db.model('sensor', SensorSchema);
       }
@@ -721,71 +1367,94 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          db.model('plc', PlcSchema);
       }
 
+      if (!dbAuth.models.user) {
+         dbAuth.model('user', UserSchema, 'users');
+      }
+
       const sensors = (await db.models.sensor.find().lean()) as SensorIface[];
       const plcs = (await db.models.plc.find({ node: node }).lean()) as PlcIface[];
       const sensorByName = _.groupBy(sensors, 'plc_name');
+      const alertEmails = (await dbAuth.models.user.find({ alert: true }).lean()) as UserIface[];
+      let emailsToSendAlerts = "";
+      for (let i = 0; i < alertEmails.length; i++) {
+         if (i === alertEmails.length - 1) {
+            emailsToSendAlerts += alertEmails[i].email;
+         } else {
+            emailsToSendAlerts += alertEmails[i].email + ', ';
+         }
+      }
 
       let nodes = getBaseNodesConfig(dbName);
       let y = 100;
 
       plcs.forEach(plc => {
+         if (!plc._id || !plc.name || !plc.line || !plc.type || !plc.ip) {
+            return;
+         }
          switch (plc.type) {
             case 'siemens':
+
                globalSiemensNodes(plc, sensorByName, nodes);
 
                sensorByName[plc.name].forEach(sensor => {
+                  if (!sensor._id || !sensor.name || !sensor.address || !sensor.line) {
+                     return;
+                  }
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
                         if (sensor.autoinc) {
-                           nodeReadSiemensAutoInc(sensor, plc, y, nodes);
+                           nodeReadSiemensAutoInc(sensor, plc, y, nodes, emailsToSendAlerts);
                         } else {
-                           nodeReadSiemens(sensor, plc, y, nodes);
+                           nodeReadSiemens(sensor, plc, y, nodes, emailsToSendAlerts);
                         }
                      }
                      if (sensor.write) {
                         nodeWriteSiemens(sensor, plc, y, nodes);
                      }
-                     y = y + 50;
+                     y = y + 200;
                   }
                });
                break;
             case 'modbus':
                globalModbusNodes(plc, nodes);
-
                sensorByName[plc.name].forEach(sensor => {
+                  if (!sensor._id || !sensor.name || !sensor.address || !sensor.line) {
+                     return;
+                  }
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
                         if (sensor.autoinc) {
-                           nodeReadModbusAutoInc(sensor, plc, y, nodes);
+                           nodeReadModbusAutoInc(sensor, plc, y, nodes, emailsToSendAlerts);
                         } else {
-                           nodeReadModbus(sensor, plc, y, nodes);
+                           nodeReadModbus(sensor, plc, y, nodes, emailsToSendAlerts);
                         }
                      }
                      if (sensor.write) {
                         nodeWriteModbus(sensor, plc, y, nodes);
                      }
-                     y = y + 50;
+                     y = y + 200;
                   }
                }
                );
                break;
             case 'omron':
                globalOmronNodes(plc, nodes);
-
                sensorByName[plc.name].forEach(sensor => {
+                  if (!sensor._id || !sensor.name || !sensor.address || !sensor.line) {
+                     return;
+                  }
                   if (sensor.line == plc.line && (sensor.read || sensor.write)) {
                      if (sensor.read) {
                         if (sensor.autoinc) {
-                           nodeReadFinsAutoInc(sensor, plc, y, nodes);
+                           nodeReadFinsAutoInc(sensor, plc, y, nodes, emailsToSendAlerts);
                         } else {
-                           nodeReadFins(sensor, plc, y, nodes);
+                           nodeReadFins(sensor, plc, y, nodes, emailsToSendAlerts);
                         }
-
                      }
                      if (sensor.write) {
                         nodeWriteFins(sensor, plc, y, nodes);
                      }
-                     y = y + 50;
+                     y = y + 200;
                   }
                }
                );

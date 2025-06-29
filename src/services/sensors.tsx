@@ -68,7 +68,7 @@ export const getNamesUnits = async (line: string, db?: string) => {
 
 export const getSensorsbyLine = async (db?: string) => {
    const data = await getSensors(db);
-   const data2 = await getFilteredSensors(db, { read: true }, ['-_id', 'name', 'unit', 'line'], 'name');
+   const data2 = await getFilteredSensors(db, { read: true }, ['-_id', 'name', 'unit', 'line', 'minrange', 'maxrange'], 'name');
    return _.groupBy(data2, 'line');
 }
 

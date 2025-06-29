@@ -5,6 +5,7 @@ export interface UserIface {
    lastname: string,
    email: string,
    password: string,
+   alert: boolean,
    hash: string,
    license?: {
       start: string,
@@ -24,6 +25,9 @@ const UserSchema = new mongoose.Schema({
    },
    lastname: {
       type: String,
+   },
+   alert: {
+      type: Boolean,
    },
    email: {
       type: String,

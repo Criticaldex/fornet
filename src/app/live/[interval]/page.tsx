@@ -11,7 +11,6 @@ export default async function Dashboard({ params }: any) {
    const types = ['line', 'gauge', 'bool']
    let selected = {} as any;
    lines.map((line) => { selected[line] = { type: 'line', sensor: sensors[line][0].name, unit: sensors[line][0].unit } });
-
    return (
       <>
          <div className="flex mx-2 mb-2">

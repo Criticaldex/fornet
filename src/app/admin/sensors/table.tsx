@@ -180,8 +180,14 @@ export function AdminTable({ sensors, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Incremental',
-         selector: (row: any) => row.autoinc ? "X" : "",
+         name: 'Min Range',
+         selector: (row: any) => row.minrange,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Max Range',
+         selector: (row: any) => row.maxrange,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },

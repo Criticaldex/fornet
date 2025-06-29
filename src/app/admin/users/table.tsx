@@ -112,6 +112,12 @@ export function AdminTable({ users, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
+         name: 'Alerts',
+         selector: (row: any) => row.alert ? "X" : "",
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
          name: 'Licencia',
          selector: (row: any) => Intl.DateTimeFormat("es-ES").format(new Date(row.license?.start)) + ' - ' + Intl.DateTimeFormat("es-ES").format(new Date(row.license?.end)),
          sortable: true,
