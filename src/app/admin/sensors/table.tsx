@@ -162,18 +162,6 @@ export function AdminTable({ sensors, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Read',
-         selector: (row: any) => row.read ? "X" : "",
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Write',
-         selector: (row: any) => row.write ? "X" : "",
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
          name: 'Modbus DataType',
          selector: (row: any) => row.dataType,
          sortable: true,
@@ -188,6 +176,18 @@ export function AdminTable({ sensors, session }: any) {
       {
          name: 'Max Range',
          selector: (row: any) => row.maxrange,
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Read',
+         selector: (row: any) => row.read ? "X" : "",
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Write',
+         selector: (row: any) => row.write ? "X" : "",
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },

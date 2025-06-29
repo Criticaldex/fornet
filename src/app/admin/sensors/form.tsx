@@ -88,55 +88,6 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          </div>
          {errors.address && <p role="alert" className="text-red self-end">⚠ {errors.address?.message}</p>}
 
-         <div className="inline-flex justify-end">
-            <label htmlFor="read" className="self-center">Read:</label>
-            <input id="read"
-               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("read")} type="checkbox" value={true}
-               onChange={e => {
-                  if (plcType == 'modbus') {
-                     resetField("write", { defaultValue: !e.target.value })
-                     setModbusDataType(modbusRead)
-                  }
-               }} />
-         </div>
-         {errors.read && <p role="alert" className="text-red self-end">⚠ {errors.read?.message}</p>}
-
-         <div className="inline-flex justify-end">
-            <label htmlFor="write" className="self-center">Write:</label>
-            <input id="write"
-               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("write")} type="checkbox"
-               onChange={e => {
-                  if (plcType == 'modbus') {
-                     resetField("read", { defaultValue: !e.target.value })
-                     setModbusDataType(modbusWrite)
-                  }
-               }} />
-         </div>
-         {errors.write && <p role="alert" className="text-red self-end">⚠ {errors.write?.message}</p>}
-         <div className="inline-flex justify-end">
-            <label htmlFor="minrange" className="self-center">MinRange:</label>
-            <input type="number" id="minrange" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.minrange ? 'border-foreground' : 'border-red'}`}
-               {...register("minrange")} />
-         </div>
-         {errors.minrange && <p role="alert" className="text-red self-end">⚠ {errors.minrange?.message}</p>}
-
-         <div className="inline-flex justify-end">
-            <label htmlFor="maxrange" className="self-center">MaxRange:</label>
-            <input type="number" id="maxrange" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.maxrange ? 'border-foreground' : 'border-red'}`}
-               {...register("maxrange")} />
-         </div>
-         {errors.maxrange && <p role="alert" className="text-red self-end">⚠ {errors.maxrange?.message}</p>}
-
-         <div className="inline-flex justify-end">
-            <label htmlFor="autoinc" className="self-center">Incremental:</label>
-            <input id="autoinc"
-               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
-               {...register("autoinc")} type="checkbox" />
-         </div>
-         {errors.autoinc && <p role="alert" className="text-red self-end">⚠ {errors.autoinc?.message}</p>}
-
          <div className={`inline-flex justify-end ${plcType == 'modbus' ? '' : 'hidden'}`}>
             <label htmlFor="dataType" className="flex self-center">DataType:</label>
             <select id="dataType"
@@ -165,6 +116,41 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
                {...register("maxrange")} />
          </div>
          {errors.maxrange && <p role="alert" className="text-red self-end">⚠ {errors.maxrange?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="read" className="self-center">Read:</label>
+            <input id="read"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
+               {...register("read")} type="checkbox" value={true}
+               onChange={e => {
+                  if (plcType == 'modbus') {
+                     resetField("write", { defaultValue: !e.target.value })
+                     setModbusDataType(modbusRead)
+                  }
+               }} />
+         </div>
+         {errors.read && <p role="alert" className="text-red self-end">⚠ {errors.read?.message}</p>}
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="write" className="self-center">Write:</label>
+            <input id="write"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
+               {...register("write")} type="checkbox"
+               onChange={e => {
+                  if (plcType == 'modbus') {
+                     resetField("read", { defaultValue: !e.target.value })
+                     setModbusDataType(modbusWrite)
+                  }
+               }} />
+         </div>
+
+         <div className="inline-flex justify-end">
+            <label htmlFor="autoinc" className="self-center">Incremental:</label>
+            <input id="autoinc"
+               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12`}
+               {...register("autoinc")} type="checkbox" />
+         </div>
+         {errors.autoinc && <p role="alert" className="text-red self-end">⚠ {errors.autoinc?.message}</p>}
 
          <div className="inline-flex justify-around">
             <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
