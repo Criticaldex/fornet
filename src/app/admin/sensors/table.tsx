@@ -192,6 +192,12 @@ export function AdminTable({ sensors, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
+         name: 'Incremental',
+         selector: (row: any) => row.autoinc ? "X" : "",
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
          name: 'Accions',
          cell: (row: any) => (
             <div className='flex flex-row'>
