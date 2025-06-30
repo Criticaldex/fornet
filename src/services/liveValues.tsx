@@ -7,7 +7,8 @@ export const getMappedCandleValues = async (filter: { line: string; name: string
       const session = await getSession();
       db = session?.user.db;
    }
-   return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${filter.line}/${filter.name}/${filter.interval}/candle/${db}`,
+
+   return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${db}/${filter.line}/${filter.name}/${filter.interval}/candle`,
       {
          method: 'GET',
          headers: {
@@ -22,7 +23,7 @@ export const getCandleLastValue = async (filter: { line: string; name: string; }
       const session = await getSession();
       db = session?.user.db;
    }
-   return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${filter.line}/${filter.name}/lastValue/${db}`,
+   return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${db}/${filter.line}/${filter.name}/lastValue`,
       {
          method: 'GET',
          headers: {

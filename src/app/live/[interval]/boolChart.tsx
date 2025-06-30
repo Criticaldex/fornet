@@ -10,6 +10,7 @@ import highchartsMore from "highcharts/highcharts-more"
 import solidGauge from "highcharts/modules/solid-gauge";
 import { GetNames } from '../routing'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 if (typeof Highcharts === "object") {
    HighchartsExporting(Highcharts)
@@ -21,6 +22,7 @@ if (typeof Highcharts === "object") {
 }
 
 export function BoolChart({ line, name }: any) {
+   const { data: session } = useSession();
 
    const options = {
       ...chartOptions,
@@ -33,7 +35,7 @@ export function BoolChart({ line, name }: any) {
          spacing: [0, 0, 0, 0],
       },
       data: {
-         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/lastValue`,
+         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${session?.user.db}/${line}/${name}/lastValue`,
          enablePolling: true,
          dataRefreshRate: 1
       },

@@ -2,7 +2,6 @@ import { getLines } from "@/services/plcs";
 import { getSensorsbyLine } from "@/services/sensors";
 import { LinesTable } from "./linesTable";
 import { getSession } from "@/services/session";
-import { getMappedCandleValues } from "@/services/values";
 
 export default async function Dashboard({ params }: any) {
    const { interval } = params;
