@@ -43,7 +43,7 @@ const ExpandedComponent = ({ data }: any) => {
    const width = window.innerWidth - 105;
 
    async function saveUser(user: any) {
-      const upsert = await updateConfig(user);
+      await updateConfig(user);
    }
 
    return (

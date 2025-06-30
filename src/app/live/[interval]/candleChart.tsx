@@ -9,6 +9,7 @@ import HighchartsData from 'highcharts/modules/data'
 import { useRef, useState, useEffect } from 'react'
 import { chartOptions } from '@/components/chart.components'
 import { useSession } from 'next-auth/react'
+import { getCandleLastValue, getMappedCandleValues } from '@/services/liveValues'
 
 if (typeof Highcharts === "object") {
     HighchartsExporting(Highcharts)
@@ -22,7 +23,6 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
     const { data: session } = useSession();
     const currentCandleRef = useRef<any>(null);
     const [initialData, setInitialData] = useState<any[]>([]);
-    const [lastPrice, setLastPrice] = useState<number | null>(null);
     const lastTimestampRef = useRef<number>(0);
     const [isReady, setIsReady] = useState(false);
     const chartRef = useRef<any>(null);
@@ -31,20 +31,10 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
     const candleDuration = ((interval * 60 * 60 * 1000) / numVelas);
 
     useEffect(() => {
-        var a = "A";
         const fetchData = async () => {
             try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/${interval}/candle`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-type': 'application/json',
-                            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
-                        },
-                    }
-                );
-                const data = await res.json();
+                const data = await getMappedCandleValues({ line: line, name: name, interval: interval }, session?.user.db);
+
                 setInitialData(data);
 
                 if (data.length > 0) {
@@ -56,7 +46,6 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                         close: lastCandle[4],
                         timestamp: lastCandle[0],
                     };
-                    setLastPrice(lastCandle[4]);
                     lastTimestampRef.current = lastCandle[0];
                     setIsReady(true);
                 }
@@ -64,7 +53,6 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                 console.error('Error fetching candle data:', error);
             }
         };
-
         fetchData();
     }, [line, name, interval]);
 
@@ -75,20 +63,10 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
             const currentTime = Date.now();
             const alignedCandleStart = Math.floor(currentTime / candleDuration) * candleDuration;
 
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/lastValue`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-type': 'application/json',
-                        token: `${process.env.NEXT_PUBLIC_API_KEY}`,
-                    },
-                }
-            );
-            const apiValue = await res.json();
-            if (!apiValue || !Array.isArray(apiValue)) return;
+            const lastValue: any = await getCandleLastValue({ line: line, name: name }, session?.user.db)
+            if (!lastValue || !Array.isArray(lastValue)) return;
 
-            const newValue = apiValue[0][1];
+            const newValue = lastValue[0][1];
 
             // ¿Es necesario crear nueva vela?
             if (!currentCandleRef.current || currentCandleRef.current.timestamp < alignedCandleStart) {
@@ -125,8 +103,6 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                     close: newValue,
                 };
 
-                setLastPrice(newValue);
-
                 const lastPoint = series.data[series.data.length - 1];
                 if (lastPoint && lastPoint.update) {
                     lastPoint.update({
@@ -137,16 +113,13 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
                 }
             }
         } catch (error) {
-            console.error('Error en updateCandleData:', error);
+            console.error('Error en updateCandleData: ', error);
         }
     };
 
     useEffect(() => {
-        if (!isReady) return;
-
-        const chart = chartRef.current?.chart;
-        const series = chart?.series?.[0];
-        if (!series) return;
+        const series = chartRef.current?.chart?.series?.[0];
+        if (!isReady && !series) return;
 
         const intervalId = setInterval(() => {
             updateCandleData(series);

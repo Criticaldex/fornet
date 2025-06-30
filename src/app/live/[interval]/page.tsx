@@ -13,8 +13,6 @@ export default async function Dashboard({ params }: any) {
    let selected = {} as any;
    lines.map((line) => { selected[line] = { type: 'line', sensor: sensors[line][0].name, unit: sensors[line][0].unit } });
 
-   const data = await getMappedCandleValues({ line: 'Random', name: 'Temperatura', interval: 8 }, session?.user.db);
-
    return (
       <>
          <div className="flex mx-2 mb-2">
