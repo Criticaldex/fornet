@@ -3,10 +3,8 @@ import dbConnect from '@/lib/dbConnect'
 import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { line: string, name: string } }) {
+export async function GET(request: Request, { params }: { params: { db: string, line: string, name: string } }) {
    try {
-      const dbName = 'empresa2';
-
       const filter = {
          "line": params.line, "name": params.name
       };
@@ -17,7 +15,7 @@ export async function GET(request: Request, { params }: { params: { line: string
       ];
 
       await dbConnect();
-      const db = mongoose.connection.useDb(dbName, { useCache: true });
+      const db = mongoose.connection.useDb(params.db, { useCache: true });
       if (!db.models.value) {
          db.model('value', indicatorSchema);
       }

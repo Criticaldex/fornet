@@ -151,6 +151,7 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         },
         rangeSelector: { enabled: false },
         navigator: { enabled: false },
+        scrollbar: { enabled: false },
         exporting: { enabled: true },
         credits: { enabled: false },
         tooltip: {

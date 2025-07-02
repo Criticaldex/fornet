@@ -4,9 +4,8 @@ import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
 import _ from "lodash"
 
-export async function GET(request: Request, { params }: { params: { line: string, name: string, interval: number } }) {
+export async function GET(request: Request, { params }: { params: { db: string, line: string, name: string, interval: number } }) {
    try {
-      const dbName = 'empresa2';
       let startTime = Math.floor(Date.now() - (params.interval * 60 * 60 * 1000));
       let numVelas = 30;
       let duradaVelas = ((params.interval * 60 * 60 * 1000) / numVelas);
@@ -22,7 +21,7 @@ export async function GET(request: Request, { params }: { params: { line: string
       ];
 
       await dbConnect();
-      const db = mongoose.connection.useDb(dbName, { useCache: false });
+      const db = mongoose.connection.useDb(params.db, { useCache: false });
       if (!db.models.value) {
          db.model('value', indicatorSchema);
       }
