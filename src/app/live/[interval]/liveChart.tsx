@@ -29,7 +29,7 @@ export function LiveChart({ i, line, name, unit, interval }: any) {
          type: 'spline',
       },
       data: {
-         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${line}/${name}/${interval}`,
+         rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${session?.user.db}/${line}/${name}/${interval}`,
          enablePolling: true,
          dataRefreshRate: 60
       },
