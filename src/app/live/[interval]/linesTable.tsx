@@ -97,6 +97,8 @@ const ExpandedComponent = ({ data }: any) => {
                         line={data.line}
                         name={chart.name}
                         unit={chart.unit}
+                        minrange={chart.minrange}
+                        maxrange={chart.maxrange}
                      />
                   </div>
                } else if (chart.type == 'bool') {
@@ -132,7 +134,7 @@ const ExpandedComponent = ({ data }: any) => {
    );
 }
 
-const handleAdd = (row: any, session: any, update: any, selected: any) => async (event: any) => {
+const handleAdd = (row: any, session: any, update: any, selected: any, sensors: any) => async (event: any) => {
    let user = session.user;
    let maxY = 0;
    session.user.config.live[row.line].forEach((element: { h: number; y: number; }) => {
@@ -147,7 +149,9 @@ const handleAdd = (row: any, session: any, update: any, selected: any) => async 
       h: 11,
       type: selected[row.line].type,
       name: selected[row.line].sensor,
-      unit: selected[row.line].unit
+      unit: selected[row.line].unit,
+      minrange: selected[row.line].minrange,
+      maxrange: selected[row.line].maxrange
    };
    switch (selected[row.line].type) {
       case 'gauge':
@@ -197,9 +201,11 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
                   let fields = e.target.value.split('/');
                   selected[row.line].sensor = fields[0];
                   selected[row.line].unit = fields[1];
+                  selected[row.line].maxrange = fields[2];
+                  selected[row.line].minrange = fields[3];
                }}>
                {sensors[row.line].map((sensor: any, i: number) => {
-                  return <option key={i} value={`${sensor.name}/${sensor.unit}`} tabIndex={i}>
+                  return <option key={i} value={`${sensor.name}/${sensor.unit}/${sensor.maxrange}/${sensor.minrange}`} tabIndex={i}>
                      {sensor.name}
                   </option>
                })}
@@ -214,7 +220,7 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
    {
       name: 'Accions',
       cell: (row: any) => (
-         <FaPlus size={20} onClick={handleAdd(row, session, update, selected)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
+         <FaPlus size={20} onClick={handleAdd(row, session, update, selected, sensors)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
       ),
       grow: 1,
       ignoreRowClick: true,

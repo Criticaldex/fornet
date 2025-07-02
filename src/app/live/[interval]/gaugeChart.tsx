@@ -21,10 +21,10 @@ if (typeof Highcharts === "object") {
    solidGauge(Highcharts);
 }
 
-export function GaugeChart({ line, name, unit }: any) {
+export function GaugeChart({ line, name, unit, maxrange, minrange }: any) {
    const { data: session } = useSession();
-   const [min, setMin] = useState(0);
-   const [max, setMax] = useState(5000);
+   const min = minrange ? minrange : 0;
+   const max = maxrange ? maxrange : 5000;
 
    const options = {
       ...chartOptions,

@@ -26,6 +26,7 @@ export async function POST(request: Request) {
          name: (body.name) ? body.name : null,
          lastname: (body.lastname) ? body.lastname : null,
          email: (body.email) ? body.email : null,
+         alert: (body.alert) ? body.alert : null,
          hash: (body.password) ? await hash(body.password, saltRounds) : null,
          license: {
             token: null,
@@ -56,7 +57,7 @@ export async function GET(request: Request) {
       }
       const { searchParams } = new URL(request.url)
       const database = searchParams.get('db');
-      const filter = database ? { db: database } : {}
+      const filter = database ? { db: database, role: { $ne: 0 } } : {}
       const dbName = 'Auth';
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });

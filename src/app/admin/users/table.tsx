@@ -119,6 +119,12 @@ export function AdminTable({ users, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
+         name: 'Alerts',
+         selector: (row: any) => row.alert ? "X" : "",
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
          name: 'Accions',
          cell: (row: any) => (
             <div className='flex flex-row'>

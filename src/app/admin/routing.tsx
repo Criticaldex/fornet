@@ -23,6 +23,14 @@ export function GetLinksAdmin({ session }: any) {
          route: `/admin/plcs`
       }
    ];
+   if (session?.user.db != 0) {
+      links = [
+         {
+            label: 'Profile',
+            route: `/admin/profile`
+         }
+      ];
+   }
 
    return (
       <div className="flex justify-start mr-3 my-2">
