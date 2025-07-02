@@ -22,9 +22,9 @@ if (typeof Highcharts === "object") {
 }
 
 export function GaugeChart({ line, name, unit, maxrange, minrange }: any) {
-   const [min, setMin] = useState(parseInt(minrange) || 0);
-   const [max, setMax] = useState(parseInt(maxrange) || 0);
-
+   const { data: session } = useSession();
+   const min = minrange ? minrange : 0;
+   const max = maxrange ? maxrange : 5000;
 
    const options = {
       ...chartOptions,

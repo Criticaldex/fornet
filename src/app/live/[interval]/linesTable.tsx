@@ -141,9 +141,6 @@ const handleAdd = (row: any, session: any, update: any, selected: any, sensors: 
       const suma = element.y + element.h
       maxY = (maxY < suma) ? suma : maxY;
    });
-   const selectedSensor = sensors[row.line].find(
-      (s: any) => s.name === selected[row.line].sensor
-   );
    let newData = {
       i: (user.config.live[row.line].length).toString(),
       x: 0,
@@ -153,8 +150,8 @@ const handleAdd = (row: any, session: any, update: any, selected: any, sensors: 
       type: selected[row.line].type,
       name: selected[row.line].sensor,
       unit: selected[row.line].unit,
-      minrange: selectedSensor.minrange,
-      maxrange: selectedSensor.maxrange
+      minrange: selected[row.line].minrange,
+      maxrange: selected[row.line].maxrange
    };
    switch (selected[row.line].type) {
       case 'gauge':
@@ -204,9 +201,11 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
                   let fields = e.target.value.split('/');
                   selected[row.line].sensor = fields[0];
                   selected[row.line].unit = fields[1];
+                  selected[row.line].maxrange = fields[2];
+                  selected[row.line].minrange = fields[3];
                }}>
                {sensors[row.line].map((sensor: any, i: number) => {
-                  return <option key={i} value={`${sensor.name}/${sensor.unit}`} tabIndex={i}>
+                  return <option key={i} value={`${sensor.name}/${sensor.unit}/${sensor.maxrange}/${sensor.minrange}`} tabIndex={i}>
                      {sensor.name}
                   </option>
                })}
