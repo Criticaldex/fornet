@@ -15,7 +15,7 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
                name: data.name,
                lastname: data.lastname,
                alert: data.alert,
-               role: "2"
+               role: data.role ? data.role : "2"
             }
          } else if (session.user.role == '0') {
             upsertData = {
@@ -100,6 +100,12 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
          </div>
          {errors.lastname && <p role="alert" className="text-red self-end">⚠ {errors.lastname?.message}</p>}
 
+         <div className="inline-flex justify-end">
+            <label htmlFor="alert" className="self-center">Alerts:</label>
+            <input type="checkbox" id="alert" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.alert ? 'border-foreground' : 'border-red'}`} {...register("alert")} />
+         </div>
+         {errors.alert && <p role="alert" className="text-red self-end">⚠ {errors.alert?.message}</p>}
+
          {session.user.role == '0' &&
             <>
                <div className="inline-flex justify-end">
@@ -131,12 +137,6 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
                   })} />
                </div>
                {errors.license?.end && <p role="alert" className="text-red self-end">⚠ {errors.license?.end.message}</p>}
-
-               <div className="inline-flex justify-end">
-                  <label htmlFor="alert" className="self-center">Alerts:</label>
-                  <input type="checkbox" id="alert" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.alert ? 'border-foreground' : 'border-red'}`} {...register("alert")} />
-               </div>
-               {errors.alert && <p role="alert" className="text-red self-end">⚠ {errors.alert?.message}</p>}
             </>
          }
          <div className="inline-flex justify-around">

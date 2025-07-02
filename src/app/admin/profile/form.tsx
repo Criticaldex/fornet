@@ -29,7 +29,7 @@ export const UsersForm = ({ user, toast }: any) => {
       } else if (dirtyFields.email) {
          toast.warning('No es pot Modificar el correu!', { theme: "colored" });
          reset(user);
-      } else if (isDirty == true && (dirtyFields.password || dirtyFields.name || dirtyFields.lastname)) {
+      } else if (isDirty == true && (dirtyFields.password || dirtyFields.name || dirtyFields.lastname || dirtyFields.alert)) {
          delete data.license;
          const upsert = await upsertUser(data);
          if (upsert.lastErrorObject?.updatedExisting) {
@@ -105,6 +105,11 @@ export const UsersForm = ({ user, toast }: any) => {
             })} />
          </div>
          {errors.license?.end && <p role="alert" className="text-red self-end">⚠ {errors.license?.end.message}</p>}
+         <div className="inline-flex justify-end">
+            <label htmlFor="alert" className="self-center">Alerts:</label>
+            <input type="checkbox" id="alert" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.alert ? 'border-foreground' : 'border-red'}`} {...register("alert")} />
+         </div>
+         {errors.alert && <p role="alert" className="text-red self-end">⚠ {errors.alert?.message}</p>}
          <div className="inline-flex justify-around">
             <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Enviar" />
          </div>
