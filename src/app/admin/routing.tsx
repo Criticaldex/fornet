@@ -23,7 +23,7 @@ export function GetLinksAdmin({ session }: any) {
          route: `/admin/plcs`
       }
    ];
-   if (session?.user.db != 0) {
+   if (session?.user.role != 0) {
       links = [
          {
             label: 'Profile',
