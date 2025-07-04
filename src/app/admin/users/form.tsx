@@ -100,11 +100,6 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
          </div>
          {errors.lastname && <p role="alert" className="text-red self-end">⚠ {errors.lastname?.message}</p>}
 
-         <div className="inline-flex justify-end">
-            <label htmlFor="alert" className="self-center">Alerts:</label>
-            <input type="checkbox" id="alert" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.alert ? 'border-foreground' : 'border-red'}`} {...register("alert")} />
-         </div>
-         {errors.alert && <p role="alert" className="text-red self-end">⚠ {errors.alert?.message}</p>}
 
          {session.user.role == '0' &&
             <>
@@ -139,6 +134,11 @@ export const UsersForm = ({ register, handleSubmit, errors, clearErrors, setRows
                {errors.license?.end && <p role="alert" className="text-red self-end">⚠ {errors.license?.end.message}</p>}
             </>
          }
+         <div className="inline-flex justify-end">
+            <label htmlFor="alert" className="self-center">Alerts:</label>
+            <input type="checkbox" id="alert" className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-8/12 ${!errors.alert ? 'border-foreground' : 'border-red'}`} {...register("alert")} />
+         </div>
+         {errors.alert && <p role="alert" className="text-red self-end">⚠ {errors.alert?.message}</p>}
          <div className="inline-flex justify-around">
             <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Netejar" />
             <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Enviar" />
