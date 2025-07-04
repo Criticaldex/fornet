@@ -22,8 +22,7 @@ const SensorSchema = new mongoose.Schema({
       required: [true, 'Line is mandatory!']
    },
    name: {
-      type: String,
-      required: [true, 'Name is mandatory!']
+      type: String
    },
    plc_name: {
       type: String,
