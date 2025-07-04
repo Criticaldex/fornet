@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 export interface SensorIface {
    _id?: any,
    line: string,
-   name?: string,
+   name: string,
    plc_name: string,
    unit?: string,
    address?: string,
@@ -22,11 +22,12 @@ const SensorSchema = new mongoose.Schema({
       required: [true, 'Line is mandatory!']
    },
    name: {
-      type: String
+      type: String,
+      required: [true, 'Name is mandatory!']
    },
    plc_name: {
       type: String,
-      required: [true, 'Line is mandatory!']
+      required: [true, 'PLC name is mandatory!']
    },
    unit: {
       type: String
