@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SummaryIface } from '@/schemas/summary';
-import { headers } from 'next/headers';
 import { empreses } from '@/app/constants';
-import { forEach } from 'lodash';
 
 export async function GET() {
     //if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
@@ -99,6 +97,17 @@ export async function GET() {
             }).then(res => res.json());
         if (insert.ERROR) {
             return NextResponse.json(insert, { status: 500 })
+        } else {
+            const deleteValues = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${dbName}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-type': 'application/json',
+                        token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+                    },
+                    body: JSON.stringify({})
+                }).then(res => res.json());
+            console.log('Values deleted: ', deleteValues);
         }
         console.log('insert done!!', insert);
     });
