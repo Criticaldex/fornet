@@ -273,7 +273,7 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
         "type": "function",
         "z": "e20161042794cb3d",
         "name": "Process",
-        "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;`,
+        "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nif(${parseInt(sensor.minrange, 10)} < parseInt(msg.payload, 10) && parseInt(msg.payload, 10) < ${parseInt(sensor.maxrange, 10)}){\n        flow.set("SendTelegram_${sensor._id.toString()}", true);\n flow.set("SendMail_${sensor._id.toString()}", true);\n}\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -297,14 +297,14 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
         "propertyType": "msg",
         "rules": [
             {
-                "t": "gte",
-                "v": sensor.maxrange,
-                "vt": "num"
+                "t": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "cont" : "gte",
+                "v": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "xx" : sensor.maxrange,
+                "vt": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "str" : "num"
             },
             {
-                "t": "lte",
-                "v": sensor.minrange,
-                "vt": "num"
+                "t": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "cont" : "lte",
+                "v": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "xx" : sensor.minrange,
+                "vt": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "str" : "num"
             }
         ],
         "checkall": "true",
@@ -328,7 +328,7 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+        "func": `let value = msg.payload;\nlet send = flow.get("SendTelegram_${sensor._id.toString()}") ?? true;\nflow.set("SendTelegram_${sensor._id.toString()}", false);\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -366,7 +366,7 @@ export function nodeReadSiemens(sensor: any, plc: any, y: number, nodes: any[], 
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Transactional Emails",
-        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\n\nlet send = flow.get("SendMail_${sensor._id.toString()}") ?? true;\nflow.set("SendMail_${sensor._id.toString()}", false);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -437,7 +437,7 @@ export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: 
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let dataArray = JSON.parse(msg.payload);\n\nlet first = dataArray[0];\nlet timestamp = first[0];\nlet value = parseInt(first[1], 10);\nlet newValue = value + 1;\n\nvar da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = newValue; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;\n`,
+        "func": `let dataArray = JSON.parse(msg.payload);\n\nlet first = dataArray[0];\nlet timestamp = first[0];\nlet value = parseInt(first[1], 10);\nlet newValue = value + 1;\n\nif(${parseInt(sensor.minrange, 10)} < newValue && newValue < ${parseInt(sensor.maxrange, 10)}){\n        flow.set("SendTelegram_${sensor._id.toString()}", true);\n flow.set("SendMail_${sensor._id.toString()}", true);\n}\nvar da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = newValue; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -461,14 +461,14 @@ export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: 
         "propertyType": "msg",
         "rules": [
             {
-                "t": "gte",
-                "v": sensor.maxrange,
-                "vt": "num"
+                "t": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "cont" : "gte",
+                "v": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "xx" : sensor.maxrange,
+                "vt": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "str" : "num"
             },
             {
-                "t": "lte",
-                "v": sensor.minrange,
-                "vt": "num"
+                "t": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "cont" : "lte",
+                "v": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "xx" : sensor.minrange,
+                "vt": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "str" : "num"
             }
         ],
         "checkall": "true",
@@ -492,7 +492,7 @@ export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: 
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+        "func": `let value = msg.payload;\nlet send = flow.get("SendTelegram_${sensor._id.toString()}") ?? true;\nflow.set("SendTelegram_${sensor._id.toString()}", false);\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -530,7 +530,7 @@ export function nodeReadSiemensAutoInc(sensor: any, plc: any, y: number, nodes: 
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Transactional Emails",
-        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\n\nlet send = flow.get("SendMail_${sensor._id.toString()}") ?? true;\nflow.set("SendMail_${sensor._id.toString()}", false);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -632,7 +632,7 @@ export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], e
         "type": "function",
         "z": "67e50ff7c3bb3610",
         "name": "function 1",
-        "func": `var da = {\n    \"line\": \"\",\n    \"plc_name\": \"\",\n    \"name\": \"\",\n    \"value\": \"\",\n    \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload.buffer[0];\nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;`,
+        "func": `var da = {\n    \"line\": \"\",\n    \"plc_name\": \"\",\n    \"name\": \"\",\n    \"value\": \"\",\n    \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload.buffer[0];\nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nif(${parseInt(sensor.minrange, 10)} < parseInt(msg.payload.buffer[0], 10) && parseInt(msg.payload.buffer[0], 10) < ${parseInt(sensor.maxrange, 10)}){\n        flow.set("SendTelegram_${sensor._id.toString()}", true);\n flow.set("SendMail_${sensor._id.toString()}", true);\n}\n\nreturn msg;`,
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -655,14 +655,14 @@ export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], e
         "propertyType": "msg",
         "rules": [
             {
-                "t": "gte",
-                "v": sensor.maxrange,
-                "vt": "num"
+                "t": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "cont" : "gte",
+                "v": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "xx" : sensor.maxrange,
+                "vt": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "str" : "num"
             },
             {
-                "t": "lte",
-                "v": sensor.minrange,
-                "vt": "num"
+                "t": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "cont" : "lte",
+                "v": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "xx" : sensor.minrange,
+                "vt": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "str" : "num"
             }
         ],
         "checkall": "true",
@@ -686,7 +686,7 @@ export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], e
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+        "func": `let value = msg.payload;\nlet send = flow.get("SendTelegram_${sensor._id.toString()}") ?? true;\nflow.set("SendTelegram_${sensor._id.toString()}", false);\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -724,7 +724,7 @@ export function nodeReadModbus(sensor: any, plc: any, y: number, nodes: any[], e
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Transactional Emails",
-        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\n\nlet send = flow.get("SendMail_${sensor._id.toString()}") ?? true;\nflow.set("SendMail_${sensor._id.toString()}", false);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -812,7 +812,7 @@ export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: a
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let dataArray = JSON.parse(msg.payload);\n\nlet first = dataArray[0];\nlet timestamp = first[0];\nlet value = parseInt(first[1], 10);\nlet newValue = value + 1;\n\nvar da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = newValue; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;\n`,
+        "func": `let dataArray = JSON.parse(msg.payload);\n\nlet first = dataArray[0];\nlet timestamp = first[0];\nif(${parseInt(sensor.minrange, 10)} < parseInt(msg.payload, 10) && parseInt(msg.payload, 10) < ${parseInt(sensor.maxrange, 10)}){\n        flow.set("SendTelegram_${sensor._id.toString()}", true);\n flow.set("SendMail_${sensor._id.toString()}", true);\n}\n\nlet value = parseInt(first[1], 10);\nlet newValue = value + 1;\n\nvar da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = newValue; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -836,14 +836,14 @@ export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: a
         "propertyType": "msg",
         "rules": [
             {
-                "t": "gte",
-                "v": sensor.maxrange,
-                "vt": "num"
+                "t": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "cont" : "gte",
+                "v": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "xx" : sensor.maxrange,
+                "vt": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "str" : "num"
             },
             {
-                "t": "lte",
-                "v": sensor.minrange,
-                "vt": "num"
+                "t": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "cont" : "lte",
+                "v": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "xx" : sensor.minrange,
+                "vt": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "str" : "num"
             }
         ],
         "checkall": "true",
@@ -867,7 +867,7 @@ export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: a
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+        "func": `let value = msg.payload;\nlet send = flow.get("SendTelegram_${sensor._id.toString()}") ?? true;\nflow.set("SendTelegram_${sensor._id.toString()}", false);\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -905,7 +905,7 @@ export function nodeReadModbusAutoInc(sensor: any, plc: any, y: number, nodes: a
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Transactional Emails",
-        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\n\nlet send = flow.get("SendMail_${sensor._id.toString()}") ?? true;\nflow.set("SendMail_${sensor._id.toString()}", false);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1008,7 +1008,7 @@ export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], em
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;`,
+        "func": `var da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = msg.payload; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\n\nif(${parseInt(sensor.minrange, 10)} < parseInt(msg.payload, 10) && parseInt(msg.payload, 10) < ${parseInt(sensor.maxrange, 10)}){\n        flow.set("SendTelegram_${sensor._id.toString()}", true);\n flow.set("SendMail_${sensor._id.toString()}", true);\n}\nreturn msg;`,
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1031,14 +1031,14 @@ export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], em
         "propertyType": "msg",
         "rules": [
             {
-                "t": "gte",
-                "v": sensor.maxrange,
-                "vt": "num"
+                "t": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "cont" : "gte",
+                "v": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "xx" : sensor.maxrange,
+                "vt": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "str" : "num"
             },
             {
-                "t": "lte",
-                "v": sensor.minrange,
-                "vt": "num"
+                "t": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "cont" : "lte",
+                "v": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "xx" : sensor.minrange,
+                "vt": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "str" : "num"
             }
         ],
         "checkall": "true",
@@ -1062,7 +1062,7 @@ export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], em
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+        "func": `let value = msg.payload;\nlet send = flow.get("SendTelegram_${sensor._id.toString()}") ?? true;\nflow.set("SendTelegram_${sensor._id.toString()}", false);\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1100,7 +1100,7 @@ export function nodeReadOmron(sensor: any, plc: any, y: number, nodes: any[], em
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Transactional Emails",
-        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\n\nlet send = flow.get("SendMail_${sensor._id.toString()}") ?? true;\nflow.set("SendMail_${sensor._id.toString()}", false);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1178,7 +1178,7 @@ export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: an
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let dataArray = JSON.parse(msg.payload);\n\nlet first = dataArray[0];\nlet timestamp = first[0];\nlet value = parseInt(first[1], 10);\nlet newValue = value + 1;\n\nvar da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = newValue; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nreturn msg;\n`,
+        "func": `let dataArray = JSON.parse(msg.payload);\n\nlet first = dataArray[0];\nlet timestamp = first[0];\nlet value = parseInt(first[1], 10);\nlet newValue = value + 1;\n\nvar da ={\n        \"line\": \"\",\n        \"plc_name\": \"\",\n        \"name\": \"\",\n        \"value\": \"\",\n        \"timestamp\": \"\"\n};\nda.plc_name = \"${sensor.plc_name}\";\nda.line = \"${sensor.line}\";\nda.value = newValue; \nda.timestamp = Date.now();\nda.name = \"${sensor.name}\";\nmsg.payload = [da];\nmsg.method = 'PATCH';\nif(${parseInt(sensor.minrange, 10)} < parseInt(msg.payload, 10) && parseInt(msg.payload, 10) < ${parseInt(sensor.maxrange, 10)}){\n        flow.set("SendTelegram_${sensor._id.toString()}", true);\n flow.set("SendMail_${sensor._id.toString()}", true);\n}\n\nreturn msg;\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1202,14 +1202,14 @@ export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: an
         "propertyType": "msg",
         "rules": [
             {
-                "t": "gte",
-                "v": sensor.maxrange,
-                "vt": "num"
+                "t": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "cont" : "gte",
+                "v": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "xx" : sensor.maxrange,
+                "vt": (sensor.maxrange === null || sensor.maxrange === undefined || sensor.maxrange === "") ? "str" : "num"
             },
             {
-                "t": "lte",
-                "v": sensor.minrange,
-                "vt": "num"
+                "t": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "cont" : "lte",
+                "v": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "xx" : sensor.minrange,
+                "vt": (sensor.minrange === null || sensor.minrange === undefined || sensor.minrange === "") ? "str" : "num"
             }
         ],
         "checkall": "true",
@@ -1233,7 +1233,7 @@ export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: an
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Process",
-        "func": `let value = msg.payload;\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\n\nreturn msg;`,
+        "func": `let value = msg.payload;\nlet send = flow.get("SendTelegram_${sensor._id.toString()}") ?? true;\nflow.set("SendTelegram_${sensor._id.toString()}", false);\n\nmsg.payload = {\n    content: \`🚨 LIMITE SUPERADO\\n Línea: ${sensor.line}\\nPLC: ${sensor.plc_name}\\nValue: \${value}\`,\n    chatId: ${process.env.CHAT_ID_TELEGRAM},\n    type: \"message\"\n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1271,7 +1271,7 @@ export function nodeReadOmronAutoInc(sensor: any, plc: any, y: number, nodes: an
         "type": "function",
         "z": "c6c280ebbc516f5b",
         "name": "Transactional Emails",
-        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\n\n\nreturn msg;`,
+        "func": `let resultado = msg.body.replace` + "(\"${msg.payload}\", " + `msg.payload);\n\nlet send = flow.get("SendMail_${sensor._id.toString()}") ?? true;\nflow.set("SendMail_${sensor._id.toString()}", false);\nmsg={\n    payload:resultado,\n    topic:\"FORNET Alerta Línea ${sensor.line}\",\n    to: \"${emailsToSendAlerts}\"\n   \n};\nif(send){\n    return msg;\n}\n`,
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
