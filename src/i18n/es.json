@@ -1,0 +1,17 @@
+{
+    "ObjectModified": "Objeto Modificado!",
+    "Line": "Linea",
+    "Node": "Nodo",
+    "Name": "Nombre",
+    "Type": "Tipo",
+    "Ip": "IP",
+    "Select": "Seleccionar...",
+    "Siemens": "Siemens",
+    "Modbus": "Modbus",
+    "Omron": "Omron",
+    "Clear": "Limpiar",
+    "Send": "Enviar",
+    "plc_name": "Nombre PLC",
+    "search_placeholder": "Buscar...",
+    "read": "Lectura"
+}
