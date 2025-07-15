@@ -40,7 +40,7 @@ export async function GET() {
 
             for (const sensor of sensors) {
                 const filter = {
-                    "timestamp": { $gte: timestamp },
+                    "timestamp": { $lte: timestamp },
                     "line": sensor.line,
                     "name": sensor.name
                 };
@@ -108,7 +108,9 @@ export async function GET() {
                             'Content-type': 'application/json',
                             token: `${process.env.NEXT_PUBLIC_API_KEY}`,
                         },
-                        body: JSON.stringify({})
+                        body: JSON.stringify({
+                            "timestamp": { $lte: timestamp }
+                        })
                     }).then(res => res.json());
                 console.log('Values deleted: ', deleteValues);
             }
