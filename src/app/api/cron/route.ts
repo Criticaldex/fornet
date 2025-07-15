@@ -36,7 +36,7 @@ export async function GET() {
                         }
                     ),
                 }).then(res => res.json());
-            console.log('sensord done!', sensors);
+            console.log('sensord done!');
 
             for (const sensor of sensors) {
                 const filter = {
@@ -61,7 +61,7 @@ export async function GET() {
                             }
                         ),
                     }).then(res => res.json());
-                console.log('values done!!', values);
+                console.log('values done!!');
 
                 if (values[0]) {
                     let summary: SummaryIface = {
@@ -112,7 +112,7 @@ export async function GET() {
                     }).then(res => res.json());
                 console.log('Values deleted: ', deleteValues);
             }
-            console.log('insert done!!', insert);
+            console.log('insert done!!');
         }
         return NextResponse.json('OK');
     } catch (error) {
