@@ -21,6 +21,10 @@ export function GetLinksAdmin({ session }: any) {
       {
          label: 'PLCs',
          route: `/admin/plcs`
+      },
+      {
+         label: 'Logs',
+         route: `/admin/logs`
       }
    ];
    if (session?.user.role == 2) {

@@ -25,4 +25,14 @@
   "terminal.integrated.defaultProfile.linux": "zsh",
   "editor.fontFamily": "DejaVuSansM Nerd Font",
   "editor.fontSize": 14,
+  "github.copilot.enable": {
+    "typescript": true,
+    "javascript": true,
+    "python": true
+  },
+  "github.copilot.advanced": {
+    "length": 500,
+    "temperature": 0.1,
+    "industrial_context": true
+  }
 }
