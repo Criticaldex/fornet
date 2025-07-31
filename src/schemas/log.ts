@@ -25,6 +25,13 @@ const LogSchema = new mongoose.Schema({
       required: [true, 'timestamp is mandatory!'],
       index: true
    },
+   severity: {
+      type: String,
+      enum: ['INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+      default: 'INFO',
+      required: [true, 'severity is mandatory!'],
+      index: true
+   },
    newValue: {
       type: String,
    },

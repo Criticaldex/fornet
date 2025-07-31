@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from 'bcryptjs';
+import { logLogin, logLogout, logError } from '@/services/logs';
 
 export const authOptions: NextAuthOptions = {
    session: {
@@ -23,26 +24,40 @@ export const authOptions: NextAuthOptions = {
          },
          async authorize(credentials: any) {
             const { email, password } = credentials as any
-            const user = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-               {
-                  method: 'POST',
-                  headers: {
-                     'Content-type': 'application/json',
-                  },
-                  body: JSON.stringify(
-                     {
-                        email,
-                        password
-                     }
-                  ),
+            try {
+               const user = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+                  {
+                     method: 'POST',
+                     headers: {
+                        'Content-type': 'application/json',
+                     },
+                     body: JSON.stringify(
+                        {
+                           email,
+                           password
+                        }
+                     ),
+                  }
+               ).then(res => res.json());
+
+               if (!user) {
+                  // Log failed login attempt
+                  await logError(email, 'AUTH', 'Invalid credentials provided');
+                  return null;
+               } else if (user?.ERROR) {
+                  // Log authentication error
+                  await logError(email, 'AUTH', user.ERROR);
+                  throw new Error(user.ERROR)
                }
-            ).then(res => res.json());
-            if (!user) {
-               return null;
-            } else if (user?.ERROR) {
-               throw new Error(user.ERROR)
+
+               // Log successful login
+               await logLogin(email, user.db);
+               return user;
+            } catch (error: any) {
+               // Log any authentication errors
+               await logError(email, 'AUTH', `Login failed: ${error.message}`);
+               throw error;
             }
-            return user;
          }
       }),
    ],
