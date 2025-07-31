@@ -31,11 +31,6 @@ export default function GetNav({ session }: any) {
          route: '/mqtt'
       },
       {
-         label: 'Logs',
-         icon: FaReceipt,
-         route: '/logs'
-      },
-      {
          label: 'PowerBi',
          icon: FaChartBar,
          route: '/powerbi'
