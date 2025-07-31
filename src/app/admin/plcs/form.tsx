@@ -5,34 +5,70 @@ import { getPlcs, upsertPlc } from "@/services/plcs";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 import { updateSensors } from "@/services/sensors";
+import { useLogs } from "@/hooks/useLogs";
 
 export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, session, nodes }: any) => {
+   const { logCreate, logUpdate, logError, logAction } = useLogs();
 
    const onSubmit = handleSubmit(async (data: PlcIface) => {
       const session = await getSession();
-      const upsert = await upsertPlc(data, session?.user.db);
-      const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
-      if (upsert.lastErrorObject?.updatedExisting) {
-         toast.success('Object Modified!', { theme: "colored" });
-         const updateSens = await updateSensors({
-            line: upsert.value.line,
-            node: upsert.value.node,
-            plc_name: upsert.value.name
-         }, session?.user.db);
-         if (updateSens.modifiedCount) {
-            toast.success(updateSens.modifiedCount + ' Sensors modified!', { theme: "colored" });
-         }
-      } else {
-         toast.success('Object Added!', { theme: "colored" });
-      }
-      if (sync.lastErrorObject?.updatedExisting) {
-         toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
-      } else {
-         toast.error('Error Syncing!', { theme: "colored" });
-      }
-      reset(data);
 
-      setRows(await getPlcs(session?.user.db));
+      try {
+         // Get existing PLC data for comparison in case of update
+         const existingPlcs = await getPlcs(session?.user.db);
+         const existingPlc = existingPlcs.find((plc: PlcIface) => plc.name === data.name);
+
+         const upsert = await upsertPlc(data, session?.user.db);
+         const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
+
+         if (upsert.lastErrorObject?.updatedExisting) {
+            // Log PLC update
+            await logUpdate('PLC', existingPlc, data);
+
+            toast.success('Object Modified!', { theme: "colored" });
+            const updateSens = await updateSensors({
+               line: upsert.value.line,
+               node: upsert.value.node,
+               plc_name: upsert.value.name
+            }, session?.user.db);
+
+            if (updateSens.modifiedCount) {
+               // Log sensor updates
+               await logAction('SENSORS', 'BULK_UPDATE', {
+                  message: `Updated ${updateSens.modifiedCount} sensors for PLC ${data.name}`,
+                  newValue: { count: updateSens.modifiedCount, plc: data.name },
+                  severity: 'INFO'
+               });
+               toast.success(updateSens.modifiedCount + ' Sensors modified!', { theme: "colored" });
+            }
+         } else {
+            // Log PLC creation
+            await logCreate('PLC', data);
+            toast.success('Object Added!', { theme: "colored" });
+         }
+
+         if (sync.lastErrorObject?.updatedExisting) {
+            // Log node sync action
+            await logAction('NODE', 'SYNC_REQUEST', {
+               message: `Requested sync for node ${sync.value.name}`,
+               newValue: { node: sync.value.name, synced: false },
+               severity: 'INFO'
+            });
+            toast.success('Syncing node ' + sync.value.name, { theme: "colored" });
+         } else {
+            // Log sync error
+            await logError('NODE', `Failed to sync node ${data.node}`);
+            toast.error('Error Syncing!', { theme: "colored" });
+         }
+
+         reset(data);
+         setRows(await getPlcs(session?.user.db));
+
+      } catch (error) {
+         // Log any errors during the process
+         await logError('PLC', `Failed to save PLC: ${error}`);
+         toast.error('Error saving PLC!', { theme: "colored" });
+      }
    });
 
    return (
