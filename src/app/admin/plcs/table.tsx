@@ -119,7 +119,7 @@ export function PlcTable({ plcs, nodes, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Accions',
+         name: 'Actions',
          cell: (row: any) => (
             <div className='flex flex-row'>
                <FaPenToSquare onClick={editHandler(row, reset)} className='cursor-pointer m-1'>Edit</FaPenToSquare>

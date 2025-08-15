@@ -56,14 +56,14 @@ export function AdminTable({ users, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: 'Vols eliminar l\'usuari: \n' + row.email + ' ?',
+         message: 'Do you want to delete the user: \n' + row.email + ' ?',
          buttons: [
             {
-               label: 'Eliminar',
+               label: 'Delete',
                onClick: async () => {
                   const del = await deleteUser(row.email);
                   if (del) {
-                     toast.error('Usuari Eliminat!!', { theme: "colored" });
+                     toast.error('User Deleted!!', { theme: "colored" });
                      if (session?.user.role == '1') {
                         setRows(await getUsersbyDB(session?.user.db));
                      } else if (session?.user.role == '0') {
@@ -73,7 +73,7 @@ export function AdminTable({ users, session }: any) {
                }
             },
             {
-               label: 'Millor no toco res :S',
+               label: 'Better not touch anything :S',
             }
          ]
       });
@@ -88,13 +88,13 @@ export function AdminTable({ users, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Nom',
+         name: 'Name',
          selector: (row: any) => row.name,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Cognom',
+         name: 'Last Name',
          selector: (row: any) => row.lastname,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
@@ -112,7 +112,7 @@ export function AdminTable({ users, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Licencia',
+         name: 'License',
          selector: (row: any) => Intl.DateTimeFormat("es-ES").format(new Date(row.license?.start)) + ' - ' + Intl.DateTimeFormat("es-ES").format(new Date(row.license?.end)),
          sortable: true,
          grow: 2,
@@ -125,7 +125,7 @@ export function AdminTable({ users, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Accions',
+         name: 'Actions',
          cell: (row: any) => (
             <div className='flex flex-row'>
                <FaPenToSquare onClick={editHandler(row, reset)} className='cursor-pointer m-1'>Edit</FaPenToSquare>

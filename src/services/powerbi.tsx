@@ -140,7 +140,7 @@ export const getEntraToken = async (entraToken?: { clientId: string; clientSecre
             message: `Failed to get Entra token: ${JSON.stringify(errorData)}`,
             severity: 'ERROR'
          });
-         throw new Error(`Error al obtener el token: ${JSON.stringify(errorData, null, 2)}`);
+         throw new Error(`Error getting token: ${JSON.stringify(errorData, null, 2)}`);
       }
 
       const result = await response.json();
