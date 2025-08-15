@@ -6,7 +6,7 @@ import HighchartsAccessibility from 'highcharts/modules/accessibility'
 import HighchartsExporting from 'highcharts/modules/exporting'
 import HighchartsExportData from 'highcharts/modules/export-data'
 import HighchartsData from 'highcharts/modules/data'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { chartOptions } from '@/components/chart.components'
 import { useSession } from 'next-auth/react'
 import { getCandleLastValue, getMappedCandleValues } from '@/services/liveValues'
@@ -54,9 +54,9 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
             }
         };
         fetchData();
-    }, [line, name, interval]);
+    }, [line, name, interval, session?.user.db]);
 
-    const updateCandleData = async (series: any) => {
+    const updateCandleData = useCallback(async (series: any) => {
         try {
             if (!series || !series.data) return;
 
@@ -115,7 +115,7 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         } catch (error) {
             console.error('Error en updateCandleData: ', error);
         }
-    };
+    }, [candleDuration, line, name, session?.user.db]);
 
     useEffect(() => {
         const series = chartRef.current?.chart?.series?.[0];
@@ -126,7 +126,7 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         }, 1000);
 
         return () => clearInterval(intervalId);
-    }, [isReady]);
+    }, [isReady, updateCandleData]);
 
     const options = {
         ...chartOptions,

@@ -26,22 +26,6 @@ export function AdminTable({ sensors, session }: any) {
    const modbusRead = ['Coil', 'Input', 'HoldingRegister', 'InputRegister'];
    const modbusWrite = ['Coil', 'HoldingRegister', 'MCoils', 'MHoldingRegisters'];
 
-
-   useEffect(() => {
-      getTypes(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            setPlcType(res[0])
-         });
-      getLines(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            resetField("line", { defaultValue: res[0] })
-         });
-      getNodes(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            resetField("node", { defaultValue: res[0] })
-         });
-   }, [plcName, session?.user.db])
-
    useEffect(() => {
       getNames(session?.user.db)
          .then((res: any) => {
@@ -81,6 +65,21 @@ export function AdminTable({ sensors, session }: any) {
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
    } = useForm<SensorIface>();
+
+   useEffect(() => {
+      getTypes(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            setPlcType(res[0])
+         });
+      getLines(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("line", { defaultValue: res[0] })
+         });
+      getNodes(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("node", { defaultValue: res[0] })
+         });
+   }, [plcName, session?.user.db, resetField])
 
    const editHandler = (row: SensorIface, reset: UseFormReset<SensorIface>) => (event: any) => {
       switch (plcType) {

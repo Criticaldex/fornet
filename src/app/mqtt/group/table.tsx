@@ -26,19 +26,6 @@ export function MqttTable({ mqtts, session }: any) {
    const [sensorNames, setSensorNames] = useState(['-']);
 
    useEffect(() => {
-      setformLoaded(false);
-      getLines(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            resetField("line", { defaultValue: res[0] })
-         });
-      getNamesSensors(plcName, session?.user.db)
-         .then((res: any) => {
-            setSensorNames(res);
-            setformLoaded(true);
-         });
-   }, [plcName, session?.user.db])
-
-   useEffect(() => {
       getNames(session?.user.db)
          .then((res: any) => {
             setPlcNames(res);
@@ -138,6 +125,19 @@ export function MqttTable({ mqtts, session }: any) {
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
    } = useForm<MqttIface>();
+
+   useEffect(() => {
+      setformLoaded(false);
+      getLines(session?.user.db, { name: plcName })
+         .then((res: any) => {
+            resetField("line", { defaultValue: res[0] })
+         });
+      getNamesSensors(plcName, session?.user.db)
+         .then((res: any) => {
+            setSensorNames(res);
+            setformLoaded(true);
+         });
+   }, [plcName, session?.user.db, resetField])
 
    const editHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
       setPlcName(row.plc);

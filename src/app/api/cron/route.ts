@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { SummaryIface } from '@/schemas/summary';
 import { empreses } from '@/app/constants';
 
+// Force dynamic runtime for this API route
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET() {
     //if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
     //    console.log('ERROR: Bad Auth');
