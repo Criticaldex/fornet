@@ -82,28 +82,15 @@ export const upsertPowerBIConfig = async (data: PowerBIIface, session?: any) => 
    }
 }
 
-export const getEntraToken = async (entraToken?: { clientId: string; clientSecret: string; tenantId: string }) => {
+export const getEntraToken = async (entraToken: { clientId: string; clientSecret: string; tenantId: string }) => {
    const session = await getSession();
-
-   let clientId, clientSecret, tenantId;
-
-   if (entraToken) {
-      clientId = entraToken.clientId;
-      clientSecret = entraToken.clientSecret;
-      tenantId = entraToken.tenantId;
-   } else {
-      // Fallback to environment variables for backward compatibility
-      clientId = process.env.AZURE_CLIENTID!;
-      clientSecret = process.env.AZURE_CLIENTSECRET!;
-      tenantId = process.env.AZURE_TENANTID!;
-   }
 
    const scope = "https://analysis.windows.net/powerbi/api/.default";
 
    const data = new URLSearchParams({
       grant_type: "client_credentials",
-      client_id: clientId,
-      client_secret: clientSecret,
+      client_id: entraToken.clientId,
+      client_secret: entraToken.clientSecret,
       scope: scope,
       claims: JSON.stringify({
          access_token: {
@@ -121,7 +108,7 @@ export const getEntraToken = async (entraToken?: { clientId: string; clientSecre
          severity: 'INFO'
       });
 
-      const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+      const response = await fetch(`https://login.microsoftonline.com/${entraToken.tenantId}/oauth2/v2.0/token`, {
          method: "POST",
          headers: {
             "Content-Type": "application/x-www-form-urlencoded",
