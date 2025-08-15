@@ -4,6 +4,7 @@ export interface LogIface {
    user: string,
    resource: string,
    timestamp: number,
+   severity?: 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL',
    newValue?: string
    oldValue?: string,
    message?: string,
