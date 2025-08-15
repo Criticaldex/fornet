@@ -68,7 +68,7 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
 
             const newValue = lastValue[0][1];
 
-            // ¿Es necesario crear nueva vela?
+            // Is it necessary to create a  candle?
             if (!currentCandleRef.current || currentCandleRef.current.timestamp < alignedCandleStart) {
                 if (currentCandleRef.current) {
                     series.addPoint([

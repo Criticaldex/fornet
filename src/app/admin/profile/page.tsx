@@ -12,7 +12,7 @@ export default async function ProfilePage() {
    return (
       <div className="flex place-content-center mt-2">
          <ToastContainer />
-         <div className="flex basis-1/4 rounded-md bg-light">
+         <div className="flex basis-1/3 rounded-md bg-light">
             <UsersForm
                user={user}
                toast={toast}

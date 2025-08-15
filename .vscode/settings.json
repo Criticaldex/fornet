@@ -26,6 +26,10 @@
   "editor.fontFamily": "DejaVuSansM Nerd Font",
   "editor.fontSize": 14,
   "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
     "typescript": true,
     "javascript": true,
     "python": true

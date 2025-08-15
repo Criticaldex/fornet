@@ -25,6 +25,10 @@ export function GetLinksAdmin({ session }: any) {
       {
          label: 'Logs',
          route: `/admin/logs`
+      },
+      {
+         label: 'PowerBi',
+         route: `/admin/powerBi`
       }
    ];
    if (session?.user.role == 2) {
