@@ -5,9 +5,9 @@ import { createThemes } from "@/styles/themes"
 import { MqttForm } from "./form";
 import { MqttIface } from "@/schemas/mqtt";
 import { useForm, UseFormReset } from "react-hook-form";
-import { deleteMqtt, getMqttConfigs } from '@/services/mqtts';
+import { deleteMqtt, getMqttConfigs, sendMqtt } from '@/services/mqtts';
 import { confirmAlert } from 'react-confirm-alert';
-import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
+import { FaTrashCan, FaPenToSquare, FaShareFromSquare } from "react-icons/fa6";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
@@ -38,6 +38,15 @@ export function MqttTable({ mqtts, session }: any) {
    useEffect(() => {
       setIsClient(true)
    }, [])
+
+   const mqttHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
+      if (row.subtable.length > 0) {
+         row.subtable.forEach(element => {
+            //Està malament, està enviant el _id de la base de dades de mqtts, no el _id del sensor, igual es millor guardar el id del sensor en la base de dades de mqtt
+            sendMqtt(element);
+         });
+      }
+   }
 
    const ExpandedComponent = ({ data }: any) => {
       if (data.subtable) {
@@ -237,6 +246,7 @@ export function MqttTable({ mqtts, session }: any) {
          name: 'Accions',
          cell: (row: any) => (
             <div className='flex flex-row'>
+               <FaShareFromSquare onClick={mqttHandler(row, reset)} className='cursor-pointer m-1'>Send</FaShareFromSquare>
                <FaPenToSquare onClick={editHandler(row, reset)} className='cursor-pointer m-1'>Edit</FaPenToSquare>
                <FaTrashCan onClick={deleteHandler(row)} className='cursor-pointer m-1'>Delete</FaTrashCan>
             </div>
