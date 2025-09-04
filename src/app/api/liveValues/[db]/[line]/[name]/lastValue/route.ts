@@ -2,9 +2,15 @@ import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
 import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation';
 
 export async function GET(request: Request, { params }: { params: { db: string, line: string, name: string } }) {
    try {
+      // Validate that the database name is allowed
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
       const filter = {
          "line": params.line, "name": params.name
       };

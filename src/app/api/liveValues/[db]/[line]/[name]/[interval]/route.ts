@@ -2,10 +2,16 @@ import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
 import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation';
 
-export async function GET(request: Request, { params }: { params: { line: string, name: string, interval: number } }) {
+export async function GET(request: Request, { params }: { params: { db: string, line: string, name: string, interval: number } }) {
    try {
-      const dbName = 'empresa2';
+      // Validate that the database name is allowed
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
+      const dbName = params.db;
       let timestamp = Math.floor(Date.now() - (params.interval * 60 * 60 * 1000)).toString();
 
       const filter = {

@@ -10,11 +10,16 @@ import { getBaseNodesConfig } from "@/services/nodered"
 import { globalSiemensNodes, nodeReadSiemens, nodeReadSiemensAutoInc, nodeWriteSiemens } from "@/services/nodered"
 import { globalModbusNodes, nodeReadModbus, nodeReadModbusAutoInc, nodeWriteModbus } from "@/services/nodered"
 import { globalOmronNodes, nodeReadOmron, nodeReadOmronAutoInc, nodeWriteOmron } from "@/services/nodered"
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation'
 
 export async function GET(request: Request, { params }: { params: { db: string, node: string } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
          return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
+      }
+
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
       }
 
       const dbName = params.db;

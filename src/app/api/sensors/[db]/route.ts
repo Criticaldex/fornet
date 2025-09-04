@@ -3,12 +3,19 @@ import dbConnect from '@/lib/dbConnect'
 import SensorSchema, { SensorIface } from '@/schemas/sensor'
 import { NextResponse } from "next/server";
 import { headers } from 'next/headers';
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation'
 
 export async function GET(request: Request, { params }: { params: { db: string } }) {
    try {
       if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
          return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
       }
+
+      // Validate database name
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
       const dbName = params.db;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
@@ -31,8 +38,14 @@ export async function POST(request: Request, { params }: { params: { db: string 
       }
       const body = await request.json();
       if (!params.db) {
-         return NextResponse.json(`DB Missing!`);
+         return NextResponse.json({ ERROR: 'Database parameter is required' }, { status: 400 });
       }
+
+      // Validate database name
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
       const fields = (body.fields) ? body.fields.join(' ') : '';
       const dbName = params.db;
       await dbConnect();
@@ -56,8 +69,15 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       }
       const body: SensorIface = await request.json();
       if (!params.db) {
-         return NextResponse.json(`DB Missing!`);
-      } else if (!body.line) {
+         return NextResponse.json({ ERROR: 'Database parameter is required' }, { status: 400 });
+      }
+
+      // Validate database name
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
+      if (!body.line) {
          return NextResponse.json(`Line Missing!`);
       } else if (!body.name) {
          return NextResponse.json(`Name Missing!`);
@@ -96,8 +116,15 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       }
       const body: SensorIface = await request.json();
       if (!params.db) {
-         return NextResponse.json(`DB Missing!`);
-      } else if (!body.line) {
+         return NextResponse.json({ ERROR: 'Database parameter is required' }, { status: 400 });
+      }
+
+      // Validate database name
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
+      if (!body.line) {
          return NextResponse.json(`Line Missing!`);
       } else if (!body.plc_name) {
          return NextResponse.json(`PLC_Name Missing!`);

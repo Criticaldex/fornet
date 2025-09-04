@@ -3,6 +3,7 @@ import dbConnect from '@/lib/dbConnect'
 import { NextResponse } from 'next/server'
 import valueSchema, { ValueIface } from '@/schemas/value'
 import { headers } from 'next/headers'
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation';
 
 export async function POST(request: Request, { params }: { params: { db: string | undefined } }) {
    try {
@@ -13,6 +14,12 @@ export async function POST(request: Request, { params }: { params: { db: string 
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
       }
+
+      // Validate database name
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
       const fields = (body.fields) ? body.fields.join(' ') : '';
       const dbName = params.db;
       await dbConnect();
@@ -36,6 +43,12 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
       }
+
+      // Validate database name
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
       const dbName = params.db;
       await dbConnect();
       const db = mongoose.connection.useDb(dbName, { useCache: true });
@@ -57,6 +70,11 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       const body: ValueIface = await request.json();
       if (!params.db) {
          return NextResponse.json(`DB Missing!`);
+      }
+
+      // Validate database name
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
       }
 
       const dbName = params.db;

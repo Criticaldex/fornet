@@ -2,13 +2,19 @@ import mongoose from 'mongoose'
 import dbConnect from '@/lib/dbConnect'
 import PowerBISchema, { PowerBIIface } from '@/schemas/powerbi'
 import { NextResponse } from "next/server";
-import { headers } from 'next/headers';
+import { headers } from 'next/headers'
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation';
 
 export async function GET(request: Request, { params }: { params: { db: string } }) {
     try {
         if (headers().get('token') != process.env.NEXT_PUBLIC_API_KEY) {
             return NextResponse.json({ ERROR: 'Bad Auth' }, { status: 401 });
         }
+
+        if (!validateDatabaseName(params.db)) {
+            return invalidDatabaseResponse();
+        }
+
         const dbName = params.db;
         await dbConnect();
         const db = mongoose.connection.useDb(dbName, { useCache: true });
@@ -31,7 +37,12 @@ export async function PATCH(request: Request, { params }: { params: { db: string
         }
         const body: PowerBIIface = await request.json();
         if (!params.db) {
-            return NextResponse.json(`DB Missing!`);
+            return NextResponse.json({ ERROR: 'Database parameter is required' }, { status: 400 });
+        }
+
+        // Validate database name
+        if (!validateDatabaseName(params.db)) {
+            return invalidDatabaseResponse();
         }
 
         const dbName = params.db;
