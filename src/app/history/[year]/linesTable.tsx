@@ -7,8 +7,6 @@ import { createThemes } from "@/styles/themes";
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { SummaryChart } from './chart';
-import { getLineDrilldown, getLineSummaries } from '@/services/summaries';
-import { when } from 'jquery';
 
 const GridLayout = WidthProvider(RGL);
 
@@ -23,21 +21,16 @@ const ExpandedComponent = ({ data }: any) => {
       if (session) {
          let user = session.user;
          if (user.config.summary[data.line] != undefined) {
-            getLineSummaries(data.line, data.year, session)
-               .then((res: any) => {
-                  setLineCharts(res);
-                  getLineDrilldown(data.line, data.year, session)
-                     .then((res: any) => {
-                        setDrilldown(res);
-                        setLayoutConf(session?.user.config.summary[data.line] as any);
-                     })
-               })
+            // Use the server-side fetched data instead of making new API calls
+            setLineCharts(data.chartsData);
+            setDrilldown(data.drilldown);
+            setLayoutConf(session?.user.config.summary[data.line] as any);
          } else {
             user.config.summary[data.line] = [];
             update(user);
          }
       }
-   }, [data.line, data.year, session, update])
+   }, [data.line, data.year, session, update, data.chartsData, data.drilldown])
 
    function handleDel(i: any): void {
       if (session) {
