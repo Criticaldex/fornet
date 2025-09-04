@@ -4,6 +4,7 @@ import PlcSchema, { PlcIface } from '@/schemas/plc'
 import { NextResponse } from "next/server";
 import { headers } from 'next/headers';
 import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation'
+import { logCreate, logUpdate, logDelete } from '@/services/logs';
 
 export async function GET(request: Request, { params }: { params: { db: string } }) {
    try {
@@ -98,11 +99,34 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       if (!db.models.plc) {
          db.model('plc', PlcSchema);
       }
+
+      // Get old value for logging
+      const oldPlc = await db.models.plc.findOne(filter).lean() as PlcIface;
+
       const res = await db.models.plc.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
          includeResultMetadata: true
       });
+
+      // Log PLC update/create
+      const loggerUser = 'admin'; // Since we don't have session info in API routes, use admin as default
+      if (oldPlc) {
+         await logUpdate(
+            loggerUser,
+            'PLC',
+            { name: oldPlc.name, ip: oldPlc.ip, line: oldPlc.line, type: oldPlc.type },
+            { name: res.value.name, ip: res.value.ip, line: res.value.line, type: res.value.type },
+            params.db
+         );
+      } else {
+         await logCreate(
+            loggerUser,
+            'PLC',
+            { name: res.value.name, ip: res.value.ip, line: res.value.line, type: res.value.type },
+            params.db
+         );
+      }
 
       return NextResponse.json(res);
    } catch (err) {
@@ -143,7 +167,20 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
       if (!db.models.plc) {
          db.model('plc', PlcSchema);
       }
+
       const res = await db.models.plc.findOneAndDelete(filter);
+
+      // Log PLC deletion
+      if (res) {
+         const deletedPlc = res as unknown as PlcIface;
+         await logDelete(
+            'admin', // Since we don't have session info in API routes, use admin as default
+            'PLC',
+            { name: deletedPlc.name, ip: deletedPlc.ip, line: deletedPlc.line, type: deletedPlc.type },
+            params.db
+         );
+      }
+
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
