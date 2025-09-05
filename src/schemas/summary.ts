@@ -8,6 +8,7 @@ export interface SummaryIface {
    max?: number,
    min?: number,
    avg?: number,
+   shift?: string,
    year?: number
    month?: number
    day?: number
@@ -44,6 +45,11 @@ const SummarySchema = new mongoose.Schema({
       type: Number,
       required: [true, 'Average is mandatory!']
    },
+   shift: {
+      type: String,
+      required: [true, 'Shift is mandatory!'],
+      index: true
+   },
    year: {
       type: Number,
       required: [true, 'Year is mandatory!'],
@@ -61,6 +67,6 @@ const SummarySchema = new mongoose.Schema({
    }
 });
 
-SummarySchema.index({ line: 1, plc_name: 1, name: 1, year: 1, month: 1, day: 1 }, { unique: true });
+SummarySchema.index({ line: 1, plc_name: 1, name: 1, shift: 1, year: 1, month: 1, day: 1 }, { unique: true });
 
 export default SummarySchema;

@@ -34,7 +34,7 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
    const dataByMonth = _.groupBy(data, 'month')
    let chartData: any = [{
       type: 'spline',
-      name: 'Mitjana',
+      name: 'Average',
       color: 'var(--accent)',
       zIndex: 1,
       marker: {
@@ -45,7 +45,7 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
       data: []
    }, {
       type: 'columnrange',
-      name: 'Rang',
+      name: 'Range',
       color: 'var(--accent)',
       lineWidth: 0,
       linkedTo: ':previous',
@@ -57,26 +57,47 @@ export const getChartSummaries = async (filter: SummaryIface, session: any) => {
       data: []
    }];
 
-   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'Setember', 'October', 'November', 'December']
+   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
    for (const [month, monthData] of (Object.entries(dataByMonth) as unknown as [number, any][])) {
-      let avgSum = 0;
-      let min = monthData[0].min;
-      let max = monthData[0].max;
-      monthData.map((dia: any) => {
-         avgSum += dia.avg;
-         min = (dia.min < min) ? dia.min : min;
-         max = (dia.max > max) ? dia.max : max;
-      })
-      const avg = (avgSum / monthData.length);
+      // Group daily data by shift to calculate aggregated values
+      const shiftGroups = _.groupBy(monthData, 'shift');
+
+      // Calculate monthly averages across all shifts
+      let totalAvgSum = 0;
+      let monthMin = Number.MAX_VALUE;
+      let monthMax = Number.MIN_VALUE;
+      let totalDays = 0;
+
+      // For each day, we want the aggregate of all shifts
+      const dailyAggregates = _.chain(monthData)
+         .groupBy('day')
+         .mapValues((dayData: any[]) => {
+            const dayAvg = _.meanBy(dayData, 'avg');
+            const dayMin = _.minBy(dayData, 'min')?.min || 0;
+            const dayMax = _.maxBy(dayData, 'max')?.max || 0;
+            return { avg: dayAvg, min: dayMin, max: dayMax };
+         })
+         .values()
+         .value();
+
+      dailyAggregates.forEach((day: any) => {
+         totalAvgSum += day.avg;
+         monthMin = Math.min(monthMin, day.min);
+         monthMax = Math.max(monthMax, day.max);
+         totalDays++;
+      });
+
+      const monthAvg = totalDays > 0 ? (totalAvgSum / totalDays) : 0;
+
       chartData[0].data.push({
          name: monthStr[month],
-         y: avg,
+         y: monthAvg,
          drilldown: 'M' + monthStr[month]
       });
       chartData[1].data.push({
          name: monthStr[month],
-         high: max,
-         low: min,
+         high: monthMax,
+         low: monthMin,
          drilldown: 'R' + monthStr[month]
       });
    };
@@ -107,11 +128,13 @@ export const getChartDrilldown = async (filter: SummaryIface, session: any) => {
       series: []
    };
 
-   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'Setember', 'October', 'November', 'December']
+   let monthStr: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
    for (const [month, monthData] of (Object.entries(dataByMonth) as unknown as [number, any][])) {
+      // Monthly drill-down to days (aggregated by day)
       let mitja = {
          type: 'spline',
-         name: 'Mitjana',
+         name: 'Daily Average',
          id: '',
          color: 'var(--accent)',
          zIndex: 1,
@@ -120,11 +143,11 @@ export const getChartDrilldown = async (filter: SummaryIface, session: any) => {
             lineWidth: 2,
             lineColor: 'var(--accent)'
          },
-         data: []
+         data: [] as any[]
       }
       let rang = {
          type: 'columnrange',
-         name: 'Rang',
+         name: 'Daily Range',
          id: '',
          color: 'var(--accent)',
          lineWidth: 0,
@@ -133,28 +156,79 @@ export const getChartDrilldown = async (filter: SummaryIface, session: any) => {
          marker: {
             enabled: false
          },
-         data: []
+         data: [] as any[]
       }
-      let mitjanes: any = [];
-      let rangs: any = [];
-      const orderedDays = _.orderBy(monthData, 'day');
-      orderedDays.map((dia: any) => {
-         mitjanes.push({
-            name: dia.day,
-            y: dia.avg,
+
+      // Group by day and aggregate shifts
+      const dayGroups = _.groupBy(monthData, 'day');
+      const orderedDays = _.orderBy(Object.keys(dayGroups), (day) => parseInt(day));
+
+      orderedDays.forEach((dayKey) => {
+         const dayData = dayGroups[dayKey];
+         const dayAvg = _.meanBy(dayData, 'avg');
+         const dayMin = _.minBy(dayData, 'min')?.min || 0;
+         const dayMax = _.maxBy(dayData, 'max')?.max || 0;
+
+         mitja.data.push({
+            name: `Day ${dayKey}`,
+            y: dayAvg,
+            drilldown: `D${monthStr[month]}_${dayKey}` // Enable drill-down to shifts
          });
-         rangs.push({
-            name: dia.day,
-            high: dia.max,
-            low: dia.min,
+         rang.data.push({
+            name: `Day ${dayKey}`,
+            high: dayMax,
+            low: dayMin,
+            drilldown: `DR${monthStr[month]}_${dayKey}`
          });
-      })
+      });
+
       mitja.id = 'M' + monthStr[month];
       rang.id = 'R' + monthStr[month];
-      mitja.data = mitjanes;
-      rang.data = rangs;
       chartData.series.push(rang);
       chartData.series.push(mitja);
+
+      // Add shift-level drill-down data for each day
+      orderedDays.forEach((dayKey) => {
+         const dayData = dayGroups[dayKey];
+
+         let shiftMitja = {
+            type: 'column',
+            name: 'Average by Shift',
+            id: `D${monthStr[month]}_${dayKey}`,
+            color: 'var(--accent)',
+            data: [] as any[]
+         };
+
+         let shiftRang = {
+            type: 'columnrange',
+            name: 'Range by Shift',
+            id: `DR${monthStr[month]}_${dayKey}`,
+            color: 'var(--accent)',
+            opacity: 0.6,
+            data: [] as any[]
+         };
+
+         // Get unique shifts for this day and sort them
+         const shifts = _.uniqBy(dayData, 'shift').map(d => d.shift).sort();
+
+         shifts.forEach((shift) => {
+            const shiftData = dayData.find((d: any) => d.shift === shift);
+            if (shiftData) {
+               shiftMitja.data.push({
+                  name: shift,
+                  y: shiftData.avg
+               });
+               shiftRang.data.push({
+                  name: shift,
+                  high: shiftData.max,
+                  low: shiftData.min
+               });
+            }
+         });
+
+         chartData.series.push(shiftRang);
+         chartData.series.push(shiftMitja);
+      });
    };
 
    return chartData;
@@ -170,6 +244,23 @@ export const getLineDrilldown = async (line: string, year: number, session: any)
       }, session);
    }
    return lineData;
+}
+
+// Debug function to check shift data structure
+export const getShiftDataSummary = async (filter: SummaryIface, db?: string) => {
+   const data: any[] = await getSummaries(filter, ['-id'], db);
+   const shiftSummary = {
+      totalRecords: data.length,
+      shifts: _.uniq(data.map(d => d.shift)).sort(),
+      dateRange: {
+         from: _.minBy(data, d => `${d.year}-${d.month}-${d.day}`),
+         to: _.maxBy(data, d => `${d.year}-${d.month}-${d.day}`)
+      },
+      recordsByShift: _.countBy(data, 'shift'),
+      sampleData: data.slice(0, 3)
+   };
+   console.log('Shift Data Summary:', shiftSummary);
+   return shiftSummary;
 }
 
 export const getLines = async (db?: any) => {
