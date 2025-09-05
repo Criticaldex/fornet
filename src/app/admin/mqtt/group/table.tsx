@@ -12,7 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { getLines, getNames } from '@/services/plcs';
-import { getNames as getNamesSensors } from '@/services/sensors';
+import { getNames as getNamesSensors, getSensorsWithIds } from '@/services/sensors';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 
@@ -26,6 +26,7 @@ export function MqttTable({ mqtts, session }: any) {
    const [plcName, setPlcName] = useState('');
    const [plcNames, setPlcNames] = useState(['-']);
    const [sensorNames, setSensorNames] = useState(['-']);
+   const [sensors, setSensors] = useState<{ _id: string, name: string }[]>([]);
    const pathname = usePathname();
 
    useEffect(() => {
@@ -39,12 +40,17 @@ export function MqttTable({ mqtts, session }: any) {
       setIsClient(true)
    }, [])
 
-   const mqttHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
-      if (row.subtable.length > 0) {
-         row.subtable.forEach(element => {
-            //Està malament, està enviant el _id de la base de dades de mqtts, no el _id del sensor, igual es millor guardar el id del sensor en la base de dades de mqtt
-            sendMqtt(element);
+   const mqttHandler = (row: any, reset: UseFormReset<MqttIface>) => (event: any) => {
+      if (row.subtable && Array.isArray(row.subtable)) {
+         // For group MQTT, iterate through subtable and send each item
+         row.subtable.forEach((item: any) => {
+            if (item.sensorId && item.value) {
+               sendMqtt(item.sensorId, item.value);
+            }
          });
+      } else if (row.sensorId && row.value) {
+         // Fallback for individual items
+         sendMqtt(row.sensorId, row.value);
       }
    }
 
@@ -182,19 +188,39 @@ export function MqttTable({ mqtts, session }: any) {
       resetField,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
-   } = useForm<MqttIface>();
+   } = useForm<MqttIface>({
+      defaultValues: {
+         name: '',
+         line: '',
+         ip: '',
+         plc: '',
+         sensor: '',
+         sensorId: '',
+         value: ''
+      }
+   });
 
    useEffect(() => {
-      setformLoaded(false);
-      getLines(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            resetField("line", { defaultValue: res[0] })
-         });
-      getNamesSensors(plcName, session?.user.db)
-         .then((res: any) => {
-            setSensorNames(res);
-            setformLoaded(true);
-         });
+      if (plcName && plcName !== '') {
+         setformLoaded(false);
+         getLines(session?.user.db, { name: plcName })
+            .then((res: any) => {
+               resetField("line", { defaultValue: res[0] })
+            });
+
+         // Get sensor names for backward compatibility
+         getNamesSensors(plcName, session?.user.db)
+            .then((res: any) => {
+               setSensorNames(res);
+            });
+
+         // Get sensors with IDs for the new functionality
+         getSensorsWithIds(plcName, session?.user.db)
+            .then((res: any) => {
+               setSensors(res);
+               setformLoaded(true);
+            });
+      }
    }, [plcName, session?.user.db, resetField])
 
    const editHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
@@ -247,7 +273,6 @@ export function MqttTable({ mqtts, session }: any) {
          cell: (row: any) => (
             <div className='flex flex-row'>
                <FaShareFromSquare onClick={mqttHandler(row, reset)} className='cursor-pointer m-1'>Send</FaShareFromSquare>
-               <FaPenToSquare onClick={editHandler(row, reset)} className='cursor-pointer m-1'>Edit</FaPenToSquare>
                <FaTrashCan onClick={deleteHandler(row)} className='cursor-pointer m-1'>Delete</FaTrashCan>
             </div>
          ),
@@ -278,7 +303,7 @@ export function MqttTable({ mqtts, session }: any) {
                   />
                </div>
                <div className="flex basis-1/4 rounded-md bg-light">
-                  {formLoaded ?
+                  {(formLoaded || plcName === '') ?
                      <MqttForm
                         register={register}
                         handleSubmit={handleSubmit}
@@ -291,6 +316,7 @@ export function MqttTable({ mqtts, session }: any) {
                         setPlcName={setPlcName}
                         plcNames={plcNames}
                         sensorNames={sensorNames}
+                        sensors={sensors}
                      />
                      : <Loading />}
                </div>

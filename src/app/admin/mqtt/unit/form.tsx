@@ -5,7 +5,7 @@ import { getFilteredMqtts, upsertMqtt } from "@/services/mqtts";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 
-export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, setPlcName, plcNames, sensorNames }: any) => {
+export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, setPlcName, plcNames, sensorNames, sensors }: any) => {
 
    const onSubmit = handleSubmit(async (data: MqttIface) => {
       const session = await getSession();
@@ -62,7 +62,20 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
                <label htmlFor="sensor" className="flex self-center">Sensor:</label>
                <select id="sensor"
                   className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.sensor ? 'border-foreground' : 'border-red'}`}
-                  {...register("sensor", { required: 'Field Required' })}>
+                  {...register("sensor", {
+                     required: 'Field Required',
+                     onChange: (e: any) => {
+                        const selectedSensor = sensors.find((s: any) => s.name === e.target.value);
+                        if (selectedSensor) {
+                           // Set the sensorId in the form
+                           reset((current: any) => ({
+                              ...current,
+                              sensor: selectedSensor.name,
+                              sensorId: selectedSensor._id
+                           }));
+                        }
+                     }
+                  })}>
                   <option key='' value=''>Select...</option>
                   {sensorNames.map((name: any) => {
                      return <option key={name} value={`${name}`}>
@@ -72,6 +85,9 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
                </select>
             </div>
             {errors.sensor && <p role="alert" className="text-red self-end">⚠ {errors.sensor?.message}</p>}
+
+            {/* Hidden field for sensorId */}
+            <input type="hidden" {...register("sensorId")} />
 
             <div className="inline-flex justify-end">
                <label htmlFor="value" className="flex self-center">Value:</label>

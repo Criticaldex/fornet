@@ -12,7 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { getLines, getNames } from '@/services/plcs';
-import { getNames as getNamesSensors } from '@/services/sensors';
+import { getNames as getNamesSensors, getSensorsWithIds } from '@/services/sensors';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 
@@ -25,6 +25,7 @@ export function MqttTable({ mqtts, nodes, session }: any) {
    const [plcName, setPlcName] = useState('');
    const [plcNames, setPlcNames] = useState(['-']);
    const [sensorNames, setSensorNames] = useState(['-']);
+   const [sensors, setSensors] = useState<{ _id: string, name: string }[]>([]);
    const pathname = usePathname();
 
    useEffect(() => {
@@ -121,6 +122,7 @@ export function MqttTable({ mqtts, nodes, session }: any) {
          ip: '',
          plc: '',
          sensor: '',
+         sensorId: '',
          value: ''
       }
    });
@@ -133,16 +135,26 @@ export function MqttTable({ mqtts, nodes, session }: any) {
                // Only reset line field if it's currently empty or if we're not in an edit scenario
                resetField("line", { defaultValue: res[0] })
             });
+
+         // Get sensor names for backward compatibility
          getNamesSensors(plcName, session?.user.db)
             .then((res: any) => {
                setSensorNames(res);
+            });
+
+         // Get sensors with IDs for the new functionality
+         getSensorsWithIds(plcName, session?.user.db)
+            .then((res: any) => {
+               setSensors(res);
                setformLoaded(true);
             });
       }
    }, [plcName, session?.user.db, resetField])
 
    const mqttHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
-      sendMqtt(row);
+      if (row.sensorId && row.value) {
+         sendMqtt(row.sensorId, row.value);
+      }
    }
 
    const editHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
@@ -242,6 +254,7 @@ export function MqttTable({ mqtts, nodes, session }: any) {
                         setPlcName={setPlcName}
                         plcNames={plcNames}
                         sensorNames={sensorNames}
+                        sensors={sensors}
                      />
                      : <Loading />}
                </div>
