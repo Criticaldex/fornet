@@ -29,10 +29,12 @@ export function BoolChart({ line, name }: any) {
       chart: {
          animation: false,
          type: 'solidgauge',
+         height: null, // Allow responsive height
          spacingTop: 0,
-         height: '30%',
-         margin: [20, 0, 0, 0],
-         spacing: [0, 0, 0, 0],
+         spacingRight: 0,
+         spacingBottom: 0,
+         spacingLeft: 0,
+         margin: [5, 5, 5, 5],
       },
       data: {
          rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${session?.user.db}/${line}/${name}/lastValue`,
@@ -64,16 +66,16 @@ export function BoolChart({ line, name }: any) {
                enabled: false
             },
             lineWidth: 1,
-            radius: "20%",
+            radius: "40%",
             innerRadius: "0%"
          }
       },
       pane: {
-         size: '400%',
+         size: '100%',
          innerSize: '0%',
          center: ["50%", "50%"],
          background: {
-            outerRadius: '20%',
+            outerRadius: '40%',
             innerRadius: '0%',
             backgroundColor: `var(--bg-dark)`,
             borderWidth: 1,
@@ -89,10 +91,11 @@ export function BoolChart({ line, name }: any) {
    }
 
    return (
-      <div className="m-2">
+      <div className="w-full h-full">
          <HighchartsReact
             highcharts={Highcharts}
             options={options}
+            containerProps={{ style: { height: '100%', width: '100%' } }}
          />
       </div>
    )

@@ -27,6 +27,11 @@ export function LiveChart({ i, line, name, unit, interval }: any) {
       ...chartOptions,
       chart: {
          type: 'spline',
+         height: null, // Allow responsive height
+         spacingTop: 5,
+         spacingRight: 5,
+         spacingBottom: 5,
+         spacingLeft: 5,
       },
       data: {
          rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${session?.user.db}/${line}/${name}/${interval}`,
@@ -43,6 +48,23 @@ export function LiveChart({ i, line, name, unit, interval }: any) {
          ...chartOptions.yAxis,
          title: null
       },
+      responsive: {
+         rules: [{
+            condition: {
+               maxWidth: 300
+            },
+            chartOptions: {
+               legend: {
+                  enabled: false
+               },
+               yAxis: {
+                  labels: {
+                     enabled: false
+                  }
+               }
+            }
+         }]
+      },
       tooltip: {
          formatter: function (this: any) {
             const time = new Date(this.point.x)
@@ -52,10 +74,11 @@ export function LiveChart({ i, line, name, unit, interval }: any) {
    }
 
    return (
-      <div className="m-2">
+      <div className="w-full h-full">
          <HighchartsReact
             highcharts={Highcharts}
             options={options}
+            containerProps={{ style: { height: '100%', width: '100%' } }}
          />
       </div>
    )
