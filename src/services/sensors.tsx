@@ -52,6 +52,20 @@ export const getNames = async (plc: string, db?: string) => {
    return names;
 }
 
+export const getSensorsWithIds = async (plc: string, db?: string) => {
+   const data = await getFilteredSensors(db, { plc_name: plc }, ['_id', 'name'], 'name');
+   let groupByName = _.groupBy(data, 'name');
+
+   let sensors: { _id: string, name: string }[] = [];
+
+   for (const [key, value] of (Object.entries(groupByName) as [string, any][])) {
+      if (value.length > 0) {
+         sensors.push({ _id: value[0]._id, name: key });
+      }
+   }
+   return sensors;
+}
+
 export const getNamesUnits = async (line: string, db?: string) => {
    const data = await getFilteredSensors(db, { line: line }, ['-_id', 'name', 'unit'], 'name');
    let groupByName = _.groupBy(data, 'name');

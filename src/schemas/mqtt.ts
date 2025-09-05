@@ -7,6 +7,7 @@ export interface MqttIface {
     ip?: string,
     plc: string,
     sensor?: string,
+    sensorId?: string,
     value?: string
 }
 
@@ -25,6 +26,9 @@ const MqttSchema = new mongoose.Schema({
         type: String,
     },
     sensor: {
+        type: String,
+    },
+    sensorId: {
         type: String,
     },
     value: {

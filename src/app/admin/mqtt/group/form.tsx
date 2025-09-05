@@ -4,7 +4,7 @@ import { MqttIface } from "@/schemas/mqtt";
 import { getMqttConfigs, upsertMqtt } from "@/services/mqtts";
 import { getSession } from "next-auth/react"
 
-export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, resetField, setPlcName, plcNames, sensorNames }: any) => {
+export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, resetField, setPlcName, plcNames, sensorNames, sensors }: any) => {
 
    const onSubmit = handleSubmit(async (data: MqttIface) => {
       const session = await getSession();
@@ -46,10 +46,12 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
                <label htmlFor="plc" className="flex self-center">PLC:</label>
                <select id="plc"
                   className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}
-                  {...register("plc", { required: 'Field Required' })}
-                  onChange={e => {
-                     setPlcName(e.target.value)
-                  }}>
+                  {...register("plc", {
+                     required: 'Field Required',
+                     onChange: (e: any) => {
+                        setPlcName(e.target.value)
+                     }
+                  })}>
                   <option key='' value=''>Select...</option>
                   {plcNames.map((name: any) => {
                      return <option key={name} value={`${name}`}>
@@ -64,7 +66,15 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
                <label htmlFor="sensor" className="flex self-center">Sensor:</label>
                <select id="sensor"
                   className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.sensor ? 'border-foreground' : 'border-red'}`}
-                  {...register("sensor", { required: 'Field Required' })}>
+                  {...register("sensor", { 
+                     required: 'Field Required',
+                     onChange: (e: any) => {
+                        const selectedSensor = sensors.find((sensor: any) => sensor.name === e.target.value);
+                        if (selectedSensor) {
+                           resetField("sensorId", { defaultValue: selectedSensor._id });
+                        }
+                     }
+                  })}>
                   <option key='' value=''>Select...</option>
                   {sensorNames.map((name: any) => {
                      return <option key={name} value={`${name}`}>
@@ -74,6 +84,9 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
                </select>
             </div>
             {errors.sensor && <p role="alert" className="text-red self-end">⚠ {errors.sensor?.message}</p>}
+
+            {/* Hidden field to store sensor ID */}
+            <input type="hidden" {...register("sensorId")} />
 
             <div className="inline-flex justify-end">
                <label htmlFor="value" className="flex self-center">Value:</label>

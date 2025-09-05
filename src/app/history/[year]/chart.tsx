@@ -8,7 +8,7 @@ import HighchartsReact from 'highcharts-react-official'
 import HighchartsNoData from 'highcharts/modules/no-data-to-display'
 import highchartsDrilldown from "highcharts/modules/drilldown";
 import { chartOptions } from '@/components/chart.components'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Loading } from "@/components/loading.component";
 
 
@@ -24,39 +24,54 @@ if (typeof Highcharts === "object") {
 export function SummaryChart({ name, data, dd }: any) {
 
    const [isLoading, setIsLoading] = useState(true);
+   const chartRef = useRef<HighchartsReact.RefObject>(null);
+
    useEffect(() => {
       if (dd && data) {
          setIsLoading(false);
+
+         // Reset chart to initial state when data changes (e.g., after tab switch)
+         if (chartRef.current?.chart) {
+            // Reset drilldown to root level
+            chartRef.current.chart.drillUp();
+         }
       }
    }, [dd, data]);
+
+   // Handle window resize to ensure chart reflows properly
+   useEffect(() => {
+      const handleResize = () => {
+         if (chartRef.current?.chart) {
+            setTimeout(() => {
+               chartRef.current?.chart?.reflow();
+            }, 100);
+         }
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+   }, []);
 
    const options = {
       ...chartOptions,
       chart: {
-         spacingTop: 10,
-         height: 400, // Increased height for better shift visualization
+         type: 'column',
+         height: null, // Allow responsive height
+         spacingTop: 5,
+         spacingRight: 5,
+         spacingBottom: 5,
+         spacingLeft: 5,
       },
       title: {
-         text: name,
-         style: {
-            color: 'var(--textColor)',
-            fontSize: '16px',
-            fontWeight: 'bold'
-         }
+         text: undefined
       },
-      subtitle: {
-         text: 'Click on data points to see details by day and shift',
-         style: {
-            color: 'var(--textColor)',
-            fontSize: '12px'
-         }
-      },
+      subtitle: undefined,
       series: data,
       drilldown: {
          ...dd,
          breadcrumbs: {
             position: {
-               align: 'right'
+               align: 'left'
             },
             buttonTheme: {
                fill: 'var(--bgLight)',
@@ -64,7 +79,7 @@ export function SummaryChart({ name, data, dd }: any) {
                'stroke-width': 1,
                style: {
                   color: 'var(--textColor)',
-                  fontSize: '12px'
+                  fontSize: '11px'
                },
                states: {
                   hover: {
@@ -124,6 +139,23 @@ export function SummaryChart({ name, data, dd }: any) {
             return tooltip;
          }
       },
+      responsive: {
+         rules: [{
+            condition: {
+               maxWidth: 300
+            },
+            chartOptions: {
+               legend: {
+                  enabled: false
+               },
+               yAxis: {
+                  labels: {
+                     enabled: false
+                  }
+               }
+            }
+         }]
+      },
       plotOptions: {
          series: {
             borderWidth: 0,
@@ -156,11 +188,14 @@ export function SummaryChart({ name, data, dd }: any) {
    }
 
    return (
-      <div className="relative w-full h-full min-h-[400px]">
+      <div className="w-full h-full">
          {!isLoading ? (
             <HighchartsReact
+               ref={chartRef}
                highcharts={Highcharts}
                options={options}
+               containerProps={{ style: { height: '100%', width: '100%' } }}
+               key={`${name}-${JSON.stringify(data?.[0]?.data?.[0])}`}
             />
          ) : (
             <div className="absolute inset-0">

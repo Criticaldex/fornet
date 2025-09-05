@@ -1,4 +1,7 @@
 export const empreses = [
     'empresa2',
-    'fornet'
+    'fornet',
+    'lluis',
+    'eric',
+    'coma'
 ]
