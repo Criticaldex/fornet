@@ -71,17 +71,19 @@ const ExpandedComponent = ({ data }: any) => {
          {
             layoutConf.map((chart: any, index: number) => {
                chart.i = index.toString();
-               return < div key={chart.i} className='bg-bgLight rounded-md'>
-                  <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                     <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name}</span>
-                     <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
+               return < div key={chart.i} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
+                  <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
+                     <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name}</span>
+                     <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                   </div>
-                  <SummaryChart
-                     i={chart.i}
-                     name={chart.name}
-                     data={lineCharts[chart.name]}
-                     dd={drilldown[chart.name]}
-                  />
+                  <div className="flex-1 min-h-0 overflow-hidden p-2">
+                     <SummaryChart
+                        i={chart.i}
+                        name={chart.name}
+                        data={lineCharts[chart.name]}
+                        dd={drilldown[chart.name]}
+                     />
+                  </div>
                </div>
             })
          }

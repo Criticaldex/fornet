@@ -38,11 +38,29 @@ export function SummaryChart({ name, data, dd }: any) {
       }
    }, [dd, data]);
 
+   // Handle window resize to ensure chart reflows properly
+   useEffect(() => {
+      const handleResize = () => {
+         if (chartRef.current?.chart) {
+            setTimeout(() => {
+               chartRef.current?.chart?.reflow();
+            }, 100);
+         }
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+   }, []);
+
    const options = {
       ...chartOptions,
       chart: {
-         spacingTop: 10,
-         height: 400, // Increased height for better shift visualization
+         type: 'column',
+         height: null, // Allow responsive height
+         spacingTop: 5,
+         spacingRight: 5,
+         spacingBottom: 5,
+         spacingLeft: 5,
       },
       title: {
          text: undefined
@@ -53,7 +71,7 @@ export function SummaryChart({ name, data, dd }: any) {
          ...dd,
          breadcrumbs: {
             position: {
-               align: 'right'
+               align: 'left'
             },
             buttonTheme: {
                fill: 'var(--bgLight)',
@@ -61,7 +79,7 @@ export function SummaryChart({ name, data, dd }: any) {
                'stroke-width': 1,
                style: {
                   color: 'var(--textColor)',
-                  fontSize: '12px'
+                  fontSize: '11px'
                },
                states: {
                   hover: {
@@ -121,6 +139,23 @@ export function SummaryChart({ name, data, dd }: any) {
             return tooltip;
          }
       },
+      responsive: {
+         rules: [{
+            condition: {
+               maxWidth: 300
+            },
+            chartOptions: {
+               legend: {
+                  enabled: false
+               },
+               yAxis: {
+                  labels: {
+                     enabled: false
+                  }
+               }
+            }
+         }]
+      },
       plotOptions: {
          series: {
             borderWidth: 0,
@@ -153,12 +188,13 @@ export function SummaryChart({ name, data, dd }: any) {
    }
 
    return (
-      <div className="relative w-full h-full min-h-[400px]">
+      <div className="w-full h-full">
          {!isLoading ? (
             <HighchartsReact
                ref={chartRef}
                highcharts={Highcharts}
                options={options}
+               containerProps={{ style: { height: '100%', width: '100%' } }}
                key={`${name}-${JSON.stringify(data?.[0]?.data?.[0])}`}
             />
          ) : (
