@@ -23,6 +23,10 @@ export function GetLinksAdmin({ session }: any) {
          route: `/admin/plcs`
       },
       {
+         label: 'Shifts',
+         route: `/admin/shifts`
+      },
+      {
          label: 'Logs',
          route: `/admin/logs`
       },
