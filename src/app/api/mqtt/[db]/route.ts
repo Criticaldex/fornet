@@ -122,16 +122,7 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
 
       if (!body.line) {
          return NextResponse.json({ ERROR: 'line Missing!' }, { status: 400 });
-      } else if (!body.name) {
-         return NextResponse.json({ ERROR: 'name Missing!' }, { status: 400 });
       }
-
-      // const filter = {
-      //    line: body.line,
-      //    name: body.name,
-      //    plc: body.plc,
-      //    sensor: body.sensor
-      // }
 
       const dbName = params.db;
 

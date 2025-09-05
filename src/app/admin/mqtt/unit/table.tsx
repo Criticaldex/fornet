@@ -114,19 +114,31 @@ export function MqttTable({ mqtts, nodes, session }: any) {
       resetField,
       clearErrors,
       formState: { errors, isDirty, dirtyFields }
-   } = useForm<MqttIface>();
+   } = useForm<MqttIface>({
+      defaultValues: {
+         name: '',
+         line: '',
+         ip: '',
+         plc: '',
+         sensor: '',
+         value: ''
+      }
+   });
 
    useEffect(() => {
-      setformLoaded(false);
-      getLines(session?.user.db, { name: plcName })
-         .then((res: any) => {
-            resetField("line", { defaultValue: res[0] })
-         });
-      getNamesSensors(plcName, session?.user.db)
-         .then((res: any) => {
-            setSensorNames(res);
-            setformLoaded(true);
-         });
+      if (plcName && plcName !== '') {
+         setformLoaded(false);
+         getLines(session?.user.db, { name: plcName })
+            .then((res: any) => {
+               // Only reset line field if it's currently empty or if we're not in an edit scenario
+               resetField("line", { defaultValue: res[0] })
+            });
+         getNamesSensors(plcName, session?.user.db)
+            .then((res: any) => {
+               setSensorNames(res);
+               setformLoaded(true);
+            });
+      }
    }, [plcName, session?.user.db, resetField])
 
    const mqttHandler = (row: MqttIface, reset: UseFormReset<MqttIface>) => (event: any) => {
@@ -217,7 +229,7 @@ export function MqttTable({ mqtts, nodes, session }: any) {
                   />
                </div>
                <div className="flex basis-1/4 rounded-md bg-light">
-                  {formLoaded ?
+                  {(formLoaded || plcName === '') ?
                      <MqttForm
                         register={register}
                         handleSubmit={handleSubmit}

@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
+import { deleteMqtt } from '@/services/mqtts';
 import { getLines, getNames, getNodes, getTypes } from '@/services/plcs';
 
 export function AdminTable({ sensors, session }: any) {
@@ -122,19 +123,24 @@ export function AdminTable({ sensors, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL It\'s Values ⚠️ Are you sure?',
+         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL It\'s Values and MQTT entries ⚠️ Are you sure?',
          buttons: [
             {
                label: 'Yes',
                onClick: async () => {
                   const dSensor = await deleteSensor({ line: row.line, name: row.name, plc_name: row.plc_name }, session?.user.db);
                   const dValue = await deleteValues({ line: row.line, name: row.name, plc_name: row.plc_name }, session?.user.db);
+                  const dMqtt = await deleteMqtt({ line: row.line, plc: row.plc_name, sensor: row.name }, session?.user.db);
+
                   if (dSensor) {
                      toast.error('Sensor Deleted!!', { theme: "colored" });
                      setRows(await getSensors(session?.user.db));
                   }
                   if (dValue.acknowledged) {
                      toast.error(dValue.deletedCount + ' Values Deleted!!', { theme: "colored" });
+                  }
+                  if (dMqtt.acknowledged) {
+                     toast.error(dMqtt.deletedCount + ' MQTT entries Deleted!!', { theme: "colored" });
                   }
                }
             },

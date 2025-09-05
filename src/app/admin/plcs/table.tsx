@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
+import { deleteMqtt } from '@/services/mqtts';
 import { mongo } from 'mongoose';
 import { deleteSensor } from '@/services/sensors';
 
@@ -81,7 +82,7 @@ export function PlcTable({ plcs, nodes, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL sensors and values attached to this plc ⚠️ Are you sure?',
+         message: '⚠️ Deleting ' + row.name + ' in ' + row.line + ' line and ALL sensors, values, and MQTT entries attached to this plc ⚠️ Are you sure?',
          buttons: [
             {
                label: 'Yes',
@@ -89,6 +90,7 @@ export function PlcTable({ plcs, nodes, session }: any) {
                   const dPlc = await deletePlc(row, session?.user.db);
                   const dSensor = await deleteSensor({ line: row.line, plc_name: row.name }, session?.user.db);
                   const dValue = await deleteValues({ line: row.line, plc_name: row.name }, session?.user.db);
+                  const dMqtt = await deleteMqtt({ line: row.line, plc: row.name }, session?.user.db);
 
                   if (dPlc) {
                      toast.error('PLC Deleted!!', { theme: "colored" });
@@ -99,6 +101,9 @@ export function PlcTable({ plcs, nodes, session }: any) {
                   }
                   if (dValue.acknowledged) {
                      toast.error(dValue.deletedCount + ' Values Deleted!!', { theme: "colored" });
+                  }
+                  if (dMqtt.acknowledged) {
+                     toast.error(dMqtt.deletedCount + ' MQTT entries Deleted!!', { theme: "colored" });
                   }
                }
             },

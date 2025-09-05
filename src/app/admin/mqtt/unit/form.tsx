@@ -42,10 +42,12 @@ export const MqttForm = ({ register, handleSubmit, errors, setRows, toast, reset
                <label htmlFor="plc" className="flex self-center">PLC:</label>
                <select id="plc"
                   className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 basis-9/12 ${!errors.plc ? 'border-foreground' : 'border-red'}`}
-                  {...register("plc", { required: 'Field Required' })}
-                  onChange={e => {
-                     setPlcName(e.target.value)
-                  }}>
+                  {...register("plc", {
+                     required: 'Field Required',
+                     onChange: (e: any) => {
+                        setPlcName(e.target.value)
+                     }
+                  })}>
                   <option key='' value=''>Select...</option>
                   {plcNames.map((name: any) => {
                      return <option key={name} value={`${name}`}>
