@@ -12,7 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
-import { deleteMqtt } from '@/services/mqtts';
+import { deleteMqtt, sendMqtt } from '@/services/mqtts';
 import { getLines, getNames, getNodes, getTypes } from '@/services/plcs';
 
 export function AdminTable({ sensors, session }: any) {
@@ -131,6 +131,11 @@ export function AdminTable({ sensors, session }: any) {
                   const dSensor = await deleteSensor({ line: row.line, name: row.name, plc_name: row.plc_name }, session?.user.db);
                   const dValue = await deleteValues({ line: row.line, name: row.name, plc_name: row.plc_name }, session?.user.db);
                   const dMqtt = await deleteMqtt({ line: row.line, plc: row.plc_name, sensor: row.name }, session?.user.db);
+
+                  // Send MQTT notification about sensor deletion
+                  if (dSensor && row.node) {
+                     sendMqtt(row.node, 'true');
+                  }
 
                   if (dSensor) {
                      toast.error('Sensor Deleted!!', { theme: "colored" });

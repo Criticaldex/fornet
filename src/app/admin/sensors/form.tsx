@@ -4,12 +4,16 @@ import { SensorIface } from "@/schemas/sensor";
 import { getSensors, upsertSensor } from "@/services/sensors";
 import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
+import { sendMqtt } from "@/services/mqtts";
 
 export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRows, toast, reset, resetField, setPlcName, plcNames, plcType, setModbusDataType, modbusDataType, modbusRead, modbusWrite }: any) => {
    const onSubmit = handleSubmit(async (data: SensorIface) => {
       const session = await getSession();
       const upsert = await upsertSensor(data, session?.user.db, plcType);
       const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
+      if (data.node) {
+         sendMqtt(data.node, 'true');
+      }
 
       if (upsert.lastErrorObject?.updatedExisting) {
          toast.success('Object Modified!', { theme: "colored" });

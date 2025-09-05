@@ -12,7 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { deleteValues } from '@/services/values';
-import { deleteMqtt } from '@/services/mqtts';
+import { deleteMqtt, sendMqtt } from '@/services/mqtts';
 import { mongo } from 'mongoose';
 import { deleteSensor } from '@/services/sensors';
 
@@ -91,6 +91,11 @@ export function PlcTable({ plcs, nodes, session }: any) {
                   const dSensor = await deleteSensor({ line: row.line, plc_name: row.name }, session?.user.db);
                   const dValue = await deleteValues({ line: row.line, plc_name: row.name }, session?.user.db);
                   const dMqtt = await deleteMqtt({ line: row.line, plc: row.name }, session?.user.db);
+
+                  // Send MQTT notification about PLC deletion
+                  if (dPlc && row.node) {
+                     sendMqtt(row.node, 'true');
+                  }
 
                   if (dPlc) {
                      toast.error('PLC Deleted!!', { theme: "colored" });

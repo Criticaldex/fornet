@@ -6,6 +6,7 @@ import { patchNodes } from "@/services/nodes";
 import { getSession } from "next-auth/react"
 import { updateSensors } from "@/services/sensors";
 import { useLogs } from "@/hooks/useLogs";
+import { sendMqtt } from "@/services/mqtts";
 
 export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset, clearErrors, session, nodes }: any) => {
    const { logCreate, logUpdate, logError, logAction } = useLogs();
@@ -20,6 +21,9 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset,
 
          const upsert = await upsertPlc(data, session?.user.db);
          const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
+         if (data.node) {
+            sendMqtt(data.node, 'true');
+         }
 
          if (upsert.lastErrorObject?.updatedExisting) {
             // Log PLC update
