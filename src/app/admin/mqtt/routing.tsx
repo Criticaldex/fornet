@@ -8,11 +8,11 @@ export function GetLinksAdmin({ session }: any) {
    let links: object[] = [
       {
          label: 'Group',
-         route: `/mqtt/group`
+         route: `/admin/mqtt/group`
       },
       {
          label: 'Unit',
-         route: `/mqtt/unit`
+         route: `/admin/mqtt/unit`
       }
    ];
 

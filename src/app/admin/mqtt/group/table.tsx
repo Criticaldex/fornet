@@ -13,6 +13,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Loading } from "@/components/loading.component";
 import { getLines, getNames } from '@/services/plcs';
 import { getNames as getNamesSensors } from '@/services/sensors';
+import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
 
 export function MqttTable({ mqtts, session }: any) {
@@ -24,6 +26,7 @@ export function MqttTable({ mqtts, session }: any) {
    const [plcName, setPlcName] = useState('');
    const [plcNames, setPlcNames] = useState(['-']);
    const [sensorNames, setSensorNames] = useState(['-']);
+   const pathname = usePathname();
 
    useEffect(() => {
       getNames(session?.user.db)
@@ -98,24 +101,70 @@ export function MqttTable({ mqtts, session }: any) {
    }
 
    const filteredItems = rows.filter(
-      (item: any) => item.name && item.name.toLowerCase().includes(filterText.toLowerCase()),
+      (item: any) => {
+         const searchText = filterText.toLowerCase();
+         return (
+            (item.name && item.name.toLowerCase().includes(searchText)) ||
+            (item.line && item.line.toLowerCase().includes(searchText))
+         );
+      }
    );
 
    const subHeaderComponentMemo = useMemo(() => {
       return (
-         <div className="flex justify-end grow m-2">
-            <input
-               id="search"
-               type="text"
-               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4`}
-               placeholder="Name"
-               aria-label="Search Input"
-               value={filterText}
-               onChange={(e: any) => setFilterText(e.target.value)}
-            />
+         <div className="flex flex-col gap-2 p-2 w-full">
+            <div className="flex flex-wrap gap-2 items-center justify-between">
+               {/* Search Input */}
+               <div className="flex items-center gap-2">
+                  <input
+                     id="search"
+                     type="text"
+                     className="text-textColor border-b-2 bg-bgDark rounded-md p-2 min-w-64"
+                     placeholder="Search..."
+                     aria-label="Search Input"
+                     value={filterText}
+                     onChange={(e: any) => setFilterText(e.target.value)}
+                  />
+               </div>
+
+               {/* Navigation Links */}
+               <div className="flex items-center gap-2">
+                  <Link
+                     className={`py-2 px-4 rounded-md text-textColor font-bold border border-accent
+                        ${pathname?.includes('/admin/mqtt/group') ? 'bg-accent text-textColor' : 'bg-bgDark bg-opacity-20 dark:bg-opacity-80 hover:bg-opacity-40'}`}
+                     href="/admin/mqtt/group"
+                  >
+                     Group
+                  </Link>
+                  <Link
+                     className={`py-2 px-4 rounded-md text-textColor font-bold border border-accent
+                        ${pathname?.includes('/admin/mqtt/unit') ? 'bg-accent text-textColor' : 'bg-bgDark bg-opacity-20 dark:bg-opacity-80 hover:bg-opacity-40'}`}
+                     href="/admin/mqtt/unit"
+                  >
+                     Unit
+                  </Link>
+               </div>
+
+               {/* Refresh Button */}
+               <button
+                  className={`bg-bgDark bg-opacity-20 dark:bg-opacity-80 hover:bg-opacity-40 my-1 mx-4 py-2 px-5 rounded-md text-textColor font-bold border border-accent`}
+                  onClick={async () => {
+                     setRows(await getMqttConfigs(session?.user.db, { name: { '$not': { $eq: 'null' } } }));
+                  }}
+               >
+                  Refresh
+               </button>
+            </div>
+
+            {/* Results Count */}
+            <div className="flex justify-between items-center">
+               <div className="text-sm text-textColor">
+                  Showing {filteredItems.length} of {rows?.length || 0} MQTT configs
+               </div>
+            </div>
          </div>
       );
-   }, [filterText]);
+   }, [filterText, filteredItems.length, rows?.length, pathname, session?.user.db]);
 
    const {
       register,
