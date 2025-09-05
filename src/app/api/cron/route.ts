@@ -88,6 +88,23 @@ async function executeCronLogic() {
 
     console.log('deleting old values...');
     for (const dbName of empreses) {
+        // First, get list of incremental sensors
+        const sensors = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${dbName}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                    token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+                },
+                body: JSON.stringify({
+                    fields: ['-_id', 'line', 'plc_name', 'autoinc'],
+                    filter: { autoinc: true }
+                })
+            }).then(res => res.json());
+
+        const incrementalSensors = sensors.filter((sensor: any) => sensor.autoinc);
+
+        // Delete old values for all sensors
         const deleteValues = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${dbName}`,
             {
                 method: 'DELETE',
@@ -99,7 +116,27 @@ async function executeCronLogic() {
                     "timestamp": { $lt: timestampDelete }
                 })
             }).then(res => res.json());
-        console.log('Values deleted for', dbName);
+
+        // For incremental sensors, add a 0 value at yesterday's timestamp
+        for (const sensor of incrementalSensors) {
+            const zeroValue = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${dbName}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-type': 'application/json',
+                        token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        line: sensor.line,
+                        plc_name: sensor.plc_name,
+                        value: 0,
+                        timestamp: timestampDelete
+                    })
+                }).then(res => res.json());
+            console.log(`Zero value added for incremental sensor ${sensor.line}/${sensor.plc_name} in ${dbName}`);
+        }
+
+        console.log('Values deleted for', dbName, `- ${incrementalSensors.length} incremental sensors reset to 0`);
     }
 
     const fields = [
