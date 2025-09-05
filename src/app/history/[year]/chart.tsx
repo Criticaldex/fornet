@@ -156,13 +156,17 @@ export function SummaryChart({ name, data, dd }: any) {
    }
 
    return (
-      <>
-         {!isLoading ?
+      <div className="relative w-full h-full min-h-[400px]">
+         {!isLoading ? (
             <HighchartsReact
                highcharts={Highcharts}
                options={options}
             />
-            : <Loading />}
-      </>
+         ) : (
+            <div className="absolute inset-0">
+               <Loading />
+            </div>
+         )}
+      </div>
    )
 }
