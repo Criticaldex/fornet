@@ -8,7 +8,7 @@ import HighchartsReact from 'highcharts-react-official'
 import HighchartsNoData from 'highcharts/modules/no-data-to-display'
 import highchartsDrilldown from "highcharts/modules/drilldown";
 import { chartOptions } from '@/components/chart.components'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Loading } from "@/components/loading.component";
 
 
@@ -24,9 +24,17 @@ if (typeof Highcharts === "object") {
 export function SummaryChart({ name, data, dd }: any) {
 
    const [isLoading, setIsLoading] = useState(true);
+   const chartRef = useRef<HighchartsReact.RefObject>(null);
+
    useEffect(() => {
       if (dd && data) {
          setIsLoading(false);
+
+         // Reset chart to initial state when data changes (e.g., after tab switch)
+         if (chartRef.current?.chart) {
+            // Reset drilldown to root level
+            chartRef.current.chart.drillUp();
+         }
       }
    }, [dd, data]);
 
@@ -37,20 +45,9 @@ export function SummaryChart({ name, data, dd }: any) {
          height: 400, // Increased height for better shift visualization
       },
       title: {
-         text: name,
-         style: {
-            color: 'var(--textColor)',
-            fontSize: '16px',
-            fontWeight: 'bold'
-         }
+         text: undefined
       },
-      subtitle: {
-         text: 'Click on data points to see details by day and shift',
-         style: {
-            color: 'var(--textColor)',
-            fontSize: '12px'
-         }
-      },
+      subtitle: undefined,
       series: data,
       drilldown: {
          ...dd,
@@ -159,8 +156,10 @@ export function SummaryChart({ name, data, dd }: any) {
       <div className="relative w-full h-full min-h-[400px]">
          {!isLoading ? (
             <HighchartsReact
+               ref={chartRef}
                highcharts={Highcharts}
                options={options}
+               key={`${name}-${JSON.stringify(data?.[0]?.data?.[0])}`}
             />
          ) : (
             <div className="absolute inset-0">
