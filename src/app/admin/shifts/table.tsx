@@ -154,11 +154,6 @@ export function ShiftTable({ shifts: initialShifts, session }: ShiftTableProps) 
             selector: (row: any) => row.name,
             sortable: true,
             style: baseColumnStyle,
-            grow: 2,
-            minWidth: '200px',
-            cell: (row: any) => (
-                <span className="font-medium">{row.name}</span>
-            ),
         },
         {
             name: 'Time',
@@ -214,74 +209,27 @@ export function ShiftTable({ shifts: initialShifts, session }: ShiftTableProps) 
     createThemes();
 
     return (
-        <div className="flex flex-col xl:flex-row w-full h-full gap-4 p-4">
-            {/* Left Panel - Table */}
-            <div className="flex flex-col xl:w-2/3">
-                <div className="flex-1 bg-bgLight rounded-md p-4">
-                    <DataTable
-                        title="Work Shifts"
-                        columns={columns}
-                        data={filteredItems}
-                        pagination
-                        paginationPerPage={10}
-                        paginationRowsPerPageOptions={[5, 10, 20, 50]}
-                        subHeader
-                        subHeaderComponent={subHeaderComponentMemo}
-                        persistTableHead
-                        theme="custom"
-                        defaultSortFieldId={1}
-                        defaultSortAsc={true}
-                        dense
-                        responsive
-                        fixedHeader
-                        fixedHeaderScrollHeight="calc(100vh - 300px)"
-                        customStyles={{
-                            table: {
-                                style: {
-                                    width: '100%',
-                                    height: '100%',
-                                    tableLayout: 'auto',
-                                    minWidth: '100%'
-                                }
-                            },
-                            tableWrapper: {
-                                style: {
-                                    width: '100%',
-                                    overflow: 'auto'
-                                }
-                            },
-                            headRow: {
-                                style: {
-                                    backgroundColor: 'var(--bg-light)',
-                                    borderTopLeftRadius: '8px',
-                                    borderTopRightRadius: '8px'
-                                }
-                            },
-                            headCells: {
-                                style: {
-                                    fontSize: '14px',
-                                    fontWeight: 'bold',
-                                    paddingLeft: '8px',
-                                    paddingRight: '8px',
-                                    color: 'var(--text-color)'
-                                }
-                            },
-                            cells: {
-                                style: {
-                                    fontSize: '13px',
-                                    paddingLeft: '8px',
-                                    paddingRight: '8px',
-                                    wordBreak: 'break-word',
-                                    color: 'var(--text-color)'
-                                }
-                            }
-                        }}
-                    />
-                </div>
+        <div className="flex mt-2">
+            <div className="mr-2 basis-3/4 rounded-md">
+                <DataTable
+                    columns={columns}
+                    data={filteredItems}
+                    pagination
+                    paginationPerPage={10}
+                    paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                    subHeader
+                    subHeaderComponent={subHeaderComponentMemo}
+                    persistTableHead
+                    theme="custom"
+                    defaultSortFieldId={1}
+                    defaultSortAsc={true}
+                    dense
+                    responsive
+                    fixedHeader
+                    fixedHeaderScrollHeight="calc(100vh - 300px)"
+                />
             </div>
-
-            {/* Right Panel - Form */}
-            <div className="flex flex-col gap-4 xl:w-1/3">
+            <div className="flex basis-1/4 rounded-md bg-light">
                 <ShiftsForm
                     register={register}
                     handleSubmit={handleSubmit}
@@ -297,7 +245,6 @@ export function ShiftTable({ shifts: initialShifts, session }: ShiftTableProps) 
                     setEditingShift={setEditingShift}
                 />
             </div>
-
             <ToastContainer />
         </div>
     );
