@@ -95,7 +95,7 @@ export function ShiftTable({ rows, setRows, toast, session, setEditingShift }: S
                             id="search"
                             type="text"
                             className="text-textColor border-b-2 bg-bgDark rounded-md p-2 min-w-64"
-                            placeholder="Search shift name"
+                            placeholder="Search..."
                             aria-label="Search Input"
                             value={filterText}
                             onChange={(e) => handleFilterChange(e.target.value)}
@@ -114,7 +114,7 @@ export function ShiftTable({ rows, setRows, toast, session, setEditingShift }: S
 
                 {/* Results Count */}
                 <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-textColor">
                         Showing {filteredItems.length} of {rows?.length || 0} shifts
                     </div>
                 </div>

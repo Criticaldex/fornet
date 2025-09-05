@@ -212,7 +212,7 @@ export function LogTable({ logs, session }: LogTableProps) {
 
             {/* Status and Results Count */}
             <div className="flex justify-between items-center">
-               <div className="text-sm text-gray-600">
+               <div className="text-sm text-textColor">
                   Showing {filteredItems.length} of {rows?.length || 0} logs
                   {(dateRange.start || dateRange.end) && (
                      <span className="ml-2 text-blue-600">

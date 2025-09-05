@@ -31,19 +31,41 @@ export function PlcTable({ plcs, nodes, session }: any) {
 
    const subHeaderComponentMemo = useMemo(() => {
       return (
-         <div className="flex justify-end grow m-2">
-            <input
-               id="search"
-               type="text"
-               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4`}
-               placeholder="Name"
-               aria-label="Search Input"
-               value={filterText}
-               onChange={(e: any) => setFilterText(e.target.value)}
-            />
+         <div className="flex flex-col gap-2 p-2 w-full">
+            <div className="flex flex-wrap gap-2 items-center justify-between">
+               {/* Text Search */}
+               <div className="flex items-center gap-2">
+                  <input
+                     id="search"
+                     type="text"
+                     className="text-textColor border-b-2 bg-bgDark rounded-md p-2 min-w-64"
+                     placeholder="Search..."
+                     aria-label="Search Input"
+                     value={filterText}
+                     onChange={(e: any) => setFilterText(e.target.value)}
+                  />
+               </div>
+
+               {/* Refresh Button */}
+               <button
+                  className={`bg-bgDark bg-opacity-20 dark:bg-opacity-80 hover:bg-opacity-40 my-1 mx-4 py-2 px-5 rounded-md text-textColor font-bold border border-accent`}
+                  onClick={async () => {
+                     setRows(await getPlcs(session?.user.db));
+                  }}
+               >
+                  Refresh
+               </button>
+            </div>
+
+            {/* Results Count */}
+            <div className="flex justify-between items-center">
+               <div className="text-sm text-textColor">
+                  Showing {filteredItems.length} of {rows?.length || 0} PLCs
+               </div>
+            </div>
          </div>
       );
-   }, [filterText]);
+   }, [filterText, filteredItems.length, rows?.length, session?.user.db]);
 
    const {
       register,

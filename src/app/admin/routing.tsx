@@ -31,6 +31,10 @@ export function GetLinksAdmin({ session }: any) {
          route: `/admin/logs`
       },
       {
+         label: 'Mqtt',
+         route: `/admin/mqtt`
+      },
+      {
          label: 'PowerBi',
          route: `/admin/powerBi`
       }

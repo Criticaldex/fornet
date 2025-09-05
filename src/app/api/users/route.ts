@@ -110,16 +110,19 @@ export async function PATCH(request: Request) {
       const { hash, ...userWithoutHash } = res.value;
       res.value = userWithoutHash;
 
-      // Log user update
+      // Log user update only for significant changes (not just config updates)
       const loggerEmail = body.email || 'system';
-      if (oldUser) {
+      const isConfigOnlyUpdate = Object.keys(body).length === 2 && body.email && body.config;
+
+      if (oldUser && !isConfigOnlyUpdate) {
+         // Only log updates for significant user property changes (name, role, db, etc.)
          await logUpdate(
             loggerEmail,
             'USER',
             { email: oldUser.email, name: oldUser.name, role: oldUser.role, db: oldUser.db },
             { email: res.value.email, name: res.value.name, role: res.value.role, db: res.value.db }
          );
-      } else {
+      } else if (!oldUser) {
          // This was actually a creation via upsert
          await logCreate(
             loggerEmail,
@@ -127,6 +130,7 @@ export async function PATCH(request: Request) {
             { email: res.value.email, name: res.value.name, role: res.value.role, db: res.value.db }
          );
       }
+      // Skip logging for config-only updates to reduce log noise
 
       return NextResponse.json(res);
    } catch (err) {

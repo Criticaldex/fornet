@@ -32,6 +32,16 @@ const nextConfig = {
             source: '/history',
             destination: `/history/${process.env.SUMMARY_DEFAULT_YEAR}`,
             permanent: false,
+         },
+         {
+            source: '/admin',
+            destination: '/admin/profile',
+            permanent: false,
+         },
+         {
+            source: '/admin/mqtt',
+            destination: '/admin/mqtt/unit',
+            permanent: false,
          }
       ];
    }

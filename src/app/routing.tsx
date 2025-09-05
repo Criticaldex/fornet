@@ -26,11 +26,6 @@ export default function GetNav({ session }: any) {
          route: '/history'
       },
       {
-         label: 'MQTT',
-         icon: FaPodcast,
-         route: '/mqtt'
-      },
-      {
          label: 'PowerBi',
          icon: FaChartBar,
          route: '/powerbi'
@@ -70,13 +65,13 @@ export default function GetNav({ session }: any) {
                         </span>
                      </Link>
                   ))}
-                  <hr className="my-4 ml-2 border-spacerNav" />
+                  {/* <hr className="my-4 ml-2 border-spacerNav" />
                   <div className="text-lg grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
                      <h1 className="text-accent">
                         External
                      </h1>
                   </div>
-                  {/* {externalLinks.map((navTI) => (
+                  {externalLinks.map((navTI) => (
                      <Link key={navTI.label} href={navTI.route} rel="noopener noreferrer" target="_blank" className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
                      ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
                         <navTI.icon size={19} />
