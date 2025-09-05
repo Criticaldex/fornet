@@ -8,19 +8,39 @@ import { deleteValues, getAllShifts, formatShiftTime, getShiftDuration } from '@
 import { getSession } from "next-auth/react";
 import { confirmAlert } from 'react-confirm-alert';
 import { FaTrashCan, FaPenToSquare } from "react-icons/fa6";
+import { useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ShiftsForm } from "./form";
 
 interface ShiftTableProps {
-    rows: ShiftIface[];
-    setRows: any;
-    toast: any;
+    shifts: ShiftIface[];
     session: any;
-    setEditingShift?: (shift: ShiftIface | null) => void;
 }
 
-export function ShiftTable({ rows, setRows, toast, session, setEditingShift }: ShiftTableProps) {
+export function ShiftTable({ shifts: initialShifts, session }: ShiftTableProps) {
+    const [rows, setRows] = useState<ShiftIface[]>(initialShifts);
     const [filterText, setFilterText] = useState('');
     const [isClient, setIsClient] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [editingShift, setEditingShift] = useState<ShiftIface | null>(null);
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        clearErrors,
+        reset,
+        resetField,
+        watch,
+        setValue
+    } = useForm({
+        defaultValues: {
+            name: '',
+            startTime: '',
+            endTime: ''
+        }
+    });
 
     useEffect(() => {
         setIsClient(true);
@@ -39,7 +59,7 @@ export function ShiftTable({ rows, setRows, toast, session, setEditingShift }: S
         } finally {
             setIsLoading(false);
         }
-    }, [session?.user?.db, setRows, toast]);
+    }, [session?.user?.db]);
 
     const filteredItems = useMemo(() => {
         return rows?.filter((item: ShiftIface) => {
@@ -75,7 +95,7 @@ export function ShiftTable({ rows, setRows, toast, session, setEditingShift }: S
                 }
             ]
         });
-    }, [session?.user?.db, toast, refreshShifts]);
+    }, [session?.user?.db, refreshShifts]);
 
     const handleEdit = useCallback((shift: ShiftIface) => {
         if (setEditingShift) {
@@ -191,69 +211,94 @@ export function ShiftTable({ rows, setRows, toast, session, setEditingShift }: S
         return <Loading />;
     }
 
+    createThemes();
+
     return (
-        <div className="flex flex-col rounded-md w-full h-full">
-            <div className="flex flex-col grow min-h-0">
-                <DataTable
-                    title="Work Shifts"
-                    columns={columns}
-                    data={filteredItems}
-                    pagination
-                    paginationPerPage={10}
-                    paginationRowsPerPageOptions={[5, 10, 20, 50]}
-                    subHeader
-                    subHeaderComponent={subHeaderComponentMemo}
-                    persistTableHead
-                    theme="custom"
-                    defaultSortFieldId={1}
-                    defaultSortAsc={true}
-                    dense
-                    responsive
-                    fixedHeader
-                    fixedHeaderScrollHeight="calc(100vh - 300px)"
-                    customStyles={{
-                        table: {
-                            style: {
-                                width: '100%',
-                                height: '100%',
-                                tableLayout: 'auto',
-                                minWidth: '100%'
+        <div className="flex flex-col xl:flex-row w-full h-full gap-4 p-4">
+            {/* Left Panel - Table */}
+            <div className="flex flex-col xl:w-2/3">
+                <div className="flex-1 bg-bgLight rounded-md p-4">
+                    <DataTable
+                        title="Work Shifts"
+                        columns={columns}
+                        data={filteredItems}
+                        pagination
+                        paginationPerPage={10}
+                        paginationRowsPerPageOptions={[5, 10, 20, 50]}
+                        subHeader
+                        subHeaderComponent={subHeaderComponentMemo}
+                        persistTableHead
+                        theme="custom"
+                        defaultSortFieldId={1}
+                        defaultSortAsc={true}
+                        dense
+                        responsive
+                        fixedHeader
+                        fixedHeaderScrollHeight="calc(100vh - 300px)"
+                        customStyles={{
+                            table: {
+                                style: {
+                                    width: '100%',
+                                    height: '100%',
+                                    tableLayout: 'auto',
+                                    minWidth: '100%'
+                                }
+                            },
+                            tableWrapper: {
+                                style: {
+                                    width: '100%',
+                                    overflow: 'auto'
+                                }
+                            },
+                            headRow: {
+                                style: {
+                                    backgroundColor: 'var(--bg-light)',
+                                    borderTopLeftRadius: '8px',
+                                    borderTopRightRadius: '8px'
+                                }
+                            },
+                            headCells: {
+                                style: {
+                                    fontSize: '14px',
+                                    fontWeight: 'bold',
+                                    paddingLeft: '8px',
+                                    paddingRight: '8px',
+                                    color: 'var(--text-color)'
+                                }
+                            },
+                            cells: {
+                                style: {
+                                    fontSize: '13px',
+                                    paddingLeft: '8px',
+                                    paddingRight: '8px',
+                                    wordBreak: 'break-word',
+                                    color: 'var(--text-color)'
+                                }
                             }
-                        },
-                        tableWrapper: {
-                            style: {
-                                width: '100%',
-                                overflow: 'auto'
-                            }
-                        },
-                        headRow: {
-                            style: {
-                                backgroundColor: 'var(--bg-light)',
-                                borderTopLeftRadius: '8px',
-                                borderTopRightRadius: '8px'
-                            }
-                        },
-                        headCells: {
-                            style: {
-                                fontSize: '14px',
-                                fontWeight: 'bold',
-                                paddingLeft: '8px',
-                                paddingRight: '8px',
-                                color: 'var(--text-color)'
-                            }
-                        },
-                        cells: {
-                            style: {
-                                fontSize: '13px',
-                                paddingLeft: '8px',
-                                paddingRight: '8px',
-                                wordBreak: 'break-word',
-                                color: 'var(--text-color)'
-                            }
-                        }
-                    }}
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* Right Panel - Form */}
+            <div className="flex flex-col gap-4 xl:w-1/3">
+                <ShiftsForm
+                    register={register}
+                    handleSubmit={handleSubmit}
+                    errors={errors}
+                    clearErrors={clearErrors}
+                    setRows={setRows}
+                    toast={toast}
+                    reset={reset}
+                    resetField={resetField}
+                    watch={watch}
+                    setValue={setValue}
+                    editingShift={editingShift}
+                    setEditingShift={setEditingShift}
                 />
             </div>
+
+            <ToastContainer />
         </div>
     );
 }
