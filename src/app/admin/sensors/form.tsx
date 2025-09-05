@@ -11,8 +11,8 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
       const session = await getSession();
       const upsert = await upsertSensor(data, session?.user.db, plcType);
       const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
-      if (data.node) {
-         sendMqtt(data.node, 'true');
+      if (data.node && session?.user?.db) {
+         sendMqtt(session.user.db + data.node, 'true');
       }
 
       if (upsert.lastErrorObject?.updatedExisting) {

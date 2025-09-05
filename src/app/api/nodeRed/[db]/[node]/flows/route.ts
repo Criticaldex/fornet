@@ -61,8 +61,8 @@ function processPlcSensors(
    let currentY = y;
    const plcSensors = sensorByName[plc.name];
 
-   if (!plcSensors || !Array.isArray(plcSensors)) {
-      console.warn('[Node-RED Flows] No sensors found for PLC', { plcName: plc.name });
+   if (!plcSensors || !Array.isArray(plcSensors) || plcSensors.length === 0) {
+      console.info('[Node-RED Flows] No sensors found for PLC, skipping sensor processing', { plcName: plc.name });
       return currentY;
    }
 
@@ -214,15 +214,15 @@ export async function GET(request: Request, { params }: { params: { db: string, 
          return NextResponse.json({ ERROR: 'Failed to fetch data from database' }, { status: 500 });
       }
 
-      // Validate that we have data to work with
-      if (!sensors || sensors.length === 0) {
-         console.warn('[Node-RED Flows] No sensors found', { dbName, node });
-         return NextResponse.json({ WARNING: 'No sensors found for this configuration' });
-      }
-
+      // Validate that we have PLCs to work with
       if (!plcs || plcs.length === 0) {
          console.warn('[Node-RED Flows] No PLCs found for node', { dbName, node });
          return NextResponse.json({ WARNING: 'No PLCs found for the specified node' });
+      }
+
+      // Handle case where no sensors exist - still allow flow generation
+      if (!sensors || sensors.length === 0) {
+         console.info('[Node-RED Flows] No sensors found, generating base configuration only', { dbName, node });
       }
 
       // Process sensor data safely

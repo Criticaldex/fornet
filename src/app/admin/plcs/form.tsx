@@ -21,8 +21,8 @@ export const PlcForm = ({ register, handleSubmit, errors, setRows, toast, reset,
 
          const upsert = await upsertPlc(data, session?.user.db);
          const sync = await patchNodes({ name: data.node, synced: false }, session?.user.db);
-         if (data.node) {
-            sendMqtt(data.node, 'true');
+         if (data.node && session?.user?.db) {
+            sendMqtt(session.user.db + data.node, 'true');
          }
 
          if (upsert.lastErrorObject?.updatedExisting) {

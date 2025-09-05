@@ -134,7 +134,7 @@ export function AdminTable({ sensors, session }: any) {
 
                   // Send MQTT notification about sensor deletion
                   if (dSensor && row.node) {
-                     sendMqtt(row.node, 'true');
+                     sendMqtt(session.user.db + row.node, 'true');
                   }
 
                   if (dSensor) {
@@ -200,34 +200,31 @@ export function AdminTable({ sensors, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Min Range',
-         selector: (row: any) => row.minrange,
+         name: 'Range',
+         selector: (row: any) => {
+            const min = row.minrange !== undefined && row.minrange !== null ? row.minrange : '';
+            const max = row.maxrange !== undefined && row.maxrange !== null ? row.maxrange : '';
+            if (min !== '' && max !== '') return `${min}/${max}`;
+            if (min !== '') return `${min}/-`;
+            if (max !== '') return `-/${max}`;
+            return '-/-';
+         },
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+         width: '100px',
       },
       {
-         name: 'Max Range',
-         selector: (row: any) => row.maxrange,
+         name: 'R/W/I',
+         selector: (row: any) => {
+            const flags = [];
+            if (row.read) flags.push('R');
+            if (row.write) flags.push('W');
+            if (row.autoinc) flags.push('I');
+            return flags.join('/') || '-';
+         },
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Read',
-         selector: (row: any) => row.read ? "X" : "",
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Write',
-         selector: (row: any) => row.write ? "X" : "",
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
-      },
-      {
-         name: 'Incremental',
-         selector: (row: any) => row.autoinc ? "X" : "",
-         sortable: true,
-         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+         width: '80px',
       },
       {
          name: 'Accions',
