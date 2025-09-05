@@ -134,7 +134,7 @@ export function AdminTable({ sensors, session }: any) {
 
                   // Send MQTT notification about sensor deletion
                   if (dSensor && row.node) {
-                     sendMqtt(row.node, 'true');
+                     sendMqtt(session.user.db + row.node, 'true');
                   }
 
                   if (dSensor) {

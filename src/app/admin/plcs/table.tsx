@@ -94,7 +94,7 @@ export function PlcTable({ plcs, nodes, session }: any) {
 
                   // Send MQTT notification about PLC deletion
                   if (dPlc && row.node) {
-                     sendMqtt(row.node, 'true');
+                     sendMqtt(session.user.db + row.node, 'true');
                   }
 
                   if (dPlc) {
