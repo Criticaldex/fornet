@@ -108,68 +108,58 @@ body {
 
 /* LOADING */
 
-.pl {
-   display: block;
-   width: 6.25em;
-   height: 6.25em;
+.fornet-loading {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 140px;
+   width: 140px;
 }
 
-.pl__ring,
-.pl__ball {
-   animation: ring 2s ease-out infinite;
+.fornet-logo-bounce {
+   animation: kdeDesktopBounce 2s ease-in-out infinite;
+   transform-origin: center bottom;
+   will-change: transform;
 }
 
-.pl__ball {
-   animation-name: ball;
-}
-
-
-/* Animation */
-@keyframes ring {
-   from {
-      stroke-dasharray: 0 257 0 0 1 0 0 258;
-   }
-
-   25% {
-      stroke-dasharray: 0 0 0 0 257 0 258 0;
-   }
-
-   50%,
-   to {
-      stroke-dasharray: 0 0 0 0 0 515 0 0;
-   }
-}
-
-@keyframes ball {
-
-   from,
-   50% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: 1;
-   }
-
-   64% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: -109;
-   }
-
-   78% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: -145;
-   }
-
-   92% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: -157;
-   }
-
-   57%,
-   71%,
-   85%,
-   99%,
-   to {
+/* KDE-style desktop bounce animation */
+@keyframes kdeDesktopBounce {
+   0% {
+      transform: translateY(0) scaleY(1) scaleX(1);
       animation-timing-function: ease-out;
-      stroke-dashoffset: -163;
+   }
+
+   15% {
+      transform: translateY(-30px) scaleY(1.1) scaleX(0.95);
+      animation-timing-function: ease-in;
+   }
+
+   30% {
+      transform: translateY(0) scaleY(0.9) scaleX(1.05);
+      animation-timing-function: ease-out;
+   }
+
+   45% {
+      transform: translateY(-15px) scaleY(1.05) scaleX(0.98);
+      animation-timing-function: ease-in;
+   }
+
+   60% {
+      transform: translateY(0) scaleY(0.95) scaleX(1.02);
+      animation-timing-function: ease-out;
+   }
+
+   75% {
+      transform: translateY(-5px) scaleY(1.02) scaleX(0.99);
+      animation-timing-function: ease-in;
+   }
+
+   90% {
+      transform: translateY(0) scaleY(0.98) scaleX(1.01);
+   }
+
+   100% {
+      transform: translateY(0) scaleY(1) scaleX(1);
    }
 }
 
