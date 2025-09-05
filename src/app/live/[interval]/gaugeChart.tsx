@@ -30,10 +30,12 @@ export function GaugeChart({ line, name, unit, maxrange, minrange }: any) {
       ...chartOptions,
       chart: {
          type: 'solidgauge',
+         height: null, // Allow responsive height
          spacingTop: 0,
-         height: '60%',
-         margin: [20, 0, 0, 0],
-         spacing: [0, 0, 0, 0],
+         spacingRight: 0,
+         spacingBottom: 0,
+         spacingLeft: 0,
+         margin: [10, 10, 10, 10],
       },
       data: {
          rowsURL: `${process.env.NEXT_PUBLIC_API_URL}/api/liveValues/${session?.user.db}/${line}/${name}/lastValue`,
@@ -99,10 +101,11 @@ export function GaugeChart({ line, name, unit, maxrange, minrange }: any) {
    }
 
    return (
-      <div className="m-2">
+      <div className="w-full h-full">
          <HighchartsReact
             highcharts={Highcharts}
             options={options}
+            containerProps={{ style: { height: '100%', width: '100%' } }}
          />
       </div>
    )

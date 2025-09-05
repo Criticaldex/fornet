@@ -1,5 +1,5 @@
 'use client'
-import React, { MouseEventHandler, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
 import { updateConfig } from "@/services/users";
 import { useSession } from 'next-auth/react';
@@ -15,8 +15,27 @@ import { CandleChart } from './candleChart';
 const GridLayout = WidthProvider(RGL);
 
 const ExpandedComponent = ({ data }: any) => {
-   const { data: session, status, update } = useSession();
+   const { data: session, update } = useSession();
    const [layoutConf, setLayoutConf] = useState([]);
+   const [windowWidth, setWindowWidth] = useState(0); // Start with 0 to indicate not ready
+   const [isClient, setIsClient] = useState(false);
+
+   useEffect(() => {
+      // Set initial width and handle resize
+      const handleResize = () => {
+         setWindowWidth(window.innerWidth);
+      };
+
+      // Set initial width and mark as client-side
+      handleResize();
+      setIsClient(true);
+
+      // Add resize listener
+      window.addEventListener('resize', handleResize);
+
+      // Cleanup
+      return () => window.removeEventListener('resize', handleResize);
+   }, []);
 
    useEffect(() => {
       if (session) {
@@ -38,9 +57,9 @@ const ExpandedComponent = ({ data }: any) => {
       }
    }
 
-   if (layoutConf == undefined) return <Loading />
+   if (layoutConf == undefined || !isClient || windowWidth === 0) return <Loading />
 
-   const width = window.innerWidth - 105;
+   const width = windowWidth - 105;
 
    async function saveUser(user: any) {
       await updateConfig(user);
@@ -70,62 +89,70 @@ const ExpandedComponent = ({ data }: any) => {
       >
          {
             layoutConf.map((chart: any, index: number) => {
-               chart.i = index.toString();
+               const key = index.toString();
                if (chart.type == 'line') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
+                  return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
+                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
+                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name} ({chart.unit})</span>
+                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
 
-                     <LiveChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                        unit={chart.unit}
-                        interval={data.interval}
-                     />
+                     <div className="flex-1 min-h-0 overflow-hidden p-2">
+                        <LiveChart
+                           i={key}
+                           line={data.line}
+                           name={chart.name}
+                           unit={chart.unit}
+                           interval={data.interval}
+                        />
+                     </div>
                   </div>
                } else if (chart.type == 'gauge') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
+                  return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
+                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
+                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name} ({chart.unit})</span>
+                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
-                     <GaugeChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                        unit={chart.unit}
-                        minrange={chart.minrange}
-                        maxrange={chart.maxrange}
-                     />
+                     <div className="flex-1 min-h-0 overflow-hidden p-2">
+                        <GaugeChart
+                           i={key}
+                           line={data.line}
+                           name={chart.name}
+                           unit={chart.unit}
+                           minrange={chart.minrange}
+                           maxrange={chart.maxrange}
+                        />
+                     </div>
                   </div>
                } else if (chart.type == 'bool') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className=" flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name}</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
+                  return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
+                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
+                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name}</span>
+                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
-                     <BoolChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                     />
+                     <div className="flex-1 min-h-0 overflow-hidden p-2">
+                        <BoolChart
+                           i={key}
+                           line={data.line}
+                           name={chart.name}
+                        />
+                     </div>
                   </div>
                } else if (chart.type == 'candle') {
-                  return < div key={chart.i} className='bg-bgLight rounded-md'>
-                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark">
-                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent'>Remove Graph</FaXmark>
+                  return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
+                     <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
+                        <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name} ({chart.unit})</span>
+                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
-                     <CandleChart
-                        i={chart.i}
-                        line={data.line}
-                        name={chart.name}
-                        unit={chart.unit}
-                        interval={data.interval}
-                     />
+                     <div className="flex-1 min-h-0 overflow-hidden p-2">
+                        <CandleChart
+                           i={key}
+                           line={data.line}
+                           name={chart.name}
+                           unit={chart.unit}
+                           interval={data.interval}
+                        />
+                     </div>
                   </div>
                }
             })
@@ -136,42 +163,109 @@ const ExpandedComponent = ({ data }: any) => {
 
 const handleAdd = (row: any, session: any, update: any, selected: any, sensors: any) => async (event: any) => {
    let user = session.user;
-   let maxY = 0;
-   session.user.config.live[row.line].forEach((element: { h: number; y: number; }) => {
-      const suma = element.y + element.h
-      maxY = (maxY < suma) ? suma : maxY;
-   });
+
+   // Determine dimensions based on chart type
+   let chartWidth = 4, chartHeight = 11;
+   switch (selected[row.line].type) {
+      case 'gauge':
+         chartWidth = 2;
+         chartHeight = 7;
+         break;
+      case 'bool':
+         chartWidth = 1;
+         chartHeight = 3;
+         break;
+      default:
+         chartWidth = 4;
+         chartHeight = 11;
+         break;
+   }
+
+   // Find the best available position
+   const findBestPosition = (existingCharts: any[], width: number, height: number) => {
+      const gridCols = 8; // Grid has 8 columns
+
+      // Create a grid to track occupied spaces
+      let maxY = 0;
+      existingCharts.forEach(chart => {
+         maxY = Math.max(maxY, chart.y + chart.h);
+      });
+
+      // Try to find space from top-left, row by row
+      for (let y = 0; y <= maxY; y++) {
+         for (let x = 0; x <= gridCols - width; x++) {
+            // Check if this position is available
+            let canPlace = true;
+
+            for (let checkY = y; checkY < y + height && canPlace; checkY++) {
+               for (let checkX = x; checkX < x + width && canPlace; checkX++) {
+                  // Check if any existing chart occupies this space
+                  for (const chart of existingCharts) {
+                     if (checkX >= chart.x && checkX < chart.x + chart.w &&
+                        checkY >= chart.y && checkY < chart.y + chart.h) {
+                        canPlace = false;
+                        break;
+                     }
+                  }
+               }
+            }
+
+            if (canPlace) {
+               return { x, y };
+            }
+         }
+      }
+
+      // If no space found, place at bottom
+      return { x: 0, y: maxY };
+   };
+
+   const position = findBestPosition(session.user.config.live[row.line], chartWidth, chartHeight);
+
    let newData = {
       i: (user.config.live[row.line].length).toString(),
-      x: 0,
-      y: maxY,
-      w: 4,
-      h: 11,
+      x: position.x,
+      y: position.y,
+      w: chartWidth,
+      h: chartHeight,
       type: selected[row.line].type,
       name: selected[row.line].sensor,
       unit: selected[row.line].unit,
       minrange: selected[row.line].minrange,
       maxrange: selected[row.line].maxrange
    };
-   switch (selected[row.line].type) {
-      case 'gauge':
-         newData.w = 2;
-         newData.h = 7
-         break;
-      case 'bool':
-         newData.w = 1;
-         newData.h = 3
-         break;
-      default:
-         break;
-   }
 
    user.config.live[row.line].push(newData);
    update(user);
 }
 
-export function LinesTable({ lines, interval, sensors, types, selected }: any) {
-   const { data: session, status, update } = useSession();
+export function LinesTable({ lines, interval, sensors, types, selected: initialSelected }: any) {
+   const { data: session, update } = useSession();
+   const [isClient, setIsClient] = useState(false);
+
+   // Initialize state for selected values
+   const [selected, setSelected] = useState(() => {
+      const init: any = {};
+      lines.forEach((line: string) => {
+         init[line] = initialSelected[line] || {
+            type: types[0] || 'line',
+            sensor: sensors[line]?.[0]?.name,
+            unit: sensors[line]?.[0]?.unit,
+            minrange: sensors[line]?.[0]?.minrange,
+            maxrange: sensors[line]?.[0]?.maxrange
+         };
+      });
+      return init;
+   });
+
+   useEffect(() => {
+      setIsClient(true);
+   }, []);
+
+   // Show loading until client-side is ready
+   if (!isClient) {
+      return <Loading />;
+   }
    let columns: any = [{
       name: 'Line',
       selector: (row: any) => row.line,
@@ -181,42 +275,56 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
    },
    {
       name: 'Selects',
-      cell: (row: any) => (
-         <div className='flex flex-row mr-2 justify-end items-center '>
-            <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
-               onChange={e => {
-                  row.type = e.target.value;
-                  selected[row.line].type = e.target.value;
-               }}>
-               {types.map((type: any, i: number) => {
-                  return <option key={i} value={`${type}`} tabIndex={i}>
-                     {type}
-                  </option>
-               })}
-            </select>
+      cell: (row: any) => {
+         return (
+            <div className='flex flex-row mr-2 justify-end items-center '>
+               <select id="line" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
+                  value={selected[row.line]?.type || types[0]}
+                  onChange={e => {
+                     setSelected((prev: any) => ({
+                        ...prev,
+                        [row.line]: {
+                           ...prev[row.line],
+                           type: e.target.value
+                        }
+                     }));
+                  }}>
+                  {types.map((type: any, i: number) => {
+                     return <option key={i} value={`${type}`} tabIndex={i}>
+                        {type}
+                     </option>
+                  })}
+               </select>
 
-            <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
-               onChange={e => {
-                  const sensorName = e.target.value;
-                  row.sensor = sensorName;
+               <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
+                  value={selected[row.line]?.sensor || sensors[row.line]?.[0]?.name || ''}
+                  onChange={e => {
+                     const sensorName = e.target.value;
 
-                  // Find the sensor data
-                  const sensorData = sensors[row.line].find((s: any) => s.name === sensorName);
-                  if (sensorData) {
-                     selected[row.line].sensor = sensorData.name;
-                     selected[row.line].unit = sensorData.unit;
-                     selected[row.line].maxrange = sensorData.maxrange;
-                     selected[row.line].minrange = sensorData.minrange;
-                  }
-               }}>
-               {sensors[row.line].map((sensor: any, i: number) => {
-                  return <option key={i} value={sensor.name} tabIndex={i}>
-                     {sensor.name}
-                  </option>
-               })}
-            </select>
-         </div>
-      ),
+                     // Find the sensor data
+                     const sensorData = sensors[row.line].find((s: any) => s.name === sensorName);
+                     if (sensorData) {
+                        setSelected((prev: any) => ({
+                           ...prev,
+                           [row.line]: {
+                              ...prev[row.line],
+                              sensor: sensorData.name,
+                              unit: sensorData.unit,
+                              maxrange: sensorData.maxrange,
+                              minrange: sensorData.minrange
+                           }
+                        }));
+                     }
+                  }}>
+                  {sensors[row.line].map((sensor: any, i: number) => {
+                     return <option key={i} value={sensor.name} tabIndex={i}>
+                        {sensor.name}
+                     </option>
+                  })}
+               </select>
+            </div>
+         )
+      },
       grow: 2,
       ignoreRowClick: true,
       button: false,

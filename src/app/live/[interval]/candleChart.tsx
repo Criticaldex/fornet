@@ -132,8 +132,21 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         ...chartOptions,
         title: { text: '' },
         chart: {
-            marginLeft: 30,
-            marginRight: 30,
+            height: null, // Allow responsive height
+            spacingTop: 5,
+            spacingRight: 5,
+            spacingBottom: 5,
+            spacingLeft: 20,
+            zoomType: undefined, // Completely disable drag-to-zoom
+            panning: {
+                enabled: false // Properly disable panning
+            },
+            pinchType: undefined, // Disable pinch zoom on touch devices
+            zooming: {
+                mouseWheel: {
+                    enabled: false // This is the key for disabling mouse wheel zoom
+                }
+            }
         },
         xAxis: {
             type: 'datetime',
@@ -154,6 +167,9 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
         scrollbar: { enabled: false },
         exporting: { enabled: true },
         credits: { enabled: false },
+        boost: {
+            enabled: false // Disable boost module which can interfere with zoom settings
+        },
         tooltip: {
             backgroundColor: '#f76f20',
             borderColor: '#ff9900',
@@ -205,12 +221,13 @@ export function CandleChart({ i, line, name, unit, interval }: any) {
     };
 
     return (
-        <div>
+        <div className="w-full h-full">
             <HighchartsReact
                 highcharts={Highcharts}
                 constructorType={'stockChart'}
                 options={options}
                 ref={chartRef}
+                containerProps={{ style: { height: '100%', width: '100%' } }}
             />
         </div>
     );
