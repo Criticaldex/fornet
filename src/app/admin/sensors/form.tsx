@@ -153,8 +153,17 @@ export const LabelsForm = ({ register, handleSubmit, errors, clearErrors, setRow
          {errors.autoinc && <p role="alert" className="text-red self-end">⚠ {errors.autoinc?.message}</p>}
 
          <div className="inline-flex justify-around">
-            <input type="reset" onClick={() => { clearErrors() }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark'} value="Clean" />
-            <input className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent'} type="submit" value="Send" />
+            <button type="button" onClick={() => {
+               clearErrors();
+               reset({
+                  line: '',
+                  name: '',
+                  description: '',
+                  unit: '',
+                  autoinc: false
+               });
+            }} className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-bgDark hover:bg-opacity-80'}>Clear</button>
+            <button className={'my-1 py-2 px-5 rounded-md text-textColor font-bold border border-accent bg-accent hover:bg-accent-hover'} type="submit">Send</button>
          </div>
       </form >
    );
