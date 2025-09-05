@@ -3,6 +3,7 @@ import dbConnect from '@/lib/dbConnect'
 import SensorSchema, { SensorIface } from '@/schemas/sensor'
 import { NextResponse } from "next/server";
 import { headers } from 'next/headers';
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation'
 
 
 export async function PATCH(request: Request, { params }: { params: { db: string | undefined } }) {
@@ -12,13 +13,19 @@ export async function PATCH(request: Request, { params }: { params: { db: string
       }
       const body: SensorIface = await request.json();
       if (!params.db) {
-         return NextResponse.json(`DB Missing!`);
-      } else if (!body.line) {
-         return NextResponse.json(`Line Missing!`);
+         return NextResponse.json({ ERROR: 'Database parameter is required' }, { status: 400 });
+      }
+
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
+      if (!body.line) {
+         return NextResponse.json({ ERROR: 'Line Missing!' }, { status: 400 });
       } else if (!body.plc_name) {
-         return NextResponse.json(`PLC_Name Missing!`);
+         return NextResponse.json({ ERROR: 'PLC_Name Missing!' }, { status: 400 });
       } else if (!body.node) {
-         return NextResponse.json(`Node Missing!`);
+         return NextResponse.json({ ERROR: 'Node Missing!' }, { status: 400 });
       }
 
       const filter = {

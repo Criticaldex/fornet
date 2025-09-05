@@ -14,6 +14,7 @@
    },
    "dependencies": {
       "@fluentui/web-components": "^2.6.1",
+      "@fontsource/dejavu-sans": "^5.2.5",
       "@microsoft/fast-react-wrapper": "^0.3.25",
       "@svgr/webpack": "^8.1.0",
       "@types/bcryptjs": "^2.4.2",

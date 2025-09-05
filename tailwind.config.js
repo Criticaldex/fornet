@@ -43,7 +43,7 @@ module.exports = {
             universals2: 'var(--universals2)'
          },
          fontFamily: {
-            sans: ['var(--font-inter)']
+            sans: ['DejaVu Sans', 'sans-serif']
          }
       },
    },

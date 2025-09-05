@@ -277,10 +277,11 @@ export function LogTable({ logs, session }: LogTableProps) {
       },
       {
          name: 'Timestamp',
-         selector: (row: any) => new Date(row.timestamp).toLocaleString(),
+         selector: (row: any) => row.timestamp,
          sortable: true,
          style: baseColumnStyle,
          width: '200px',
+         cell: (row: any) => new Date(row.timestamp).toLocaleString(),
       },
       {
          name: 'Severity',

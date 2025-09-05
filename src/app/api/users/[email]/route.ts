@@ -4,6 +4,7 @@ import userSchema, { UserIface } from '@/schemas/user'
 import { NextResponse } from "next/server";
 import { hash } from 'bcryptjs';
 import { headers } from 'next/headers';
+import { logDelete } from '@/services/logs';
 
 export async function GET(request: Request, { params }: { params: { email: string } }) {
    try {
@@ -40,6 +41,17 @@ export async function DELETE(request: Request, { params }: { params: { email: st
          db.model('user', userSchema);
       }
       const res = await db.models.user.findOneAndDelete(params);
+
+      // Log user deletion
+      if (res) {
+         const deletedUser = res as unknown as UserIface;
+         await logDelete(
+            deletedUser.email || 'system',
+            'USER',
+            { email: deletedUser.email, name: deletedUser.name, role: deletedUser.role, db: deletedUser.db }
+         );
+      }
+
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });

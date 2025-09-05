@@ -4,6 +4,7 @@ import userSchema, { UserIface } from '@/schemas/user'
 import { NextResponse } from "next/server";
 import { hash } from 'bcryptjs';
 import { headers } from 'next/headers';
+import { logCreate, logUpdate } from '@/services/logs';
 
 export async function POST(request: Request) {
    try {
@@ -44,6 +45,14 @@ export async function POST(request: Request) {
          db.model('user', userSchema);
       }
       const user = await db.models.user.create(fields);
+
+      // Log user creation
+      await logCreate(
+         fields.email || 'system',
+         'USER',
+         { email: user.email, name: user.name, role: user.role, db: user.db }
+      );
+
       return NextResponse.json(`Usuari ${user.email} creat!`);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
@@ -89,6 +98,10 @@ export async function PATCH(request: Request) {
       if (!db.models.user) {
          db.model('user', userSchema);
       }
+
+      // Get old value for logging
+      const oldUser = await db.models.user.findOne(filter).select('-hash').lean() as UserIface;
+
       const res = await db.models.user.findOneAndUpdate(filter, body, {
          new: true,
          upsert: true,
@@ -96,6 +109,25 @@ export async function PATCH(request: Request) {
       });
       const { hash, ...userWithoutHash } = res.value;
       res.value = userWithoutHash;
+
+      // Log user update
+      const loggerEmail = body.email || 'system';
+      if (oldUser) {
+         await logUpdate(
+            loggerEmail,
+            'USER',
+            { email: oldUser.email, name: oldUser.name, role: oldUser.role, db: oldUser.db },
+            { email: res.value.email, name: res.value.name, role: res.value.role, db: res.value.db }
+         );
+      } else {
+         // This was actually a creation via upsert
+         await logCreate(
+            loggerEmail,
+            'USER',
+            { email: res.value.email, name: res.value.name, role: res.value.role, db: res.value.db }
+         );
+      }
+
       return NextResponse.json(res);
    } catch (err) {
       return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });

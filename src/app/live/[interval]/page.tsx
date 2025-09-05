@@ -10,7 +10,26 @@ export default async function Dashboard({ params }: any) {
    const sensors = await getSensorsbyLine(session?.user.db);
    const types = ['line', 'candle', 'gauge', 'bool']
    let selected = {} as any;
-   lines.map((line) => { selected[line] = { type: 'line', sensor: sensors[line][0].name, unit: sensors[line][0].unit } });
+   lines.map((line) => {
+      // Initialize with the first sensor as default
+      selected[line] = {
+         type: 'line',
+         sensor: sensors[line][0]?.name,
+         unit: sensors[line][0]?.unit,
+         minrange: sensors[line][0]?.minrange,
+         maxrange: sensors[line][0]?.maxrange
+      };
+
+      // Create a sensors map for easy lookup during sensor changes
+      selected[line].availableSensors = {};
+      sensors[line]?.forEach((sensor: any) => {
+         selected[line].availableSensors[sensor.name] = {
+            unit: sensor.unit,
+            minrange: sensor.minrange,
+            maxrange: sensor.maxrange
+         };
+      });
+   });
    return (
 
       <>

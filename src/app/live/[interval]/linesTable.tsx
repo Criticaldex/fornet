@@ -197,15 +197,20 @@ export function LinesTable({ lines, interval, sensors, types, selected }: any) {
 
             <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
                onChange={e => {
-                  row.sensor = e.target.value;
-                  let fields = e.target.value.split('/');
-                  selected[row.line].sensor = fields[0];
-                  selected[row.line].unit = fields[1];
-                  selected[row.line].maxrange = fields[2];
-                  selected[row.line].minrange = fields[3];
+                  const sensorName = e.target.value;
+                  row.sensor = sensorName;
+
+                  // Find the sensor data
+                  const sensorData = sensors[row.line].find((s: any) => s.name === sensorName);
+                  if (sensorData) {
+                     selected[row.line].sensor = sensorData.name;
+                     selected[row.line].unit = sensorData.unit;
+                     selected[row.line].maxrange = sensorData.maxrange;
+                     selected[row.line].minrange = sensorData.minrange;
+                  }
                }}>
                {sensors[row.line].map((sensor: any, i: number) => {
-                  return <option key={i} value={`${sensor.name}/${sensor.unit}/${sensor.maxrange}/${sensor.minrange}`} tabIndex={i}>
+                  return <option key={i} value={sensor.name} tabIndex={i}>
                      {sensor.name}
                   </option>
                })}

@@ -3,9 +3,15 @@ import dbConnect from '@/lib/dbConnect'
 import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
 import { NextResponse } from "next/server";
 import _ from "lodash"
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation';
 
 export async function GET(request: Request, { params }: { params: { db: string, line: string, name: string, interval: number } }) {
    try {
+      // Validate that the database name is allowed
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
       let startTime = Math.floor(Date.now() - (params.interval * 60 * 60 * 1000));
       let numVelas = 30;
       let duradaVelas = ((params.interval * 60 * 60 * 1000) / numVelas);
