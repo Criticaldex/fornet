@@ -18,9 +18,9 @@ module.exports = {
             textColor2: 'var(--text-color-2)',
             foreground: 'var(--foreground)',
             chart: 'var(--bg-light)',
-            darkBlue: 'var(--darkBlue)',
+            accent: 'var(--accent)',
             darkBlue2: 'var(--darkBlue2)',
-            lightBlue: 'var(--lightBlue)',
+            accentLight: 'var(--accentLight)',
             red: 'var(--red)',
             green: 'var(--green)',
             darkRed: 'var(--darkRed)',
@@ -43,7 +43,7 @@ module.exports = {
             universals2: 'var(--universals2)'
          },
          fontFamily: {
-            nunito: ['Nunito', 'sans-serif']
+            sans: ['DejaVu Sans', 'sans-serif']
          }
       },
    },

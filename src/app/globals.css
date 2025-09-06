@@ -8,9 +8,10 @@
    --background-end: #222;
    --background-color: #222;
    --background-color-transparent: #222222bb;
-   --text-color: #ddd;
-   --text-color-2: #dddddd88;
    --bg-nav: #161616;
+   --text-color: #ddd;
+   --text-color-2: #bbb;
+   --border: #888;
    --bg-light: #424242;
    --bg-dark: #333;
    --red-1: #f22613;
@@ -18,10 +19,12 @@
    --darkRed: #7f1d1d;
    --green: #32c87d;
    --orange-1: #f29513;
-   --orange: #f8b068;
-   --darkBlue: #0468BF;
+   --orange: #ff6600;
+   --accent: #ff6600;
+   --accentLight: #f29513;
+   --darkBlueOld: #0468BF;
    --darkBlue2: #023A6B99;
-   --lightBlue: #0dcaf0;
+   --lightBlueOld: #0dcaf0;
    --yellow: #eab107;
    --white: #fff;
    --black: #000;
@@ -36,40 +39,6 @@
    --seleccio2: #9DA2EE50;
    --universals: #B05AAA;
    --universals2: #B05AAA50;
-}
-
-@media (prefers-color-scheme: dark) {
-   :root {
-      --foreground: #ddd;
-      --background-start: #222;
-      --background-end: #222;
-      --background-color: #222;
-      --bg-nav: #161616;
-      --text-color: #ddd;
-      --text-color-2: #bbb;
-      --bg-light: #424242;
-      --bg-dark: #333;
-      --contrario: #f2f2f2;
-      --pestanaDark: #838383;
-      --pestanaLight: #555555e6;
-   }
-}
-
-@media (prefers-color-scheme: light) {
-   :root {
-      --foreground: #222;
-      --background-start: #ddd;
-      --background-end: #ddd;
-      --background-color: #ddd;
-      --bg-nav: #eee;
-      --text-color: #222;
-      --text-color-2: #33333388;
-      --bg-light: #fff;
-      --bg-dark: #ccc;
-      --contrario: #262626;
-      --pestanaDark: #262626e6;
-      --pestanaLight: #838383;
-   }
 }
 
 body {
@@ -139,68 +108,58 @@ body {
 
 /* LOADING */
 
-.pl {
-   display: block;
-   width: 6.25em;
-   height: 6.25em;
+.fornet-loading {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 140px;
+   width: 140px;
 }
 
-.pl__ring,
-.pl__ball {
-   animation: ring 2s ease-out infinite;
+.fornet-logo-bounce {
+   animation: kdeDesktopBounce 2s ease-in-out infinite;
+   transform-origin: center bottom;
+   will-change: transform;
 }
 
-.pl__ball {
-   animation-name: ball;
-}
-
-
-/* Animation */
-@keyframes ring {
-   from {
-      stroke-dasharray: 0 257 0 0 1 0 0 258;
-   }
-
-   25% {
-      stroke-dasharray: 0 0 0 0 257 0 258 0;
-   }
-
-   50%,
-   to {
-      stroke-dasharray: 0 0 0 0 0 515 0 0;
-   }
-}
-
-@keyframes ball {
-
-   from,
-   50% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: 1;
-   }
-
-   64% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: -109;
-   }
-
-   78% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: -145;
-   }
-
-   92% {
-      animation-timing-function: ease-in;
-      stroke-dashoffset: -157;
-   }
-
-   57%,
-   71%,
-   85%,
-   99%,
-   to {
+/* KDE-style desktop bounce animation */
+@keyframes kdeDesktopBounce {
+   0% {
+      transform: translateY(0) scaleY(1) scaleX(1);
       animation-timing-function: ease-out;
-      stroke-dashoffset: -163;
+   }
+
+   15% {
+      transform: translateY(-30px) scaleY(1.1) scaleX(0.95);
+      animation-timing-function: ease-in;
+   }
+
+   30% {
+      transform: translateY(0) scaleY(0.9) scaleX(1.05);
+      animation-timing-function: ease-out;
+   }
+
+   45% {
+      transform: translateY(-15px) scaleY(1.05) scaleX(0.98);
+      animation-timing-function: ease-in;
+   }
+
+   60% {
+      transform: translateY(0) scaleY(0.95) scaleX(1.02);
+      animation-timing-function: ease-out;
+   }
+
+   75% {
+      transform: translateY(-5px) scaleY(1.02) scaleX(0.99);
+      animation-timing-function: ease-in;
+   }
+
+   90% {
+      transform: translateY(0) scaleY(0.98) scaleX(1.01);
+   }
+
+   100% {
+      transform: translateY(0) scaleY(1) scaleX(1);
    }
 }
 
@@ -341,7 +300,7 @@ body.react-confirm-alert-body-element {
    outline: none;
    background: var(--bg-dark);
    border: 1px solid;
-   border-color: var(--darkBlue);
+   border-color: var(--accent);
    display: inline-block;
    padding: 6px 18px;
    color: --var(--bg-dark);

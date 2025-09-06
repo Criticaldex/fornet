@@ -1,0 +1,42 @@
+{
+  "editor.defaultFormatter": "vscode.typescript-language-features",
+  "editor.formatOnPaste": false, // required
+  "editor.formatOnType": false, // required
+  "editor.formatOnSave": true, // optional
+  "editor.formatOnSaveMode": "file", // required to format on save
+  "files.autoSave": "onFocusChange", // optional but recommended
+  "vs-code-prettier-eslint.prettierLast": false,
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "editor.tabCompletion": "on",
+  "diffEditor.codeLens": true,
+  "MutableAI.upsell": false,
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "terminal.integrated.fontFamily": "DejaVuSansM Nerd Font",
+  "workbench.colorTheme": "Gruvbox Material Dark",
+  "git.confirmSync": false,
+  "terminal.external.linuxExec": "/usr/bin/zsh '-i'",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "editor.fontFamily": "DejaVuSansM Nerd Font",
+  "editor.fontSize": 14,
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
+    "typescript": true,
+    "javascript": true,
+    "python": true
+  },
+  "github.copilot.advanced": {
+    "length": 500,
+    "temperature": 0.1,
+    "industrial_context": true
+  }
+}

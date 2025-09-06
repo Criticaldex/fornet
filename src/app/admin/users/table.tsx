@@ -28,19 +28,41 @@ export function AdminTable({ users, session }: any) {
 
    const subHeaderComponentMemo = useMemo(() => {
       return (
-         <div className="flex justify-end grow m-2">
-            <input
-               id="search"
-               type="text"
-               className={`text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4`}
-               placeholder="Filtrar per email"
-               aria-label="Search Input"
-               value={filterText}
-               onChange={(e: any) => setFilterText(e.target.value)}
-            />
+         <div className="flex flex-col gap-2 p-2 w-full">
+            <div className="flex flex-wrap gap-2 items-center justify-between">
+               {/* Text Search */}
+               <div className="flex items-center gap-2">
+                  <input
+                     id="search"
+                     type="text"
+                     className="text-textColor border-b-2 bg-bgDark rounded-md p-2 min-w-64"
+                     placeholder="Search..."
+                     aria-label="Search Input"
+                     value={filterText}
+                     onChange={(e: any) => setFilterText(e.target.value)}
+                  />
+               </div>
+
+               {/* Refresh Button */}
+               <button
+                  className={`bg-bgDark bg-opacity-20 dark:bg-opacity-80 hover:bg-opacity-40 my-1 mx-4 py-2 px-5 rounded-md text-textColor font-bold border border-accent`}
+                  onClick={async () => {
+                     setRows(await getUsers());
+                  }}
+               >
+                  Refresh
+               </button>
+            </div>
+
+            {/* Results Count */}
+            <div className="flex justify-between items-center">
+               <div className="text-sm text-textColor">
+                  Showing {filteredItems.length} of {rows?.length || 0} users
+               </div>
+            </div>
          </div>
       );
-   }, [filterText]);
+   }, [filterText, filteredItems.length, rows?.length]);
 
    const {
       register,
@@ -56,14 +78,14 @@ export function AdminTable({ users, session }: any) {
 
    const deleteHandler = (row: any) => (event: any) => {
       confirmAlert({
-         message: 'Vols eliminar l\'usuari: \n' + row.email + ' ?',
+         message: 'Do you want to delete the user: \n' + row.email + ' ?',
          buttons: [
             {
-               label: 'Eliminar',
+               label: 'Delete',
                onClick: async () => {
                   const del = await deleteUser(row.email);
                   if (del) {
-                     toast.error('Usuari Eliminat!!', { theme: "colored" });
+                     toast.error('User Deleted!!', { theme: "colored" });
                      if (session?.user.role == '1') {
                         setRows(await getUsersbyDB(session?.user.db));
                      } else if (session?.user.role == '0') {
@@ -73,7 +95,7 @@ export function AdminTable({ users, session }: any) {
                }
             },
             {
-               label: 'Millor no toco res :S',
+               label: 'Better not touch anything :S',
             }
          ]
       });
@@ -88,13 +110,13 @@ export function AdminTable({ users, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Nom',
+         name: 'Name',
          selector: (row: any) => row.name,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Cognom',
+         name: 'Last Name',
          selector: (row: any) => row.lastname,
          sortable: true,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
@@ -112,14 +134,20 @@ export function AdminTable({ users, session }: any) {
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Licencia',
+         name: 'License',
          selector: (row: any) => Intl.DateTimeFormat("es-ES").format(new Date(row.license?.start)) + ' - ' + Intl.DateTimeFormat("es-ES").format(new Date(row.license?.end)),
          sortable: true,
          grow: 2,
          style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
       },
       {
-         name: 'Accions',
+         name: 'Alerts',
+         selector: (row: any) => row.alert ? "X" : "",
+         sortable: true,
+         style: { fontSize: 'var(--table-font)', backgroundColor: '', color: '' },
+      },
+      {
+         name: 'Actions',
          cell: (row: any) => (
             <div className='flex flex-row'>
                <FaPenToSquare onClick={editHandler(row, reset)} className='cursor-pointer m-1'>Edit</FaPenToSquare>

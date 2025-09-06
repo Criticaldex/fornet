@@ -1,5 +1,6 @@
 import _ from "lodash"
 import { getSession } from "@/services/session"
+import { ValueIface } from "@/schemas/value";
 
 const getValues = async (filter: any, fields?: string[], db?: string) => {
    if (!db) {
@@ -11,27 +12,24 @@ const getValues = async (filter: any, fields?: string[], db?: string) => {
       fields = ['-_id'];
    }
 
-   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values`,
+   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${db}`,
       {
          method: 'POST',
          headers: {
             'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
          },
          body: JSON.stringify(
             {
-               db: db,
                fields: fields,
                filter: filter,
-               sort: 'ordre'
+               sort: 'timestamp'
             }
          ),
       }).then(res => res.json());
 }
 
-export const getChartValues = async (line: string, name: string) => {
-   const filter = {
-      "line": line, "name": name
-   };
+export const getChartValues = async (filter: ValueIface) => {
    const data: [] = await getValues(filter);
    const values = [{
       name: 'Productividad',
@@ -45,9 +43,9 @@ export const getChartValues = async (line: string, name: string) => {
    return values;
 }
 
-export const getLines = async (filtros?: any) => {
+export const getLines = async (db?: any) => {
    const fields = ['-_id', 'line']
-   const data = await getValues(filtros, fields);
+   const data = await getValues({}, fields, db);
    let groupBySec = _.groupBy(data, 'line');
    let lines: string[] = [];
    for (const [key, value] of (Object.entries(groupBySec) as [string, any][])) {
@@ -56,13 +54,28 @@ export const getLines = async (filtros?: any) => {
    return lines;
 }
 
-export const getNames = async (filtros?: any) => {
-   const fields = ['-_id', 'name']
-   const data = await getValues(filtros, fields);
-   let groupBySec = _.groupBy(data, 'name');
+export const getNames = async (filter?: ValueIface, db?: any) => {
+   const fields = ['-_id', 'name', 'unit']
+   const data = await getValues(filter, fields, db);
+   let groupByName = _.groupBy(data, 'name');
+
    let names: string[] = [];
-   for (const [key, value] of (Object.entries(groupBySec) as [string, any][])) {
+   let units: string[] = [];
+   for (const [key, value] of (Object.entries(groupByName) as [string, any][])) {
       names.push(key);
+      units.push(value[0].unit);
    }
-   return names;
+   return { names, units };
+}
+
+export const deleteValues = async (filter: ValueIface, db: string | undefined) => {
+   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${db}`,
+      {
+         method: 'DELETE',
+         headers: {
+            'Content-type': 'application/json',
+            token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+         },
+         body: JSON.stringify(filter)
+      }).then(res => res.json());
 }

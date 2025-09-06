@@ -9,9 +9,9 @@ export default async function ContractsLayout({ children }: any) {
          <div className="h-20 bg-light ml-16 text-right flex justify-start items-center">
             <GetLinksAdmin
                session={session} />
-            <h1 className="right-0 absolute mr-10 text-right justify-end font-semibold text-2xl italic">Panell Administració</h1>
+            <h1 className="right-0 absolute mr-10 text-right justify-end font-semibold text-2xl italic">Admin Panel</h1>
          </div>
-         <hr className="w-11/12 m-auto mt-0 border-t-2 border-darkBlue" />
+         <hr className="w-11/12 m-auto mt-0 border-t-2 border-accent" />
          <main className="m-4">
             {children}
          </main>

@@ -1,10 +1,8 @@
 'use client'
 import Link from "next/link"
 
-import { BiPlusMedical } from "react-icons/bi"
-import { FaCapsules, FaUserNurse, FaPhoneAlt } from "react-icons/fa"
-import { TbLayoutDashboard } from "react-icons/tb"
-import { RiMedicineBottleLine } from "react-icons/ri"
+import { FaCapsules, FaBroadcastTower, FaHistory, FaChartBar, FaPodcast, FaReceipt } from "react-icons/fa"
+import Image from 'next/image'
 
 import { usePathname } from "next/navigation"
 import { LogoutButton, ProfileButton } from "@/components/loginbuttons.component";
@@ -18,69 +16,70 @@ export default function GetNav({ session }: any) {
 
    const navTitlesIcons = [
       {
-         label: 'Dashboard',
-         icon: TbLayoutDashboard,
-         route: '/dashboard'
+         label: 'Live',
+         icon: FaBroadcastTower,
+         route: '/live'
       },
       {
-         label: 'Professionals',
-         icon: FaUserNurse,
-         route: '/professionals'
+         label: 'History',
+         icon: FaHistory,
+         route: '/history'
+      },
+      {
+         label: 'PowerBi',
+         icon: FaChartBar,
+         route: '/powerbi'
       }
    ]
-   {
-      callsCenters.includes(session?.user.db) &&
-         navTitlesIcons.push(
-            {
-               label: 'Trucades',
-               icon: FaPhoneAlt,
-               route: '/calls'
-            }
-         )
-   }
 
-   const navTitlesIconsFarma = [
+   const externalLinks = [
       {
-         label: 'IQF',
-         icon: FaCapsules,
-         route: '/iqf'
+         label: 'PowerBi',
+         icon: FaChartBar,
+         route: '/powerbi'
       }
    ]
 
    return (
-      <div className="fixed top-0 left-0 z-50 w-16 h-screen bg-bgNavGlobal pt-4 pr-3 pb-0 pl-0 hover:w-52 transition-all duration-500">
+      <div className="fixed top-0 left-0 z-50 w-16 h-screen bg-bgNavGlobal pt-2 pr-3 pb-0 pl-0 hover:w-52 transition-all duration-500">
          <nav className="text-TextNav flex flex-col justify-between h-full overflow-hidden">
             <div>
-               <Link href="/" className="text-yellowCustom text-xl font-bold grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
-                  <BiPlusMedical size={20} />
-                  <span className="text-lg">CAPFA</span>
+               <Link href="/" className="text-accent text-xl font-bold grid grid-cols-[max-content_max-content] gap-x-4 mt-1 mb-7 mr-1 ml-2">
+                  {/* <BsRepeat size={20} /> */}
+                  <Image
+                     className="text-accent"
+                     src="/fornet_color.svg"
+                     alt="ForNet Logo"
+                     width={40}
+                     height={40}
+                  />
+                  <span className="text-lg">ForNet</span>
                </Link>
                <div className="flex flex-col justify-between" id="lista">
                   {navTitlesIcons.map((navTI) => (
-                     <Link key={navTI.route} href={navTI.route} className={`hover:text-darkBlue pb-6 grid grid-cols-[max-content_max-content] place-items-center gap-x-4 pt-2 pr-0 pl-3 items-center ml-3
-                     ${pathname?.includes(navTI.route) ? 'text-darkBlue' : ''}`}>
+                     <Link key={navTI.route} href={navTI.route} className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-center gap-x-4 pt-2 pr-0 pl-3 items-center ml-3
+                     ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
                         <navTI.icon size={19} />
                         <span className="text-base">
                            {navTI.label}
                         </span>
                      </Link>
                   ))}
-                  <hr className="my-4 ml-2 border-spacerNav" />
-                  <div className="text-yellowCustom text-lg font-bold grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
-                     <RiMedicineBottleLine size={20} />
-                     <h3>
-                        Farmàcia
-                     </h3>
+                  {/* <hr className="my-4 ml-2 border-spacerNav" />
+                  <div className="text-lg grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0 pb-7 pl-3 ml-3">
+                     <h1 className="text-accent">
+                        External
+                     </h1>
                   </div>
-                  {navTitlesIconsFarma.map((navTI) => (
-                     <Link key={navTI.label} href={navTI.route} className={`hover:text-darkBlue pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
-                     ${pathname?.includes(navTI.route) ? 'text-darkBlue' : ''}`}>
+                  {externalLinks.map((navTI) => (
+                     <Link key={navTI.label} href={navTI.route} rel="noopener noreferrer" target="_blank" className={`hover:text-accent pb-6 grid grid-cols-[max-content_max-content] place-items-cente gap-x-4 pt-2 pr-0  pl-3 items-center ml-3
+                     ${pathname?.includes(navTI.route) ? 'text-accent' : ''}`}>
                         <navTI.icon size={19} />
                         <span className="text-base">
                            {navTI.label}
                         </span>
                      </Link>
-                  ))}
+                  ))} */}
                </div>
             </div>
             <div>

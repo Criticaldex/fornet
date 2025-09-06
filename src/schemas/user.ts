@@ -5,6 +5,7 @@ export interface UserIface {
    lastname: string,
    email: string,
    password: string,
+   alert: boolean,
    hash: string,
    license?: {
       start: string,
@@ -13,12 +14,8 @@ export interface UserIface {
    db: string,
    role: string,
    config: {
-      dashboard: {
-         general: [string]
-         cpr: [string]
-         nocpr: [string]
-      },
-      professionals: [string]
+      live: any,
+      summary: any
    }
 }
 
@@ -28,6 +25,9 @@ const UserSchema = new mongoose.Schema({
    },
    lastname: {
       type: String,
+   },
+   alert: {
+      type: Boolean,
    },
    email: {
       type: String,
@@ -51,6 +51,9 @@ const UserSchema = new mongoose.Schema({
    },
    role: {
       type: String,
+   },
+   config: {
+      type: Object,
    }
 });
 

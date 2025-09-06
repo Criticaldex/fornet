@@ -1,33 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
-
 :root {
-   --blueDark: #2a356b;
-   --blueLight: #475a9c;
-   --border: #c7c7c7;
-   --error: #ff4f68;
-   --button: #0468BF;
-}
-
-@media (prefers-color-scheme: dark) {
-   :root {
-      --foreground: #ddd;
-      --background-primary: #222;
-      --background-secondary: #00000099;
-      --input-bg: #4a4a4a;
-   }
-}
-
-@media (prefers-color-scheme: light) {
-   :root {
-      --foreground: #222;
-      --background-primary: #ddd;
-      --background-secondary: hsla(0, 0%, 100%, 0.7);
-      --input-bg: #dfdfdf;
-   }
+   --foreground: #ddd;
+   --background-primary: #222;
+   --background-secondary: #00000033;
+   --input-bg: #4a4a4a;
+   --accent: #6a040f;
+   --accentLight: #e85d04;
+   --border: #888888;
+   --error: #6a040f;
+   --button: #ff6600dd;
 }
 
 html {
-   font-family: 'Nunito', sans-serif;
+   font-family: 'Inter', sans-serif;
    font-size: 1rem;
 }
 
@@ -42,17 +26,17 @@ body {
 .bg-image {
    position: absolute;
    width: 100%;
-   height: 300px;
+   height: 500px;
    background: linear-gradient(to top,
          transparent,
-         var(--blueDark)) var(--blueLight);
+         var(--accent)) var(--background-primary);
    top: 0;
    left: 0;
    z-index: -1;
 }
 
 main {
-   width: 23%;
+   width: 500px;
    margin: auto;
 }
 
@@ -62,6 +46,7 @@ main {
    align-items: center;
    column-gap: 1rem;
    justify-content: center;
+   margin-top: 50px;
 }
 
 .title h1 {
@@ -76,14 +61,14 @@ main {
 }
 
 section {
-   margin-top: 30px;
+   margin-top: 50px;
    padding: 30px 50px 70px;
    background: var(--background-secondary);
    backdrop-filter: blur(40px);
    vertical-align: middle;
    text-align: center;
-   border: solid 1px var(--border);
    border-radius: 5px;
+   border: solid 1px var(--border);
 }
 
 section h1 {

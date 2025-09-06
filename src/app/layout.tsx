@@ -1,12 +1,15 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
+import '../../node_modules/react-grid-layout/css/styles.css'
+import '../../node_modules//react-resizable/css/styles.css'
+import '@fontsource/dejavu-sans/400.css'
+import '@fontsource/dejavu-sans/400-italic.css'
+import '@fontsource/dejavu-sans/700.css'
+import '@fontsource/dejavu-sans/700-italic.css'
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import GetNav from './routing'
 import { NextAuthProvider } from "./providers";
 import { getSession } from "@/services/session"
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
    title: 'Create Next App',
@@ -17,7 +20,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
    const session = await getSession();
    return (
       <html lang="en">
-         <body className={inter.className}>
+         <body className="font-sans">
             <GetNav
                session={session}
             />

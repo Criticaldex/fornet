@@ -1,0 +1,44 @@
+import mongoose from 'mongoose'
+import dbConnect from '@/lib/dbConnect'
+import indicatorSchema, { IndicatorIface } from '@/schemas/indicator'
+import { NextResponse } from "next/server";
+import { validateDatabaseName, invalidDatabaseResponse } from '@/lib/database-validation';
+
+export async function GET(request: Request, { params }: { params: { db: string, line: string, name: string, interval: number } }) {
+   try {
+      // Validate that the database name is allowed
+      if (!validateDatabaseName(params.db)) {
+         return invalidDatabaseResponse();
+      }
+
+      const dbName = params.db;
+      let timestamp = Math.floor(Date.now() - (params.interval * 60 * 60 * 1000)).toString();
+
+      const filter = {
+         "line": params.line, "name": params.name, "timestamp": { $gte: parseInt(timestamp) }
+      };
+
+      const fields = [
+         "-_id",
+         "value",
+         "timestamp"
+      ];
+
+      await dbConnect();
+      const db = mongoose.connection.useDb(dbName, { useCache: false });
+      if (!db.models.value) {
+         db.model('value', indicatorSchema);
+      }
+      const values = await db.models.value.find(filter).select(fields).sort('timestamp').lean();
+      const filteredValues: any[] = [];
+      values.forEach((val, i) => {
+         if (i % 60 == 0) {
+            filteredValues.push([val.timestamp, val.value]);
+         }
+      });
+      // const liveValues = filteredValues.map((val) => ([val.timestamp, val.value]));
+      return NextResponse.json(filteredValues);
+   } catch (err) {
+      return NextResponse.json({ ERROR: (err as Error).message }, { status: 500 });
+   }
+}

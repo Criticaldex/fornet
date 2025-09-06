@@ -1,22 +1,22 @@
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getCsrfToken } from "next-auth/react"
 import '../signin.css'
+import Image from 'next/image'
 import { BiPlusMedical } from "react-icons/bi"
-import { usePathname, useSearchParams } from 'next/navigation';
-import { useRouter } from "next/router";
-
-
+import Fornet from "../../public/fornet_color.svg";
+import { Inter } from 'next/font/google'
+const inter = Inter({
+   subsets: ['latin'],
+   variable: '--font-inter'
+});
 
 export default function SignIn({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-   const router = useRouter();
-   const { error } = router.query;
-
    return (
-      <main>
+      <main className={`${inter.variable} font-sans`}>
          <div className="bg-image"></div>
          <div className="title">
-            <BiPlusMedical size={50} className="icono" />
-            <h1>CAPFA</h1>
+            <Fornet />
+            <h1>ForNet</h1>
          </div>
          <section>
             <h1>SIGN IN</h1>
@@ -29,16 +29,9 @@ export default function SignIn({ csrfToken }: InferGetServerSidePropsType<typeof
                   <input name="password" type="password" placeholder="Contrasenya" required />
                </div>
                <div>
-                  <button type="submit">Sign in</button>
+                  <button type="submit">Entrar</button>
                </div>
             </form>
-            {error ?
-               <div id="errorLogin">
-                  Email o contrasenya incorrectes!
-               </div>
-               :
-               ''
-            }
          </section>
       </main>
    )

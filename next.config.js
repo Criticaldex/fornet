@@ -4,21 +4,43 @@ const nextConfig = {
       esmExternals: "loose",
       serverComponentsExternalPackages: ["mongoose", "bcryptjs"]
    },
+   webpack(config) {
+      config.module.rules.push({
+         test: /\.svg$/,
+         use: ["@svgr/webpack"]
+      });
+      return config;
+   },
    async redirects() {
       return [
          {
             source: '/',
-            destination: `/dashboard/${process.env.DASHBOARD_DEFAULT_LINE}/${process.env.DASHBOARD_DEFAULT_NAME}`,
+            destination: `/live/${process.env.LIVE_DEFAULT_INTERVAL}`,
             permanent: false,
          },
          {
-            source: '/dashboard',
-            destination: `/dashboard/${process.env.DASHBOARD_DEFAULT_LINE}/${process.env.DASHBOARD_DEFAULT_NAME}`,
+            source: '/live',
+            destination: `/live/${process.env.LIVE_DEFAULT_INTERVAL}`,
             permanent: false,
          },
          {
-            source: '/dashboard/:line',
-            destination: `/dashboard/:line/${process.env.DASHBOARD_DEFAULT_NAME}`,
+            source: '/mqtt',
+            destination: `/mqtt/${process.env.MQTT_DEFAULT}`,
+            permanent: false,
+         },
+         {
+            source: '/history',
+            destination: `/history/${process.env.SUMMARY_DEFAULT_YEAR}`,
+            permanent: false,
+         },
+         {
+            source: '/admin',
+            destination: '/admin/profile',
+            permanent: false,
+         },
+         {
+            source: '/admin/mqtt',
+            destination: '/admin/mqtt/unit',
             permanent: false,
          }
       ];
