@@ -32,11 +32,18 @@ const ExpandedComponent = ({ data }: any) => {
       }
    }, [data.line, data.year, session, update, data.chartsData, data.drilldown])
 
-   function handleDel(i: any): void {
+   function handleDel(chartId: any): void {
       if (session) {
          let user = session.user;
-         user.config.summary[data.line].splice(i, 1);
-         update(user);
+         // Find the chart by its 'i' property, not array index
+         const chartIndex = user.config.summary[data.line].findIndex((chart: any) => chart.i === chartId);
+         if (chartIndex !== -1) {
+            user.config.summary[data.line].splice(chartIndex, 1);
+            update(user);
+            console.log(`Deleted chart with id: ${chartId}`);
+         } else {
+            console.error(`Chart with id ${chartId} not found`);
+         }
       }
    }
 
@@ -54,13 +61,17 @@ const ExpandedComponent = ({ data }: any) => {
          rowHeight={width / 50}
          width={width}
          onLayoutChange={(layout) => {
-            if (session && layout[0]) {
+            if (session && layout.length > 0) {
                let user = session.user;
-               user.config.summary[data.line].forEach((ele: any, i: number) => {
-                  ele.w = layout[i].w;
-                  ele.h = layout[i].h;
-                  ele.x = layout[i].x;
-                  ele.y = layout[i].y;
+               // Update each chart by matching the layout item's i property with chart's i property
+               layout.forEach((layoutItem: any) => {
+                  const chart = user.config.summary[data.line].find((c: any) => c.i === layoutItem.i);
+                  if (chart) {
+                     chart.w = layoutItem.w;
+                     chart.h = layoutItem.h;
+                     chart.x = layoutItem.x;
+                     chart.y = layoutItem.y;
+                  }
                });
                update(user);
                saveUser(user);
@@ -70,11 +81,11 @@ const ExpandedComponent = ({ data }: any) => {
       >
          {
             layoutConf.map((chart: any, index: number) => {
-               chart.i = index.toString();
-               return < div key={chart.i} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
+               const key = chart.i;
+               return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
                   <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
                      <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name}</span>
-                     <FaXmark size={20} onClick={() => { handleDel(chart.i); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
+                     <FaXmark size={20} onClick={() => { handleDel(key); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                   </div>
                   <div className="flex-1 min-h-0 overflow-hidden p-2">
                      <SummaryChart
@@ -91,15 +102,27 @@ const ExpandedComponent = ({ data }: any) => {
    );
 }
 
-const handleAdd = (row: any, session: any, update: any, selected: any) => async (event: any) => {
+const handleAdd = (row: any, session: any, update: any, selected: any, sensors: any) => async (event: any) => {
+   const lineSensors = sensors[row.line];
+   const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
+   if (!hasValidSensors) {
+      return; // Don't add chart if no sensors available
+   }
+
    let user = session.user;
    let maxY = 0;
    session.user.config.summary[row.line].forEach((element: { h: number; y: number; }) => {
       const suma = element.y + element.h
       maxY = (maxY < suma) ? suma : maxY;
    });
+
+   // Generate unique ID by finding the highest existing ID and adding 1
+   const existingIds = user.config.summary[row.line].map((chart: any) => parseInt(chart.i) || 0);
+   const nextId = existingIds.length === 0 ? 0 : Math.max(...existingIds) + 1;
+
    let newData = {
-      i: (user.config.summary[row.line].length).toString(),
+      i: nextId.toString(),
       x: 0,
       y: maxY,
       w: 4,
@@ -123,23 +146,34 @@ export function LinesTable({ lines, year, sensors, selected, chartsData, drilldo
    },
    {
       name: 'Selects',
-      cell: (row: any) => (
-         <div className='flex flex-row mr-2 justify-end items-center '>
-            <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
-               onChange={e => {
-                  row.sensor = e.target.value;
-                  let fields = e.target.value.split('/');
-                  selected[row.line].sensor = fields[0];
-                  selected[row.line].unit = fields[1];
-               }}>
-               {sensors[row.line].map((sensor: any, i: number) => {
-                  return <option key={i} value={`${sensor.name}/${sensor.unit}`} tabIndex={i}>
-                     {sensor.name}
-                  </option>
-               })}
-            </select>
-         </div>
-      ),
+      cell: (row: any) => {
+         const lineSensors = sensors[row.line];
+         const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
+         return (
+            <div className='flex flex-row mr-2 justify-end items-center '>
+               {hasValidSensors ? (
+                  <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
+                     onChange={e => {
+                        row.sensor = e.target.value;
+                        let fields = e.target.value.split('/');
+                        selected[row.line].sensor = fields[0];
+                        selected[row.line].unit = fields[1];
+                     }}>
+                     {lineSensors.map((sensor: any, i: number) => {
+                        return <option key={i} value={`${sensor.name}/${sensor.unit}`} tabIndex={i}>
+                           {sensor.name}
+                        </option>
+                     })}
+                  </select>
+               ) : (
+                  <span className="text-gray-400 text-sm p-1 ml-4">
+                     No sensors available
+                  </span>
+               )}
+            </div>
+         )
+      },
       grow: 2,
       ignoreRowClick: true,
       button: false,
@@ -147,9 +181,19 @@ export function LinesTable({ lines, year, sensors, selected, chartsData, drilldo
    },
    {
       name: 'Accions',
-      cell: (row: any) => (
-         <FaPlus size={20} onClick={handleAdd(row, session, update, selected)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
-      ),
+      cell: (row: any) => {
+         const hasValidSensors = sensors[row.line] && sensors[row.line].length > 0;
+         return (
+            <FaPlus
+               size={20}
+               onClick={hasValidSensors ? handleAdd(row, session, update, selected, sensors) : undefined}
+               className={`mx-3 my-1 ${hasValidSensors ? 'cursor-pointer text-accent hover:text-accent-dark' : 'cursor-not-allowed text-gray-400'}`}
+               title={hasValidSensors ? 'Add Graph' : 'No sensors available'}
+            >
+               ADD Graph
+            </FaPlus>
+         )
+      },
       grow: 1,
       ignoreRowClick: true,
       button: true,
@@ -157,13 +201,17 @@ export function LinesTable({ lines, year, sensors, selected, chartsData, drilldo
    }];
 
    const data = lines.map((line: string) => {
+      const lineSensors = sensors[line];
+      const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
       return ({
          line: line,
          type: 'line',
          year: year,
-         sensor: sensors[line] ? sensors[line][0].name : null,
+         sensor: hasValidSensors ? lineSensors[0].name : null,
          chartsData: chartsData[line],
-         drilldown: drilldown[line]
+         drilldown: drilldown[line],
+         hasValidSensors: hasValidSensors
       })
    });
 
