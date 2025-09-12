@@ -101,7 +101,9 @@ export function getBaseNodesConfig(dbName: string) {
             "id": "7520a9122b3626a9",
             "type": "telegram bot",
             "botname": "Fornet_gle",
-            "token": process.env.TELEGRAM_BOT_TOKEN,
+            "credentials": {
+                "token": process.env.TELEGRAM_BOT_TOKEN
+            },
             "usernames": "",
             "chatids": "",
             "baseapiurl": "",
@@ -144,8 +146,10 @@ export function getBaseNodesConfig(dbName: string) {
             "port": "465",
             "secure": true,
             "tls": true,
-            "userid": process.env.MAIL_FORNET,
-            "password": process.env.API_TOKEN_MAIL,
+            "credentials": {
+                "userid": process.env.MAIL_FORNET,
+                "password": process.env.API_TOKEN_MAIL
+            },
             "name": "",
             "dname": "",
             "x": 690,
