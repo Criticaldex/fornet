@@ -131,9 +131,9 @@ export function SummaryChart({ name, data, dd }: any) {
             let tooltip = `<b>${this.x}</b><br/>`;
             this.points.forEach((point: any) => {
                if (point.series.type === 'columnrange') {
-                  tooltip += `<span style="color:${point.color}">●</span> ${point.series.name}: ${point.point.low} - ${point.point.high}<br/>`;
+                  tooltip += `<span style="color:${point.color}">●</span> ${point.series.name}: ${Number(point.point.low).toFixed(2)} - ${Number(point.point.high).toFixed(2)}<br/>`;
                } else {
-                  tooltip += `<span style="color:${point.color}">●</span> ${point.series.name}: ${point.y}<br/>`;
+                  tooltip += `<span style="color:${point.color}">●</span> ${point.series.name}: ${Number(point.y).toFixed(2)}<br/>`;
                }
             });
             return tooltip;
