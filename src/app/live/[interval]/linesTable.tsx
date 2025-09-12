@@ -49,11 +49,18 @@ const ExpandedComponent = ({ data }: any) => {
       }
    }, [data, session, update])
 
-   function handleDel(i: any): void {
+   function handleDel(chartId: any): void {
       if (session) {
          let user = session.user;
-         user.config.live[data.line].splice(i, 1);
-         update(user);
+         // Find the chart by its 'i' property, not array index
+         const chartIndex = user.config.live[data.line].findIndex((chart: any) => chart.i === chartId);
+         if (chartIndex !== -1) {
+            user.config.live[data.line].splice(chartIndex, 1);
+            update(user);
+            console.log(`Deleted chart with id: ${chartId}`);
+         } else {
+            console.error(`Chart with id ${chartId} not found`);
+         }
       }
    }
 
@@ -73,13 +80,17 @@ const ExpandedComponent = ({ data }: any) => {
          rowHeight={width / 50}
          width={width}
          onLayoutChange={(layout) => {
-            if (session && layout[0]) {
+            if (session && layout.length > 0) {
                let user = session.user;
-               user.config.live[data.line].forEach((ele: any, i: number) => {
-                  ele.w = layout[i].w;
-                  ele.h = layout[i].h;
-                  ele.x = layout[i].x;
-                  ele.y = layout[i].y;
+               // Update each chart by matching the layout item's i property with chart's i property
+               layout.forEach((layoutItem: any) => {
+                  const chart = user.config.live[data.line].find((c: any) => c.i === layoutItem.i);
+                  if (chart) {
+                     chart.w = layoutItem.w;
+                     chart.h = layoutItem.h;
+                     chart.x = layoutItem.x;
+                     chart.y = layoutItem.y;
+                  }
                });
                update(user);
                saveUser(user);
@@ -89,12 +100,12 @@ const ExpandedComponent = ({ data }: any) => {
       >
          {
             layoutConf.map((chart: any, index: number) => {
-               const key = index.toString();
+               const key = chart.i;
                if (chart.type == 'line') {
                   return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
                      <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
                         <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
+                        <FaXmark size={20} onClick={() => { handleDel(key); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
 
                      <div className="flex-1 min-h-0 overflow-hidden p-2">
@@ -111,7 +122,7 @@ const ExpandedComponent = ({ data }: any) => {
                   return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
                      <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
                         <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
+                        <FaXmark size={20} onClick={() => { handleDel(key); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
                      <div className="flex-1 min-h-0 overflow-hidden p-2">
                         <GaugeChart
@@ -128,7 +139,7 @@ const ExpandedComponent = ({ data }: any) => {
                   return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
                      <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
                         <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name}</span>
-                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
+                        <FaXmark size={20} onClick={() => { handleDel(key); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
                      <div className="flex-1 min-h-0 overflow-hidden p-2">
                         <BoolChart
@@ -142,7 +153,7 @@ const ExpandedComponent = ({ data }: any) => {
                   return < div key={key} className='bg-bgLight rounded-md overflow-hidden flex flex-col h-full'>
                      <div className="flex flex-row justify-between rounded-t-md bg-gradient-to-b from-40% from-bgLight to bg-bgDark shrink-0">
                         <span className="flex-grow text-center dragHandle cursor-grab active:cursor-grabbing truncate px-2">{chart.name} ({chart.unit})</span>
-                        <FaXmark size={20} onClick={() => { handleDel(index); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
+                        <FaXmark size={20} onClick={() => { handleDel(key); }} className='cursor-pointer mx-3 my-1 text-accent shrink-0'>Remove Graph</FaXmark>
                      </div>
                      <div className="flex-1 min-h-0 overflow-hidden p-2">
                         <CandleChart
@@ -162,6 +173,18 @@ const ExpandedComponent = ({ data }: any) => {
 }
 
 const handleAdd = (row: any, session: any, update: any, selected: any, sensors: any) => async (event: any) => {
+   // Check if sensors are available for this line
+   if (!sensors[row.line] || sensors[row.line].length === 0) {
+      alert('No sensors available for this line. Please add sensors first.');
+      return;
+   }
+
+   // Check if a sensor is selected
+   if (!selected[row.line]?.sensor) {
+      alert('Please select a sensor before adding a chart.');
+      return;
+   }
+
    let user = session.user;
 
    // Determine dimensions based on chart type
@@ -222,8 +245,12 @@ const handleAdd = (row: any, session: any, update: any, selected: any, sensors: 
 
    const position = findBestPosition(session.user.config.live[row.line], chartWidth, chartHeight);
 
+   // Generate unique ID by finding the highest existing ID and adding 1
+   const existingIds = user.config.live[row.line].map((chart: any) => parseInt(chart.i) || 0);
+   const nextId = existingIds.length === 0 ? 0 : Math.max(...existingIds) + 1;
+
    let newData = {
-      i: (user.config.live[row.line].length).toString(),
+      i: nextId.toString(),
       x: position.x,
       y: position.y,
       w: chartWidth,
@@ -237,7 +264,7 @@ const handleAdd = (row: any, session: any, update: any, selected: any, sensors: 
 
    user.config.live[row.line].push(newData);
    update(user);
-}
+};
 
 export function LinesTable({ lines, interval, sensors, types, selected: initialSelected }: any) {
    const { data: session, update } = useSession();
@@ -247,12 +274,16 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
    const [selected, setSelected] = useState(() => {
       const init: any = {};
       lines.forEach((line: string) => {
+         const lineSensors = sensors[line];
+         const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
          init[line] = initialSelected[line] || {
             type: types[0] || 'line',
-            sensor: sensors[line]?.[0]?.name,
-            unit: sensors[line]?.[0]?.unit,
-            minrange: sensors[line]?.[0]?.minrange,
-            maxrange: sensors[line]?.[0]?.maxrange
+            sensor: hasValidSensors ? lineSensors[0]?.name : null,
+            unit: hasValidSensors ? lineSensors[0]?.unit : null,
+            minrange: hasValidSensors ? lineSensors[0]?.minrange : null,
+            maxrange: hasValidSensors ? lineSensors[0]?.maxrange : null,
+            noSensors: !hasValidSensors
          };
       });
       return init;
@@ -297,12 +328,13 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
                </select>
 
                <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
-                  value={selected[row.line]?.sensor || sensors[row.line]?.[0]?.name || ''}
+                  value={selected[row.line]?.sensor || ''}
+                  disabled={!sensors[row.line] || sensors[row.line].length === 0}
                   onChange={e => {
                      const sensorName = e.target.value;
 
                      // Find the sensor data
-                     const sensorData = sensors[row.line].find((s: any) => s.name === sensorName);
+                     const sensorData = sensors[row.line]?.find((s: any) => s.name === sensorName);
                      if (sensorData) {
                         setSelected((prev: any) => ({
                            ...prev,
@@ -316,11 +348,15 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
                         }));
                      }
                   }}>
-                  {sensors[row.line].map((sensor: any, i: number) => {
-                     return <option key={i} value={sensor.name} tabIndex={i}>
-                        {sensor.name}
-                     </option>
-                  })}
+                  {!sensors[row.line] || sensors[row.line].length === 0 ? (
+                     <option value="">No sensors available</option>
+                  ) : (
+                     sensors[row.line].map((sensor: any, i: number) => {
+                        return <option key={i} value={sensor.name} tabIndex={i}>
+                           {sensor.name}
+                        </option>
+                     })
+                  )}
                </select>
             </div>
          )
@@ -332,9 +368,19 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
    },
    {
       name: 'Accions',
-      cell: (row: any) => (
-         <FaPlus size={20} onClick={handleAdd(row, session, update, selected, sensors)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
-      ),
+      cell: (row: any) => {
+         const hasValidSensors = sensors[row.line] && sensors[row.line].length > 0;
+         return (
+            <FaPlus
+               size={20}
+               onClick={hasValidSensors ? handleAdd(row, session, update, selected, sensors) : undefined}
+               className={`mx-3 my-1 ${hasValidSensors ? 'cursor-pointer text-accent hover:text-accent-dark' : 'cursor-not-allowed text-gray-400'}`}
+               title={hasValidSensors ? 'Add Graph' : 'No sensors available'}
+            >
+               ADD Graph
+            </FaPlus>
+         );
+      },
       grow: 1,
       ignoreRowClick: true,
       button: true,
@@ -342,11 +388,15 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
    }];
 
    const data = lines.map((line: string) => {
+      const lineSensors = sensors[line];
+      const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
       return ({
          line: line,
          interval: interval,
          type: 'line',
-         sensor: sensors[line] ? sensors[line][0].name : null
+         sensor: hasValidSensors ? lineSensors[0].name : null,
+         hasValidSensors
       })
    });
 

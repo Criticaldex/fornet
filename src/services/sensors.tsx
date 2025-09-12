@@ -1,6 +1,7 @@
 import _ from "lodash"
 import { SensorIface } from "@/schemas/sensor";
 import { getSession } from "./session";
+import valueSchema, { ValueIface } from '@/schemas/value';
 
 export const getSensors = async (db: string | undefined) => {
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${db}`,
@@ -92,6 +93,26 @@ export const upsertSensor = async (filter: SensorIface, db: string | undefined, 
       data = dataWithoutType;
    } else {
       data = filter
+   }
+   if (data.autoinc) {
+      const body: ValueIface = {
+         line: data.line,
+         plc_name: data.plc_name,
+         name: data.name,
+         unit: data.unit,
+         value: 0,
+         timestamp: new Date().getTime()
+      }
+      const value = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/values/${db}`,
+         {
+            method: 'PATCH',
+            headers: {
+               'Content-type': 'application/json',
+               token: `${process.env.NEXT_PUBLIC_API_KEY}`,
+            },
+            body: JSON.stringify(body)
+         }).then(res => res.json());
+      console.log('value: ', value);
    }
    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sensors/${db}`,
       {

@@ -18,8 +18,19 @@ export default async function Dashboard({ params }: any) {
          chartsData[line] = await getLineSummaries(line, year, session);
          drilldown[line] = await getLineDrilldown(line, year, session);
       }
-      lines.map((line) => { selected[line] = { sensor: sensors[line][0].name, unit: sensors[line][0].unit } });
    }
+
+   // Initialize selected with safe sensor access
+   lines.map((line) => {
+      const lineSensors = sensors[line];
+      const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
+      selected[line] = {
+         sensor: hasValidSensors ? lineSensors[0].name : null,
+         unit: hasValidSensors ? lineSensors[0].unit : null,
+         hasValidSensors: hasValidSensors
+      };
+   });
    return (
       <>
          <div className="flex mx-2 mb-2">

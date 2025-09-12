@@ -11,24 +11,41 @@ export default async function Dashboard({ params }: any) {
    const types = ['line', 'candle', 'gauge', 'bool']
    let selected = {} as any;
    lines.map((line) => {
-      // Initialize with the first sensor as default
-      selected[line] = {
-         type: 'line',
-         sensor: sensors[line][0]?.name,
-         unit: sensors[line][0]?.unit,
-         minrange: sensors[line][0]?.minrange,
-         maxrange: sensors[line][0]?.maxrange
-      };
+      // Check if sensors exist for this line
+      const lineSensors = sensors[line];
+      const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
 
-      // Create a sensors map for easy lookup during sensor changes
-      selected[line].availableSensors = {};
-      sensors[line]?.forEach((sensor: any) => {
-         selected[line].availableSensors[sensor.name] = {
-            unit: sensor.unit,
-            minrange: sensor.minrange,
-            maxrange: sensor.maxrange
+      if (hasValidSensors) {
+         // Initialize with the first sensor as default
+         selected[line] = {
+            type: 'line',
+            sensor: lineSensors[0]?.name,
+            unit: lineSensors[0]?.unit,
+            minrange: lineSensors[0]?.minrange,
+            maxrange: lineSensors[0]?.maxrange
          };
-      });
+
+         // Create a sensors map for easy lookup during sensor changes
+         selected[line].availableSensors = {};
+         lineSensors.forEach((sensor: any) => {
+            selected[line].availableSensors[sensor.name] = {
+               unit: sensor.unit,
+               minrange: sensor.minrange,
+               maxrange: sensor.maxrange
+            };
+         });
+      } else {
+         // Handle lines with no sensors
+         selected[line] = {
+            type: 'line',
+            sensor: null,
+            unit: null,
+            minrange: null,
+            maxrange: null,
+            availableSensors: {},
+            noSensors: true
+         };
+      }
    });
    return (
 
