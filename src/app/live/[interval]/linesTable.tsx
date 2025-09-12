@@ -162,6 +162,18 @@ const ExpandedComponent = ({ data }: any) => {
 }
 
 const handleAdd = (row: any, session: any, update: any, selected: any, sensors: any) => async (event: any) => {
+   // Check if sensors are available for this line
+   if (!sensors[row.line] || sensors[row.line].length === 0) {
+      alert('No sensors available for this line. Please add sensors first.');
+      return;
+   }
+
+   // Check if a sensor is selected
+   if (!selected[row.line]?.sensor) {
+      alert('Please select a sensor before adding a chart.');
+      return;
+   }
+
    let user = session.user;
 
    // Determine dimensions based on chart type
@@ -237,7 +249,7 @@ const handleAdd = (row: any, session: any, update: any, selected: any, sensors: 
 
    user.config.live[row.line].push(newData);
    update(user);
-}
+};
 
 export function LinesTable({ lines, interval, sensors, types, selected: initialSelected }: any) {
    const { data: session, update } = useSession();
@@ -247,12 +259,16 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
    const [selected, setSelected] = useState(() => {
       const init: any = {};
       lines.forEach((line: string) => {
+         const lineSensors = sensors[line];
+         const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
          init[line] = initialSelected[line] || {
             type: types[0] || 'line',
-            sensor: sensors[line]?.[0]?.name,
-            unit: sensors[line]?.[0]?.unit,
-            minrange: sensors[line]?.[0]?.minrange,
-            maxrange: sensors[line]?.[0]?.maxrange
+            sensor: hasValidSensors ? lineSensors[0]?.name : null,
+            unit: hasValidSensors ? lineSensors[0]?.unit : null,
+            minrange: hasValidSensors ? lineSensors[0]?.minrange : null,
+            maxrange: hasValidSensors ? lineSensors[0]?.maxrange : null,
+            noSensors: !hasValidSensors
          };
       });
       return init;
@@ -297,12 +313,13 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
                </select>
 
                <select id="sensor" className={'text-textColor border-b-2 bg-bgDark rounded-md p-1 ml-4 border-foreground'}
-                  value={selected[row.line]?.sensor || sensors[row.line]?.[0]?.name || ''}
+                  value={selected[row.line]?.sensor || ''}
+                  disabled={!sensors[row.line] || sensors[row.line].length === 0}
                   onChange={e => {
                      const sensorName = e.target.value;
 
                      // Find the sensor data
-                     const sensorData = sensors[row.line].find((s: any) => s.name === sensorName);
+                     const sensorData = sensors[row.line]?.find((s: any) => s.name === sensorName);
                      if (sensorData) {
                         setSelected((prev: any) => ({
                            ...prev,
@@ -316,11 +333,15 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
                         }));
                      }
                   }}>
-                  {sensors[row.line].map((sensor: any, i: number) => {
-                     return <option key={i} value={sensor.name} tabIndex={i}>
-                        {sensor.name}
-                     </option>
-                  })}
+                  {!sensors[row.line] || sensors[row.line].length === 0 ? (
+                     <option value="">No sensors available</option>
+                  ) : (
+                     sensors[row.line].map((sensor: any, i: number) => {
+                        return <option key={i} value={sensor.name} tabIndex={i}>
+                           {sensor.name}
+                        </option>
+                     })
+                  )}
                </select>
             </div>
          )
@@ -332,9 +353,19 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
    },
    {
       name: 'Accions',
-      cell: (row: any) => (
-         <FaPlus size={20} onClick={handleAdd(row, session, update, selected, sensors)} className='cursor-pointer mx-3 my-1 text-accent'>ADD Graph</FaPlus>
-      ),
+      cell: (row: any) => {
+         const hasValidSensors = sensors[row.line] && sensors[row.line].length > 0;
+         return (
+            <FaPlus
+               size={20}
+               onClick={hasValidSensors ? handleAdd(row, session, update, selected, sensors) : undefined}
+               className={`mx-3 my-1 ${hasValidSensors ? 'cursor-pointer text-accent hover:text-accent-dark' : 'cursor-not-allowed text-gray-400'}`}
+               title={hasValidSensors ? 'Add Graph' : 'No sensors available'}
+            >
+               ADD Graph
+            </FaPlus>
+         );
+      },
       grow: 1,
       ignoreRowClick: true,
       button: true,
@@ -342,11 +373,15 @@ export function LinesTable({ lines, interval, sensors, types, selected: initialS
    }];
 
    const data = lines.map((line: string) => {
+      const lineSensors = sensors[line];
+      const hasValidSensors = lineSensors && Array.isArray(lineSensors) && lineSensors.length > 0;
+
       return ({
          line: line,
          interval: interval,
          type: 'line',
-         sensor: sensors[line] ? sensors[line][0].name : null
+         sensor: hasValidSensors ? lineSensors[0].name : null,
+         hasValidSensors
       })
    });
 
