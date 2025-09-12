@@ -108,21 +108,39 @@ export async function PATCH(request: Request, { params }: { params: { db: string
          includeResultMetadata: true
       });
 
-      // Log sensor update/create
+      // Log sensor update/create with all schema fields
       const loggerUser = 'admin'; // Since we don't have session info in API routes, use admin as default
+
+      // Helper function to extract all sensor fields from schema
+      const extractAllSensorFields = (sensor: SensorIface) => ({
+         _id: sensor._id,
+         line: sensor.line,
+         name: sensor.name,
+         plc_name: sensor.plc_name,
+         unit: sensor.unit,
+         address: sensor.address,
+         read: sensor.read,
+         write: sensor.write,
+         dataType: sensor.dataType,
+         autoinc: sensor.autoinc,
+         maxrange: sensor.maxrange,
+         minrange: sensor.minrange,
+         node: sensor.node
+      });
+
       if (oldSensor) {
          await logUpdate(
             loggerUser,
             'SENSOR',
-            { name: oldSensor.name, line: oldSensor.line, plc_name: oldSensor.plc_name, dataType: oldSensor.dataType },
-            { name: res.value.name, line: res.value.line, plc_name: res.value.plc_name, dataType: res.value.dataType },
+            extractAllSensorFields(oldSensor),
+            extractAllSensorFields(res.value),
             params.db
          );
       } else {
          await logCreate(
             loggerUser,
             'SENSOR',
-            { name: res.value.name, line: res.value.line, plc_name: res.value.plc_name, dataType: res.value.dataType },
+            extractAllSensorFields(res.value),
             params.db
          );
       }
@@ -162,14 +180,38 @@ export async function DELETE(request: Request, { params }: { params: { db: strin
          db.model('sensor', SensorSchema);
       }
 
+      // Get sensors that will be deleted for complete logging
+      const sensorsToDelete = await db.models.sensor.find(body).lean() as SensorIface[];
+
       const res = await db.models.sensor.deleteMany(body);
 
-      // Log sensor deletion
+      // Log sensor deletion with all sensor fields
       if (res && res.deletedCount > 0) {
+         // Helper function to extract all sensor fields from schema
+         const extractAllSensorFields = (sensor: SensorIface) => ({
+            _id: sensor._id,
+            line: sensor.line,
+            name: sensor.name,
+            plc_name: sensor.plc_name,
+            unit: sensor.unit,
+            address: sensor.address,
+            read: sensor.read,
+            write: sensor.write,
+            dataType: sensor.dataType,
+            autoinc: sensor.autoinc,
+            maxrange: sensor.maxrange,
+            minrange: sensor.minrange,
+            node: sensor.node
+         });
+
          await logDelete(
             'admin', // Since we don't have session info in API routes, use admin as default
             'SENSOR',
-            { line: body.line, plc_name: body.plc_name, deletedCount: res.deletedCount },
+            {
+               deletedCount: res.deletedCount,
+               query: { line: body.line, plc_name: body.plc_name },
+               deletedSensors: sensorsToDelete.map(extractAllSensorFields)
+            },
             params.db
          );
       }
